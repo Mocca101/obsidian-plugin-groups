@@ -37,10 +37,13 @@ export default class PluginGroupEditModal extends Modal {
 				txt.setValue(this.groupToEdit.name)
 				txt.onChange(val => this.groupToEdit.name = val);
 			})
-		const includedPluginNames = (this.groupToEdit.plugins).map(p => p.name)
 
 
-		new Setting(contentEl)
+		const plugins = contentEl.createEl('div');
+
+		plugins.createEl('h5', { text: 'Plugins'})
+
+		new Setting(plugins)
 			.setName('Search')
 			.addText(txt => {
 				txt.setPlaceholder('Search for Plugin...')
@@ -51,8 +54,14 @@ export default class PluginGroupEditModal extends Modal {
 				})
 			})
 
+		const pluginList = plugins.createEl('div');
+		pluginList.addClass('group-edit-modal-plugin-list');
+
+
+		const includedPluginNames = (this.groupToEdit.plugins).map(p => p.name)
+
 		this.sortPlugins(getAllAvailablePlugins()).forEach(plugin => {
-			new Setting(contentEl)
+			new Setting(pluginList)
 				.setName(plugin.name)
 				.addToggle(tgl => {
 					tgl.onChange(doInclude => {
@@ -64,7 +73,11 @@ export default class PluginGroupEditModal extends Modal {
 			this.pluginToggleIds.push(plugin.id)
 		})
 
-		new Setting(contentEl)
+		const footer = contentEl.createEl('div');
+
+		footer.addClass('group-edit-modal-footer');
+
+		new Setting(footer)
 			.addButton(btn => {
 				btn.setButtonText('Delete');
 				btn.onClick(() => new ConfirmationPopupModal(this.app,
@@ -81,6 +94,7 @@ export default class PluginGroupEditModal extends Modal {
 				btn.setButtonText('Save');
 				btn.onClick(() => this.saveChanges());
 			})
+			.settingEl.addClass('modal-footer');
 
 	}
 

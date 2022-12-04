@@ -1,8 +1,11 @@
-/*
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.group-edit-modal-plugin-list {
+	overflow: scroll;
+	min-height: 20vh;
+	max-height: 50vh;
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
 
-If your plugin does not need CSS, delete this file.
-
-*/
+.group-edit-modal-footer {
+}
