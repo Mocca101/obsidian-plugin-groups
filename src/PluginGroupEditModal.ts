@@ -48,7 +48,7 @@ export default class PluginGroupEditModal extends Modal {
 			.addText(txt => {
 				txt.setPlaceholder('Search for Plugin...')
 				txt.onChange(search => {
-					const hits = this.pluginToggleIds.filter(el => el.contains(search));
+					const hits = getAllAvailablePlugins().filter(p => p.name.contains(search)).map(p => p.id);
 					this.pluginToggleIds.forEach(id => contentEl.find('#' + id).hide());
 					hits.forEach(id => contentEl.find('#'+id).show());
 				})
