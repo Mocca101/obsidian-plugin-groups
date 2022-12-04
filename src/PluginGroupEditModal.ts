@@ -36,7 +36,7 @@ export default class PluginGroupEditModal extends Modal {
 			})
 		const includedPluginNames = (this.groupToEdit.plugins).map(p => p.name)
 
-		getAllAvailablePlugins().forEach(info => {
+		this.sortPlugins(getAllAvailablePlugins()).forEach(info => {
 			new Setting(contentEl)
 				.setName(info.name)
 				.addToggle(tgl => {
@@ -67,20 +67,33 @@ export default class PluginGroupEditModal extends Modal {
 
 	}
 
-	togglePluginForGroup(plugin: PluginInfo, doInclude: boolean) {
+	sortPlugins(plugins: PluginInfo[]) : PluginInfo[] {
+		return plugins.sort((a, b) => {
+			const aInGroup = this.isInGroup(a);
+			const bInGroup = this.isInGroup(b);
+			if(aInGroup && !bInGroup) return -1;
+			else if(!aInGroup && bInGroup) return 1;
+			else {
+				return a.name.localeCompare(b.name);
+			}
+		})
+	}
 
+	isInGroup(plugin: PluginInfo) :boolean {
+		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
+	}
+
+	togglePluginForGroup(plugin: PluginInfo, doInclude: boolean) {
 		const pluginIds: string[] = this.groupToEdit.plugins.map(p => p.id);
 
 		const pluginInd = pluginIds.indexOf(plugin.id)
 
 		if(doInclude) {
-			if(pluginInd !== -1)	return;
-
+			if(pluginInd !== -1) return;
 			this.groupToEdit.plugins.push(plugin);
 		}
 		else {
 			if(pluginInd === -1) return;
-
 			this.groupToEdit.plugins.splice(pluginInd, 1);
 		}
 	}
@@ -132,7 +145,6 @@ export default class PluginGroupEditModal extends Modal {
 
 	async editGroup(groupIndex: number) {
 		this.plugin.settings.groups[groupIndex] = this.groupToEdit;
-
 		await this.persistChangesAndClose();
 	}
 
