@@ -1,4 +1,4 @@
-import {App, Modal, Setting} from "obsidian";
+import {App, Modal, SearchComponent, Setting} from "obsidian";
 import {PluginGroup, PluginInfo} from "./Types";
 import GroupSettingsTab from "./GroupSettingsTab";
 import {disablePluginsOfGroup, enablePluginsOfGroup, getAllAvailablePlugins} from "./Utilities";
@@ -13,12 +13,15 @@ export default class PluginGroupEditModal extends Modal {
 
 	plugin: PluginGroupsMain;
 
+	pluginToggleIds: string[];
+
 
 	constructor(app: App, settingsTab: GroupSettingsTab, group: PluginGroup) {
 		super(app);
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;
 		this.plugin = settingsTab.plugin;
+		this.pluginToggleIds = [];
 	}
 
 	onOpen() {
@@ -36,15 +39,29 @@ export default class PluginGroupEditModal extends Modal {
 			})
 		const includedPluginNames = (this.groupToEdit.plugins).map(p => p.name)
 
-		this.sortPlugins(getAllAvailablePlugins()).forEach(info => {
+
+		new Setting(contentEl)
+			.setName('Search')
+			.addText(txt => {
+				txt.setPlaceholder('Search for Plugin...')
+				txt.onChange(search => {
+					const hits = this.pluginToggleIds.filter(el => el.contains(search));
+					this.pluginToggleIds.forEach(id => contentEl.find('#' + id).hide());
+					hits.forEach(id => contentEl.find('#'+id).show());
+				})
+			})
+
+		this.sortPlugins(getAllAvailablePlugins()).forEach(plugin => {
 			new Setting(contentEl)
-				.setName(info.name)
+				.setName(plugin.name)
 				.addToggle(tgl => {
 					tgl.onChange(doInclude => {
-						this.togglePluginForGroup(info, doInclude);
+						this.togglePluginForGroup(plugin, doInclude);
 					})
-					tgl.setValue(includedPluginNames.contains(info.name))
+					tgl.setValue(includedPluginNames.contains(plugin.name))
 				})
+				.settingEl.id = plugin.id;
+			this.pluginToggleIds.push(plugin.id)
 		})
 
 		new Setting(contentEl)
