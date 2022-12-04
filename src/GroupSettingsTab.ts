@@ -1,15 +1,13 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import PluginGroupsMain from "../main";
-import {PluginGroup, PluginInfo} from "./Types";
+import {PluginGroup} from "./Types";
 import PluginGroupEditModal from "./PluginGroupEditModal";
+import {disablePluginsOfGroup, enablePluginsOfGroup} from "./Utilities";
 
 export default class GroupSettingsTab extends PluginSettingTab {
 	plugin: PluginGroupsMain;
 
 	newGroupName: string;
-
-	availablePlugins: PluginInfo[];
-
 
 	constructor(app: App, plugin: PluginGroupsMain) {
 		super(app, plugin);
@@ -43,9 +41,15 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 			new Setting(containerEl)
 				.setName(group.name)
-				.addToggle(tgl => {
-					tgl.setValue(group.active);
-					tgl.onChange(value => this.toggleGroup(value ,i))
+				.addButton(btn => {
+					btn.setButtonText('Enable All');
+					btn.setIcon('power');
+					btn.onClick(() => enablePluginsOfGroup(group));
+				})
+				.addButton(btn => {
+					btn.setButtonText('Disable All');
+					btn.setIcon('power-off');
+					btn.onClick(() => disablePluginsOfGroup(group));
 				})
 				.addButton(btn => {
 					btn.setIcon('pencil')
@@ -53,25 +57,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				})
 		}
 
-	}
-
-	async toggleGroup(enabled: boolean, groupID: number) {
-		this.plugin.settings.groups[groupID].active = enabled;
-		await this.plugin.saveSettings();
-		this.display();
-
-		if(enabled === true) {
-			for (const plugin of this.plugin.settings.groups[groupID].plugins) {
-				// @ts-ignore
-				await app.plugins.enablePlugin(plugin.id);
-			}
-		}
-		else {
-			for (const plugin of this.plugin.settings.groups[groupID].plugins) {
-				// @ts-ignore
-				await app.plugins.disablePlugin(plugin.id);
-			}
-		}
 	}
 
 	async addNewGroup() {

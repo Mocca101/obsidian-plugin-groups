@@ -1,21 +1,24 @@
 import {App, Modal, Setting} from "obsidian";
 import {PluginGroup, PluginInfo} from "./Types";
 import GroupSettingsTab from "./GroupSettingsTab";
-import {getAllAvailablePlugins} from "./Utilities";
+import {disablePluginsOfGroup, enablePluginsOfGroup, getAllAvailablePlugins} from "./Utilities";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
+import PluginGroupsMain from "../main";
 
 export default class PluginGroupEditModal extends Modal {
-	availablePlugins: PluginInfo[];
 
 	groupToEdit: PluginGroup;
 
 	settingsTab: GroupSettingsTab;
+
+	plugin: PluginGroupsMain;
 
 
 	constructor(app: App, settingsTab: GroupSettingsTab, group: PluginGroup) {
 		super(app);
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;
+		this.plugin = settingsTab.plugin;
 	}
 
 	onOpen() {
@@ -88,40 +91,61 @@ export default class PluginGroupEditModal extends Modal {
 	}
 
 	async saveChanges() {
-		const groupNames = this.settingsTab.plugin.settings.groups.map(g => g.name);
+		const groupNames = this.plugin.settings.groups.map(g => g.name);
 		const groupInd = groupNames.indexOf(this.groupToEdit.name);
 
 		if(groupInd === -1) {
-			this.settingsTab.plugin.settings.groups.push(this.groupToEdit);
-			await this.persistChangesAndClose();
+			await this.addGroup(this.groupToEdit)
 		} else {
-/*			const modal = new ConfirmationPopupModal(
-				this.app,
-				'Save Changes to: ' + this.groupToEdit.name,
-				void 0,
-				'Save',
-				() => this.editGroup(groupInd))
-			modal.open();*/
 			await this.editGroup(groupInd);
 		}
 	}
 
+	async addGroup(group: PluginGroup) {
+		this.plugin.settings.groups.push(group);
+
+		this.plugin.addCommand({
+			id: 'plugin-groups-enable'+group.name.toLowerCase(),
+			name: 'Plugin Groups: Enable ' + group.name,
+			icon: 'power',
+			checkCallback: (checking: boolean) => {
+				if(!this.plugin.settings.groups.map(g => g.name).contains(group.name)) return false;
+				if(checking) return true;
+				enablePluginsOfGroup(group);
+
+			}
+		});
+
+		this.plugin.addCommand({
+			id: 'plugin-groups-disable'+group.name.toLowerCase(),
+			name: 'Plugin Groups: Disable ' + group.name,
+			icon: 'power-off',
+			checkCallback: (checking: boolean) => {
+				if(!this.plugin.settings.groups.map(g => g.name).contains(group.name)) return false;
+				if(checking) return true;
+				disablePluginsOfGroup(group);
+			}
+		})
+
+		await this.persistChangesAndClose();
+	}
+
 	async editGroup(groupIndex: number) {
-		this.settingsTab.plugin.settings.groups[groupIndex] = this.groupToEdit;
+		this.plugin.settings.groups[groupIndex] = this.groupToEdit;
 
 		await this.persistChangesAndClose();
 	}
 
 	async persistChangesAndClose() {
-		await this.settingsTab.plugin.saveSettings();
+		await this.plugin.saveSettings();
 		this.settingsTab.display();
 		this.close();
 	}
 
 
 	async deleteGroup() {
-		this.settingsTab.plugin.settings.groups.remove(this.groupToEdit);
-		await this.settingsTab.plugin.saveSettings();
+		this.plugin.settings.groups.remove(this.groupToEdit);
+		await this.plugin.saveSettings();
 		this.settingsTab.display();
 		this.close();
 	}

@@ -1,4 +1,4 @@
-import {PluginInfo} from "./Types";
+import {PluginGroup, PluginInfo} from "./Types";
 import PluginGroupsMain from "../main";
 
 export function getAllAvailablePlugins() : PluginInfo[] {
@@ -8,7 +8,7 @@ export function getAllAvailablePlugins() : PluginInfo[] {
 
 	for(const key in manifests) {
 		if(manifests[key].id === PluginGroupsMain.pluginId) continue;
-		
+
 		const info: PluginInfo = {
 			id: manifests[key].id,
 			name: manifests[key].name,
@@ -17,4 +17,18 @@ export function getAllAvailablePlugins() : PluginInfo[] {
 	}
 
 	return plugins;
+}
+
+export async function enablePluginsOfGroup(group: PluginGroup) {
+	for (const plugin of group.plugins) {
+		// @ts-ignore
+		await app.plugins.enablePlugin(plugin.id);
+	}
+}
+
+export async function disablePluginsOfGroup(group: PluginGroup) {
+	for (const plugin of group.plugins) {
+		// @ts-ignore
+		await app.plugins.disablePlugin(plugin.id);
+	}
 }
