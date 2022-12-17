@@ -12,19 +12,43 @@ export class PluginGroup implements PgComponent{
 	isStartup = false;
 	delay = 0;
 
+	constructor(args: PluginGroupConstructorArgs) {
+		console.log(args)
 
-	constructor(id: string, name: string, plugins: PgPlugin[] = [], pluginGroups: PluginGroup[] = [],
-				active = false, isStartup = false, delay = 5) {
-		this.id = id;
-		this.name = name;
-		this.plugins = plugins;
-		this.pluginGroups = pluginGroups;
-		this.active = active;
-		this.isStartup = isStartup;
-		this.delay = delay;
+		if(args.pg) {
+			this.id = args.pg.id;
+			this.name = args.pg.name;
+
+			this.assignAndLoadPlugins(args.pg.plugins);
+			this.assignAndLoadGroups(args.pg.pluginGroups);
+
+			this.active = args.pg.active;
+			this.isStartup = args.pg.isStartup;
+			this.delay = args.pg.delay;
+			return;
+		}
+		this.id = args.id;
+		this.name = args.name;
+
+		this.assignAndLoadPlugins(args.plugins);
+		this.assignAndLoadGroups(args.pluginGroups);
+
+		this.active = args.active ?? false;
+		this.isStartup = args.isStartup ?? false;
+		this.delay = args.delay ?? 2;
+	}
+
+	assignAndLoadPlugins(plugins?: PgPlugin[]) {
+		console.log('pl', plugins);
+		this.plugins = plugins?.map(p => new PgPlugin(p.id, p.name)) ?? [];
+	}
+
+	assignAndLoadGroups(pluginGroups?: PluginGroup[]) {
+		this.pluginGroups = pluginGroups?.map(pg => new PluginGroup({id: pg.id, name: pg.name, pg: pg})) ?? [];
 	}
 
 	startup() {
+		console.log('startup');
 		setTimeout(async () => {
 			this.enable()
 		}, this.delay * 1000)
@@ -90,13 +114,23 @@ export class PluginGroup implements PgComponent{
 			return true;
 		}
 
-		this.pluginGroups.forEach(plpuginGroup => {
-			if(plpuginGroup.wouldHaveCyclicGroups(idToCheck)) {
+		this.pluginGroups.forEach(pluginGroup => {
+			if(pluginGroup.wouldHaveCyclicGroups(idToCheck)) {
 				return true;
 			}
 		})
 
 		return false;
 	}
+}
 
+interface PluginGroupConstructorArgs {
+	id: string;
+	name:string;
+	pg?: PluginGroup;
+	plugins?: PgPlugin[];
+	pluginGroups?: PluginGroup[];
+	active?: boolean;
+	isStartup?: boolean;
+	delay?: number;
 }

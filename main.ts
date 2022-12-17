@@ -1,11 +1,11 @@
 import {Plugin} from 'obsidian';
-import {PluginGroupsSettings} from "./src/Types";
+import {PersistentSettings, PluginGroupsSettings} from "./src/Types";
 import GroupSettingsTab from "./src/GroupSettingsTab";
 import * as process from "process";
 import {PluginGroup} from "./src/PluginGroup";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
-	groups: new Map<string, PluginGroup>
+	groupsMap: new Map<string, PluginGroup>()
 }
 
 export default class PluginGroupsMain extends Plugin {
@@ -19,14 +19,14 @@ export default class PluginGroupsMain extends Plugin {
 
 		PluginGroupsMain.pluginId = this.manifest.id;
 
-		if(this.settings.groups) {
-			this.settings.groups.forEach(group => {
+		if(this.settings.groupsMap) {
+			this.settings.groupsMap.forEach(group => {
 				this.addCommand({
 					id: 'plugin-groups-enable' + group.id.toLowerCase(),
 					name: 'Plugin Groups: Enable ' + group.name,
 					icon: 'power',
 					checkCallback: (checking: boolean) => {
-						if (!this.settings.groups.has(group.id)) return false;
+						if (!this.settings.groupsMap.has(group.id)) return false;
 						if (checking) return true;
 						group.enable();
 
@@ -38,7 +38,7 @@ export default class PluginGroupsMain extends Plugin {
 					name: 'Plugin Groups: Disable ' + group.name,
 					icon: 'power-off',
 					checkCallback: (checking: boolean) => {
-						if (!this.settings.groups.has(group.id)) return false;
+						if (!this.settings.groupsMap.has(group.id)) return false;
 						if (checking) return true;
 						group.disable();
 					}
@@ -52,7 +52,7 @@ export default class PluginGroupsMain extends Plugin {
 
 		if(process.uptime()) {
 			if(process.uptime() < disableStartupTimeout) {
-				this.settings.groups.forEach(group => {
+				this.settings.groupsMap.forEach(group => {
 					if (group.active && group.isStartup) group.startup();
 				});
 			}
@@ -63,10 +63,25 @@ export default class PluginGroupsMain extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const savedSettings: PersistentSettings = await this.loadData();
+
+		this.settings = Object.assign({}, DEFAULT_SETTINGS);
+
+		if(savedSettings?.groups && Array.isArray(savedSettings.groups)) {
+			this.settings.groupsMap = new Map<string, PluginGroup>()
+			savedSettings.groups.forEach(g => {
+				console.log('group', g);
+				this.settings.groupsMap.set(g.id, new PluginGroup({
+					id: g.id,
+					name: g.name,
+					pg: g
+				}));
+			});
+		}
+		console.log('save', this.settings);
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings);
+		await this.saveData({groups: Array.from(this.settings.groupsMap.values())});
 	}
 }

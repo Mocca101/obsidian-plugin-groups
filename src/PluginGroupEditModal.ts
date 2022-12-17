@@ -187,7 +187,7 @@ export default class PluginGroupEditModal extends Modal {
 	}
 
 	async saveChanges() {
-		if(this.plugin.settings.groups.has(this.groupToEdit.id)) {
+		if(this.plugin.settings.groupsMap.has(this.groupToEdit.id)) {
 			await this.editGroup(this.groupToEdit);
 		} else {
 			await this.addGroup(this.groupToEdit)
@@ -195,14 +195,14 @@ export default class PluginGroupEditModal extends Modal {
 	}
 
 	async addGroup(group: PluginGroup) {
-		this.plugin.settings.groups.set(group.id, group);
+		this.plugin.settings.groupsMap.set(group.id, group);
 
 		this.plugin.addCommand({
 			id: 'plugin-groups-enable'+group.id.toLowerCase(),
 			name: 'Plugin Groups: Enable ' + group.name,
 			icon: 'power',
 			checkCallback: (checking: boolean) => {
-				if(!this.plugin.settings.groups.has(group.id)) return false;
+				if(!this.plugin.settings.groupsMap.has(group.id)) return false;
 				if(checking) return true;
 				group.enable();
 
@@ -214,7 +214,7 @@ export default class PluginGroupEditModal extends Modal {
 			name: 'Plugin Groups: Disable ' + group.name,
 			icon: 'power-off',
 			checkCallback: (checking: boolean) => {
-				if(!this.plugin.settings.groups.has(group.id)) return false;
+				if(!this.plugin.settings.groupsMap.has(group.id)) return false;
 				if(checking) return true;
 				group.disable();
 			}
@@ -224,7 +224,7 @@ export default class PluginGroupEditModal extends Modal {
 	}
 
 	async editGroup(group: PluginGroup) {
-		this.plugin.settings.groups.set(group.id, group);
+		this.plugin.settings.groupsMap.set(group.id, group);
 		await this.persistChangesAndClose();
 	}
 
@@ -236,7 +236,7 @@ export default class PluginGroupEditModal extends Modal {
 
 
 	async deleteGroup() {
-		this.plugin.settings.groups.delete(this.groupToEdit.id);
+		this.plugin.settings.groupsMap.delete(this.groupToEdit.id);
 		await this.plugin.saveSettings();
 		this.settingsTab.display();
 		this.close();

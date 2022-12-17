@@ -36,13 +36,16 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				.onClick(() => this.addNewGroup())
 			)
 
-		this.plugin.settings.groups.forEach((group => {
+		this.plugin.settings.groupsMap.forEach((group => {
 			new Setting(containerEl)
 				.setName(group.name)
 				.addButton(btn => {
 					btn.setButtonText('Enable All');
 					btn.setIcon('power');
-					btn.onClick(() => group.enable());
+					btn.onClick(() => {
+						console.log(group);
+						group.enable()
+					});
 				})
 				.addButton(btn => {
 					btn.setButtonText('Disable All');
@@ -59,14 +62,17 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 	async addNewGroup() {
 
-		const id = generateGroupID(this.newGroupName, Array.from(this.plugin.settings.groups.keys()));
+		const id = generateGroupID(this.newGroupName, Array.from<string>(this.plugin.settings.groupsMap.keys()));
 
 		if(!id) {
 			console.error('Failed to create Group, please choose a different Name as there have been to many groups with the same name')
 			return;
 		}
 
-		const newGroup = new PluginGroup(id, this.newGroupName);
+		const newGroup = new PluginGroup({
+			id: id,
+			name: this.newGroupName
+		});
 		new PluginGroupEditModal(this.app, this, newGroup).open();
 		this.newGroupName = '';
 	}
