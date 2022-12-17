@@ -1,73 +1,30 @@
-# Obsidian Sample Plugin
+# Obsidian Plugin Groups
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Manage your Plugins through groups. Enable and disable multiple plugins through a single command. Or delay the startup
+of  plugins to speed up your Obsidian start up process.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+## Use case:
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+Obsidian has a multitude of amazing plugins, I personally have over 20 plugins in daily use. However, this has caused
+the startup time to slow down significantly to be annoying when wanting to quickly note something. 
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+In other cases having that many plugins open that I don't need or only for specific use cases slowed down the writing
+process or hindered me in some way or form, so I wanted an option to quickly enable and disable the relevant plugins 
+for the task at hand without having to search and en-/disable the plugins individually.
 
-## First time developing plugins?
+If this sounds like anything you've been struggling with this plugin might be of help to you as well.
 
-Quick starting guide for new plugin devs:
+## How to use:
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+1. Enable the Plugin
+2. Create a new Plugin Group and give it a name
+3. Add plugins
+4. Save
+5. Now you can en-/disable all plugins in this group either through the settings menu or through a command in
+6. If you wish you can also add a startup group which will enable all the plugin groups within, with the defined delay after Obsidian started.
 
-## Releasing new releases
+## Installation:
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
-
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
-
-## Adding your plugin to the community plugin list
-
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
-
-## How to use
-
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+As this plugin is not yet in the public community plugin library you have 2 options:
+1. Download the latest version from the release section on GitHub and manually copy the files into your `.obsidian/plugins` folder.
+2. Add the plugin to Obsidian through the `BRAT community plugin`. (Copy the Link to this GitHub repo and add it through Brat)

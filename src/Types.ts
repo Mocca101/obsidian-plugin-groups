@@ -1,15 +1,20 @@
+import {PluginGroup} from "./PluginGroup";
+
 export interface PluginInfo {
 	id: string,
 	name: string,
 }
 
-export interface PluginGroup {
-	name: string;
-	plugins: PluginInfo[];
-	active: boolean;
+export abstract class PgComponent {
+
+	public id: string;
+	public name: string;
+
+	abstract enable() : void;
+
+	abstract disable() : void;
 }
 
 export interface PluginGroupsSettings {
-	groups: PluginGroup[];
-
+	groups: Map<string,PluginGroup>;
 }

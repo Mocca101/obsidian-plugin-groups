@@ -1,8 +1,8 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import PluginGroupsMain from "../main";
-import {PluginGroup} from "./Types";
 import PluginGroupEditModal from "./PluginGroupEditModal";
-import {disablePluginsOfGroup, enablePluginsOfGroup} from "./Utilities";
+import {generateGroupID} from "./Utilities";
+import {PluginGroup} from "./PluginGroup";
 
 export default class GroupSettingsTab extends PluginSettingTab {
 	plugin: PluginGroupsMain;
@@ -36,35 +36,37 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				.onClick(() => this.addNewGroup())
 			)
 
-		for (let i = 0; i < this.plugin.settings.groups.length; i++) {
-			const group = this.plugin.settings.groups[i];
-
+		this.plugin.settings.groups.forEach((group => {
 			new Setting(containerEl)
 				.setName(group.name)
 				.addButton(btn => {
 					btn.setButtonText('Enable All');
 					btn.setIcon('power');
-					btn.onClick(() => enablePluginsOfGroup(group));
+					btn.onClick(() => group.enable());
 				})
 				.addButton(btn => {
 					btn.setButtonText('Disable All');
 					btn.setIcon('power-off');
-					btn.onClick(() => disablePluginsOfGroup(group));
+					btn.onClick(() => group.disable());
 				})
 				.addButton(btn => {
 					btn.setIcon('pencil')
 					btn.onClick(() => this.editGroup(group))
 				})
-		}
+		}));
 
 	}
 
 	async addNewGroup() {
-		const newGroup: PluginGroup = {
-			name: this.newGroupName,
-			plugins: [],
-			active: false
-		};
+
+		const id = generateGroupID(this.newGroupName, Array.from(this.plugin.settings.groups.keys()));
+
+		if(!id) {
+			console.error('Failed to create Group, please choose a different Name as there have been to many groups with the same name')
+			return;
+		}
+
+		const newGroup = new PluginGroup(id, this.newGroupName);
 		new PluginGroupEditModal(this.app, this, newGroup).open();
 		this.newGroupName = '';
 	}
