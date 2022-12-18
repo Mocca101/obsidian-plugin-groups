@@ -49,12 +49,12 @@ export default class PluginGroupEditModal extends Modal {
 			.setName('Startup Group')
 			.addToggle(tgl => {
 				tgl.onChange(value => {
-					this.groupToEdit.isStartup = value;
+					this.groupToEdit.enableAtStartup = value;
 					if(this.delayElement) {
 						value ? this.delayElement.settingEl.show() : this.delayElement.settingEl.hide();
 					}
 				});
-				tgl.setValue(this.groupToEdit.isStartup);
+				tgl.setValue(this.groupToEdit.enableAtStartup);
 			});
 
 		this.delayElement = new Setting(contentEl)
@@ -69,7 +69,7 @@ export default class PluginGroupEditModal extends Modal {
 			})
 			.setDesc(this.groupToEdit.delay.toString());
 
-		if(!this.groupToEdit.isStartup) {
+		if(!this.groupToEdit.enableAtStartup) {
 			this.delayElement.settingEl.hide();
 		}
 

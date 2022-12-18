@@ -62,7 +62,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 	async addNewGroup() {
 
-		const id = generateGroupID(this.newGroupName, Array.from<string>(this.plugin.settings.groupsMap.keys()));
+		const id = generateGroupID(this.newGroupName,{ map: this.plugin.settings.groupsMap});
 
 		if(!id) {
 			console.error('Failed to create Group, please choose a different Name as there have been to many groups with the same name')

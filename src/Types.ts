@@ -1,11 +1,5 @@
 import {PluginGroup} from "./PluginGroup";
 
-export interface pgData {
-
-	id: string,
-	name: string,
-}
-
 export interface PluginInfo {
 	id: string,
 	name: string,
@@ -22,10 +16,9 @@ export abstract class PgComponent {
 }
 
 export interface PluginGroupsSettings {
-	groupsMap: Map<string, PluginGroup>;
+	groupsMap: Map<string, PluginGroup>
 }
 
 export interface PersistentSettings {
 	groups: PluginGroup[]
 }
-

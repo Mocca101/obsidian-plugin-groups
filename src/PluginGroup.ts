@@ -7,9 +7,8 @@ export class PluginGroup implements PgComponent{
 	name: string;
 	plugins: PgPlugin[];
 	pluginGroups: PluginGroup[];
-	active: boolean;
 
-	isStartup = false;
+	enableAtStartup = false;
 	delay = 0;
 
 	constructor(args: PluginGroupConstructorArgs) {
@@ -22,8 +21,7 @@ export class PluginGroup implements PgComponent{
 			this.assignAndLoadPlugins(args.pg.plugins);
 			this.assignAndLoadGroups(args.pg.pluginGroups);
 
-			this.active = args.pg.active;
-			this.isStartup = args.pg.isStartup;
+			this.enableAtStartup = args.pg.enableAtStartup;
 			this.delay = args.pg.delay;
 			return;
 		}
@@ -33,8 +31,7 @@ export class PluginGroup implements PgComponent{
 		this.assignAndLoadPlugins(args.plugins);
 		this.assignAndLoadGroups(args.pluginGroups);
 
-		this.active = args.active ?? false;
-		this.isStartup = args.isStartup ?? false;
+		this.enableAtStartup = args.isStartup ?? false;
 		this.delay = args.delay ?? 2;
 	}
 
@@ -90,19 +87,19 @@ export class PluginGroup implements PgComponent{
 
 	removePgComponent(component: PgComponent) {
 		if((component instanceof PgPlugin)) {
-			const componentID = this.plugins.map(p => p.id).indexOf(component.id);
+			const indexOfPlugin: number = this.plugins.map(p => p.id).indexOf(component.id);
 
-			if(componentID === -1) return;
+			if(indexOfPlugin === -1) return;
 
-			this.plugins.splice(componentID, 1);
+			this.plugins.splice(indexOfPlugin, 1);
 			return;
 		}
 		if((component instanceof PluginGroup) && !this.wouldHaveCyclicGroups(component.id)) {
-			const componentID = this.pluginGroups.map(p => p.id).indexOf(component.id);
+			const indexOfGroup = this.pluginGroups.map(p => p.id).indexOf(component.id);
 
-			if(componentID === -1) return;
+			if(indexOfGroup === -1) return;
 
-			this.pluginGroups.splice(componentID, 1);
+			this.pluginGroups.splice(indexOfGroup, 1);
 			return;
 		} else {
 			throw new Error('Couldn\'t add Group as it would cause cyclic of groups (This would lead to an endless cycle of en/disabling).')

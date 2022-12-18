@@ -53,7 +53,7 @@ export default class PluginGroupsMain extends Plugin {
 		if(process.uptime()) {
 			if(process.uptime() < disableStartupTimeout) {
 				this.settings.groupsMap.forEach(group => {
-					if (group.active && group.isStartup) group.startup();
+					if (group.enableAtStartup) group.startup();
 				});
 			}
 		}
