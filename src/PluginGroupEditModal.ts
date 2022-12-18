@@ -61,7 +61,7 @@ export default class PluginGroupEditModal extends Modal {
 			.setName('Delay')
 			.addSlider(slider => {
 				slider.setValue(this.groupToEdit.delay);
-				slider.setLimits(0, 20, 1)
+				slider.setLimits(0, PluginGroupsMain.disableStartupTimeout, 1)
 				slider.onChange(value => {
 					this.groupToEdit.delay = value;
 					this.delayElement.setDesc(value.toString());
@@ -197,28 +197,7 @@ export default class PluginGroupEditModal extends Modal {
 	async addGroup(group: PluginGroup) {
 		this.plugin.settings.groupsMap.set(group.id, group);
 
-		this.plugin.addCommand({
-			id: 'plugin-groups-enable'+group.id.toLowerCase(),
-			name: 'Plugin Groups: Enable ' + group.name,
-			icon: 'power',
-			checkCallback: (checking: boolean) => {
-				if(!this.plugin.settings.groupsMap.has(group.id)) return false;
-				if(checking) return true;
-				group.enable();
-
-			}
-		});
-
-		this.plugin.addCommand({
-			id: 'plugin-groups-disable'+group.id.toLowerCase(),
-			name: 'Plugin Groups: Disable ' + group.name,
-			icon: 'power-off',
-			checkCallback: (checking: boolean) => {
-				if(!this.plugin.settings.groupsMap.has(group.id)) return false;
-				if(checking) return true;
-				group.disable();
-			}
-		})
+		this.plugin.AddGroupCommands(group);
 
 		await this.persistChangesAndClose();
 	}

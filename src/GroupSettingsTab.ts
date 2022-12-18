@@ -20,24 +20,43 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h5', {text: 'Groups'});
+		const generalParent = containerEl.createEl('h5', {text: 'General'});
 
-		new Setting(containerEl)
-			.setName('Groups')
-			.setDesc('Your plugin Groups')
+		new Setting(generalParent)
+			.setName('Generate Commands for Groups')
+			.addToggle(tgl => {
+				tgl.setValue(this.plugin.settings.generateCommands);
+				tgl.onChange(value => this.plugin.settings.generateCommands = value);
+			})
+
+		const groupParent = containerEl.createEl('h5', {text: 'Groups'});
+
+
+		let addBtnEl: HTMLButtonElement;
+
+		new Setting(groupParent)
+			.setName('Add Group')
 			.addText(text => text
 				.setPlaceholder('Group name')
 				.onChange(val => {
 					this.newGroupName = val;
+					if(addBtnEl) {
+						val.length > 0 ? addBtnEl.disabled = false : addBtnEl.disabled = true;
+					}
+
 				})
 			)
-			.addButton(btn => btn
-				.setIcon('plus')
-				.onClick(() => this.addNewGroup())
+			.addButton(btn => {
+					btn
+						.setIcon('plus')
+						.onClick(() => this.addNewGroup());
+					addBtnEl = btn.buttonEl;
+					addBtnEl.disabled = true;
+				}
 			)
 
 		this.plugin.settings.groupsMap.forEach((group => {
-			new Setting(containerEl)
+			new Setting(groupParent)
 				.setName(group.name)
 				.addButton(btn => {
 					btn.setButtonText('Enable All');

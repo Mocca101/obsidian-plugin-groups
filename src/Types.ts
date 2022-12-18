@@ -16,9 +16,11 @@ export abstract class PgComponent {
 }
 
 export interface PluginGroupsSettings {
-	groupsMap: Map<string, PluginGroup>
+	groupsMap: Map<string, PluginGroup>;
+	generateCommands: boolean;
 }
 
 export interface PersistentSettings {
-	groups: PluginGroup[]
+	groups: PluginGroup[];
+	generateCommands: boolean;
 }

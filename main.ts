@@ -5,11 +5,13 @@ import * as process from "process";
 import {PluginGroup} from "./src/PluginGroup";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
-	groupsMap: new Map<string, PluginGroup>()
+	groupsMap: new Map<string, PluginGroup>(),
+	generateCommands: true
 }
 
 export default class PluginGroupsMain extends Plugin {
 
+	static disableStartupTimeout = 20;
 	static pluginId = 'obsidian-plugin-groups';
 
 	settings: PluginGroupsSettings;
@@ -19,39 +21,19 @@ export default class PluginGroupsMain extends Plugin {
 
 		PluginGroupsMain.pluginId = this.manifest.id;
 
-		if(this.settings.groupsMap) {
-			this.settings.groupsMap.forEach(group => {
-				this.addCommand({
-					id: 'plugin-groups-enable' + group.id.toLowerCase(),
-					name: 'Plugin Groups: Enable ' + group.name,
-					icon: 'power',
-					checkCallback: (checking: boolean) => {
-						if (!this.settings.groupsMap.has(group.id)) return false;
-						if (checking) return true;
-						group.enable();
-
-					}
-				});
-
-				this.addCommand({
-					id: 'plugin-groups-disable' + group.id.toLowerCase(),
-					name: 'Plugin Groups: Disable ' + group.name,
-					icon: 'power-off',
-					checkCallback: (checking: boolean) => {
-						if (!this.settings.groupsMap.has(group.id)) return false;
-						if (checking) return true;
-						group.disable();
-					}
-				})
-			})
-		}
 		this.addSettingTab(new GroupSettingsTab(this.app, this));
 
-		// TODO: Improve hacky solution if possible
-		const disableStartupTimeout = 40;
+		if(!this.settings.groupsMap) {
+			return;
+		}
 
+		if(this.settings.generateCommands) {
+			this.settings.groupsMap.forEach(group => this.AddGroupCommands(group));
+		}
+
+		// TODO: Improve hacky solution if possible
 		if(process.uptime()) {
-			if(process.uptime() < disableStartupTimeout) {
+			if(process.uptime() < PluginGroupsMain.disableStartupTimeout) {
 				this.settings.groupsMap.forEach(group => {
 					if (group.enableAtStartup) group.startup();
 				});
@@ -62,15 +44,40 @@ export default class PluginGroupsMain extends Plugin {
 	onunload() {
 	}
 
+	AddGroupCommands(group: PluginGroup) {
+		this.addCommand({
+			id: 'plugin-groups-enable' + group.id.toLowerCase(),
+			name: 'Plugin Groups: Enable ' + group.name,
+			icon: 'power',
+			checkCallback: (checking: boolean) => {
+				if (!this.settings.groupsMap.has(group.id)) return false;
+				if(!this.settings.generateCommands) return false;
+				if (checking) return true;
+				group.enable();
+
+			}
+		});
+		this.addCommand({
+			id: 'plugin-groups-disable' + group.id.toLowerCase(),
+			name: 'Plugin Groups: Disable ' + group.name,
+			icon: 'power-off',
+			checkCallback: (checking: boolean) => {
+				if (!this.settings.groupsMap.has(group.id)) return false;
+				if(!this.settings.generateCommands) return false;
+				if (checking) return true;
+				group.disable();
+			}
+		});
+	}
+
 	async loadSettings() {
 		const savedSettings: PersistentSettings = await this.loadData();
 
 		this.settings = Object.assign({}, DEFAULT_SETTINGS);
 
 		if(savedSettings?.groups && Array.isArray(savedSettings.groups)) {
-			this.settings.groupsMap = new Map<string, PluginGroup>()
+			this.settings.groupsMap = new Map<string, PluginGroup>();
 			savedSettings.groups.forEach(g => {
-				console.log('group', g);
 				this.settings.groupsMap.set(g.id, new PluginGroup({
 					id: g.id,
 					name: g.name,
@@ -82,6 +89,11 @@ export default class PluginGroupsMain extends Plugin {
 	}
 
 	async saveSettings() {
-		await this.saveData({groups: Array.from(this.settings.groupsMap.values())});
+		const persistentSettings: PersistentSettings = {
+			groups:  Array.from(this.settings.groupsMap.values()),
+			generateCommands: this.settings.generateCommands,
+		}
+
+		await this.saveData(persistentSettings);
 	}
 }
