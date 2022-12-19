@@ -11,6 +11,9 @@ export default class PluginGroupEditModal extends Modal {
 
 	groupToEdit: PluginGroup;
 
+	groupToEditCache: string;
+	discardChanges = true;
+
 	settingsTab: GroupSettingsTab;
 
 	plugin: PluginGroupsMain;
@@ -22,12 +25,14 @@ export default class PluginGroupEditModal extends Modal {
 	pluginListElements : Map<string, Setting> = new Map<string, Setting>();
 
 
+
 	constructor(app: App, settingsTab: GroupSettingsTab, group: PluginGroup) {
 		super(app);
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;
 		this.plugin = settingsTab.plugin;
 		this.availablePlugins = getAllAvailablePlugins();
+		this.groupToEditCache = JSON.stringify(group);
 	}
 
 	onOpen() {
@@ -194,9 +199,17 @@ export default class PluginGroupEditModal extends Modal {
 	onClose() {
 		const {contentEl} = this;
 		contentEl.empty();
+
+		if(this.plugin.settings.groupsMap.has(this.groupToEdit.id) && this.discardChanges){
+			Object.assign(
+				this.groupToEdit,
+				JSON.parse(this.groupToEditCache))
+		}
+
 	}
 
 	async saveChanges() {
+		this.discardChanges = false;
 		if(this.plugin.settings.groupsMap.has(this.groupToEdit.id)) {
 			await this.editGroup(this.groupToEdit);
 		} else {

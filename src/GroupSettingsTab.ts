@@ -87,7 +87,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	async addNewGroup() {
-
 		const id = generateGroupID(this.newGroupName,{ map: this.plugin.settings.groupsMap});
 
 		if(!id) {
