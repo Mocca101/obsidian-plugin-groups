@@ -50,11 +50,9 @@ export default class PluginGroupsMain extends Plugin {
 			name: 'Plugin Groups: Enable ' + group.name,
 			icon: 'power',
 			checkCallback: (checking: boolean) => {
-				if (!this.settings.groupsMap.has(group.id)) return false;
-				if(!this.settings.generateCommands) return false;
+				if(!this.shouldShowCommand(group)) return false;
 				if (checking) return true;
 				group.enable();
-
 			}
 		});
 		this.addCommand({
@@ -62,12 +60,18 @@ export default class PluginGroupsMain extends Plugin {
 			name: 'Plugin Groups: Disable ' + group.name,
 			icon: 'power-off',
 			checkCallback: (checking: boolean) => {
-				if (!this.settings.groupsMap.has(group.id)) return false;
-				if(!this.settings.generateCommands) return false;
+				if(!this.shouldShowCommand(group)) return false;
 				if (checking) return true;
 				group.disable();
 			}
 		});
+	}
+
+	shouldShowCommand(group: PluginGroup): boolean {
+		if (!this.settings.groupsMap.has(group.id)) return false;
+		if (!this.settings.generateCommands) return false;
+		if (!group.generateCommands) return false;
+		return true;
 	}
 
 	async loadSettings() {

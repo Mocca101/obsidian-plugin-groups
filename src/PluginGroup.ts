@@ -8,6 +8,8 @@ export class PluginGroup implements PgComponent{
 	plugins: PgPlugin[];
 	pluginGroups: PluginGroup[];
 
+	generateCommands: boolean;
+
 	enableAtStartup = false;
 	delay = 0;
 
@@ -23,6 +25,7 @@ export class PluginGroup implements PgComponent{
 
 			this.enableAtStartup = args.pg.enableAtStartup;
 			this.delay = args.pg.delay;
+			this.generateCommands = args.pg.generateCommands;
 			return;
 		}
 		this.id = args.id;
@@ -33,6 +36,7 @@ export class PluginGroup implements PgComponent{
 
 		this.enableAtStartup = args.isStartup ?? false;
 		this.delay = args.delay ?? 2;
+		this.generateCommands = args.generateCommands ?? false;
 	}
 
 	assignAndLoadPlugins(plugins?: PgPlugin[]) {
@@ -130,4 +134,5 @@ interface PluginGroupConstructorArgs {
 	active?: boolean;
 	isStartup?: boolean;
 	delay?: number;
+	generateCommands?: boolean;
 }

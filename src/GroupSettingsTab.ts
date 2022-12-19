@@ -31,7 +31,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		const groupParent = containerEl.createEl('h5', {text: 'Groups'});
 
-
 		let addBtnEl: HTMLButtonElement;
 
 		new Setting(groupParent)
@@ -56,8 +55,12 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				}
 			)
 
+		this.GenerateGroupList(groupParent);
+	}
+
+	GenerateGroupList(groupParent: HTMLElement) {
 		this.plugin.settings.groupsMap.forEach((group => {
-			new Setting(groupParent)
+			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
 				.addButton(btn => {
 					btn.setButtonText('Enable All');
@@ -75,8 +78,12 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				.addButton(btn => {
 					btn.setIcon('pencil')
 					btn.onClick(() => this.editGroup(group))
-				})
+				});
+			if(group.enableAtStartup) {
+				groupSetting.setDesc('Load plugins delayed by ' + group.delay + ' seconds');
+			}
 		}));
+
 	}
 
 	async addNewGroup() {

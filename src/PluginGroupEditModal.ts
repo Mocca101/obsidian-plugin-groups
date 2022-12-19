@@ -22,7 +22,6 @@ export default class PluginGroupEditModal extends Modal {
 	pluginListElements : Map<string, Setting> = new Map<string, Setting>();
 
 
-
 	constructor(app: App, settingsTab: GroupSettingsTab, group: PluginGroup) {
 		super(app);
 		this.settingsTab = settingsTab;
@@ -69,6 +68,15 @@ export default class PluginGroupEditModal extends Modal {
 			})
 			.setDesc(this.groupToEdit.delay.toString());
 
+		new Setting(contentEl)
+			.setName('Commands')
+			.setDesc('Add Commands to enable/disable this group')
+			.addToggle(tgl => {
+				tgl.setValue(this.groupToEdit.generateCommands)
+				tgl.onChange(value => this.groupToEdit.generateCommands = value)
+				}
+			)
+
 		if(!this.groupToEdit.enableAtStartup) {
 			this.delayElement.settingEl.hide();
 		}
@@ -83,8 +91,6 @@ export default class PluginGroupEditModal extends Modal {
 		let searchAndList: HTMLElement | undefined = undefined;
 
 		this.pluginsSection = parentElement.createEl('div');
-
-
 
 		new Setting(this.pluginsSection.createEl('h5', {text: 'Plugins'}))
 			.setName('Hide Plugin List')
