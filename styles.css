@@ -2,9 +2,18 @@
 .group-edit-modal-plugin-list {
 	overflow: scroll;
 	min-height: 20vh;
-	max-height: 50vh;
+	max-height: 40vh;
 	padding-top: 10px;
 	padding-bottom: 5px;
+}
+
+.add-group-btn {
+
+}
+
+.btn-disabled {
+	pointer-events: none;
+	opacity: 0.3;
 }
 
 .group-edit-modal-footer {

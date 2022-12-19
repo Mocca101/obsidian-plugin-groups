@@ -18,7 +18,7 @@ export default class PluginGroupEditModal extends Modal {
 	availablePlugins: PgPlugin[];
 
 	delayElement: Setting;
-	selectionList: HTMLElement;
+	pluginsSection: HTMLElement;
 	pluginListElements : Map<string, Setting> = new Map<string, Setting>();
 
 
@@ -46,7 +46,7 @@ export default class PluginGroupEditModal extends Modal {
 			})
 
 		new Setting(contentEl)
-			.setName('Startup Group')
+			.setName('Enable on Startup')
 			.addToggle(tgl => {
 				tgl.onChange(value => {
 					this.groupToEdit.enableAtStartup = value;
@@ -73,16 +73,6 @@ export default class PluginGroupEditModal extends Modal {
 			this.delayElement.settingEl.hide();
 		}
 
-		new Setting(contentEl)
-			.setName('Hide Plugin List')
-			.addToggle(tgl => {
-				tgl.onChange(value => {
-					if(this.selectionList) {
-						value ? this.selectionList.hide() : this.selectionList.show()
-					}
-				})
-			})
-
 		this.GenerateSelectionList(contentEl);
 
 		this.GenerateFooter(contentEl);
@@ -90,11 +80,25 @@ export default class PluginGroupEditModal extends Modal {
 
 	private GenerateSelectionList(parentElement: HTMLElement) {
 
-		this.selectionList = parentElement.createEl('div');
+		let searchAndList: HTMLElement | undefined = undefined;
 
-		this.selectionList.createEl('h5', {text: 'Plugins'})
+		this.pluginsSection = parentElement.createEl('div');
 
-		new Setting(this.selectionList)
+
+
+		new Setting(this.pluginsSection.createEl('h5', {text: 'Plugins'}))
+			.setName('Hide Plugin List')
+			.addToggle(tgl => {
+				tgl.onChange(value => {
+					if(searchAndList) {
+						value ? searchAndList.hide() : searchAndList.show()
+					}
+				})
+			})
+
+		searchAndList = this.pluginsSection.createEl('div');
+
+		new Setting(searchAndList)
 			.setName('Search')
 			.addText(txt => {
 				txt.setPlaceholder('Search for Plugin...')
@@ -103,7 +107,7 @@ export default class PluginGroupEditModal extends Modal {
 				})
 			})
 
-		const pluginList = this.selectionList.createEl('div');
+		const pluginList = searchAndList.createEl('div');
 		pluginList.addClass('group-edit-modal-plugin-list');
 
 		this.pluginListElements = new Map<string, Setting>();

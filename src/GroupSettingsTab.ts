@@ -37,13 +37,14 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		new Setting(groupParent)
 			.setName('Add Group')
 			.addText(text => text
-				.setPlaceholder('Group name')
+				.setPlaceholder('Enter group name...')
 				.onChange(val => {
 					this.newGroupName = val;
 					if(addBtnEl) {
-						val.length > 0 ? addBtnEl.disabled = false : addBtnEl.disabled = true;
+						val.length > 0 ?
+							addBtnEl.removeClass('btn-disabled')
+							: addBtnEl.addClass('btn-disabled');
 					}
-
 				})
 			)
 			.addButton(btn => {
@@ -51,7 +52,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 						.setIcon('plus')
 						.onClick(() => this.addNewGroup());
 					addBtnEl = btn.buttonEl;
-					addBtnEl.disabled = true;
+					addBtnEl.addClass('btn-disabled');
 				}
 			)
 
@@ -76,7 +77,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 					btn.onClick(() => this.editGroup(group))
 				})
 		}));
-
 	}
 
 	async addNewGroup() {
