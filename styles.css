@@ -1,7 +1,7 @@
 
 .group-edit-modal-plugin-list {
 	overflow: scroll;
-	min-height: 20vh;
+	min-height: 1vh;
 	max-height: 40vh;
 	padding-top: 10px;
 	padding-bottom: 5px;

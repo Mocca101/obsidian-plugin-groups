@@ -1,5 +1,4 @@
 import {App, Modal, Setting} from "obsidian";
-import {PluginInfo} from "./Types";
 import GroupSettingsTab from "./GroupSettingsTab";
 import {getAllAvailablePlugins} from "./Utilities";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
@@ -20,9 +19,16 @@ export default class PluginGroupEditModal extends Modal {
 
 	availablePlugins: PgPlugin[];
 
+	availableGroups: PluginGroup[];
+
 	delayElement: Setting;
-	pluginsSection: HTMLElement;
+
+	pluginSelection: HTMLElement;
+
+	groupSelection: HTMLElement;
 	pluginListElements : Map<string, Setting> = new Map<string, Setting>();
+
+	groupListElements : Map<string, Setting> = new Map<string, Setting>();
 
 
 
@@ -32,6 +38,7 @@ export default class PluginGroupEditModal extends Modal {
 		this.groupToEdit = group;
 		this.plugin = settingsTab.plugin;
 		this.availablePlugins = getAllAvailablePlugins();
+		this.availableGroups = Array.from(this.plugin.settings.groupsMap.values()).filter(g => g.id !== group.id);
 		this.groupToEditCache = JSON.stringify(group);
 	}
 
@@ -50,18 +57,42 @@ export default class PluginGroupEditModal extends Modal {
 			})
 
 		new Setting(contentEl)
+			.setName('Commands')
+			.setDesc('Add Commands to enable/disable this group')
+			.addToggle(tgl => {
+					tgl.setValue(this.groupToEdit.generateCommands)
+					tgl.onChange(value => this.groupToEdit.generateCommands = value)
+				}
+			)
+
+		this.GenerateStartupSettings(contentEl);
+
+		this.GeneratePluginSelectionList(contentEl);
+
+		this.GenerateGroupSelectionList(contentEl);
+
+		this.GenerateFooter(contentEl);
+	}
+
+
+	private GenerateStartupSettings(contentEl: HTMLElement) {
+
+		const startupParent = contentEl.createEl('div');
+		startupParent.createEl('h3', {text: 'Startup'});
+
+		new Setting(startupParent)
 			.setName('Enable on Startup')
 			.addToggle(tgl => {
 				tgl.onChange(value => {
 					this.groupToEdit.enableAtStartup = value;
-					if(this.delayElement) {
+					if (this.delayElement) {
 						value ? this.delayElement.settingEl.show() : this.delayElement.settingEl.hide();
 					}
 				});
 				tgl.setValue(this.groupToEdit.enableAtStartup);
 			});
 
-		this.delayElement = new Setting(contentEl)
+		this.delayElement = new Setting(startupParent)
 			.setName('Delay')
 			.addSlider(slider => {
 				slider.setValue(this.groupToEdit.delay);
@@ -73,41 +104,38 @@ export default class PluginGroupEditModal extends Modal {
 			})
 			.setDesc(this.groupToEdit.delay.toString());
 
-		new Setting(contentEl)
-			.setName('Commands')
-			.setDesc('Add Commands to enable/disable this group')
-			.addToggle(tgl => {
-				tgl.setValue(this.groupToEdit.generateCommands)
-				tgl.onChange(value => this.groupToEdit.generateCommands = value)
-				}
-			)
-
 		if(!this.groupToEdit.enableAtStartup) {
 			this.delayElement.settingEl.hide();
 		}
-
-		this.GenerateSelectionList(contentEl);
-
-		this.GenerateFooter(contentEl);
 	}
 
-	private GenerateSelectionList(parentElement: HTMLElement) {
+	private GeneratePluginSelectionList(parentElement: HTMLElement) {
 
 		let searchAndList: HTMLElement | undefined = undefined;
 
-		this.pluginsSection = parentElement.createEl('div');
+		this.pluginSelection = parentElement.createEl('div');
 
-		new Setting(this.pluginsSection.createEl('h5', {text: 'Plugins'}))
-			.setName('Hide Plugin List')
-			.addToggle(tgl => {
-				tgl.onChange(value => {
-					if(searchAndList) {
-						value ? searchAndList.hide() : searchAndList.show()
+		let showingPlugins = true;
+
+		const headerSetting = new Setting(this.pluginSelection)
+			.addButton(btn => {
+				btn.setIcon('eye')
+				btn.onClick(e => {
+					if(!searchAndList) { return; }
+					if (showingPlugins) {
+						btn.setIcon('eye-off');
+						searchAndList.hide();
+						showingPlugins = false;
+					} else {
+						btn.setIcon('eye');
+						searchAndList.show();
+						showingPlugins = true;
 					}
-				})
-			})
+				});
+			});
+		headerSetting.nameEl.createEl('h4', {text: 'Plugins'});
 
-		searchAndList = this.pluginsSection.createEl('div');
+		searchAndList = this.pluginSelection.createEl('div');
 
 		new Setting(searchAndList)
 			.setName('Search')
@@ -129,15 +157,79 @@ export default class PluginGroupEditModal extends Modal {
 			.forEach(plugin => { const setting = new Setting(pluginList)
 					.setName(plugin.name)
 					.addToggle(tgl => {
+						tgl.setValue(includedPluginNames.contains(plugin.name));
 						tgl.onChange(doInclude => {
 							this.togglePluginForGroup(plugin, doInclude);
-						})
-						tgl.setValue(includedPluginNames.contains(plugin.name))
+						});
 					});
 
 				this.pluginListElements.set(plugin.id, setting);
 		})
 	}
+
+	private GenerateGroupSelectionList(parentElement: HTMLElement) {
+
+		let searchAndList: HTMLElement | undefined = undefined;
+
+		this.groupSelection = parentElement.createEl('div');
+
+		let showGroups = true;
+
+		const headerSetting = new Setting(this.groupSelection)
+			.addButton(btn => {
+				btn.setIcon('eye')
+				btn.onClick(e => {
+					if(!searchAndList) { return; }
+					if (showGroups) {
+						btn.setIcon('eye-off');
+						searchAndList.hide();
+						showGroups = false;
+					} else {
+						btn.setIcon('eye');
+						searchAndList.show();
+						showGroups = true;
+					}
+				});
+			});
+		headerSetting.nameEl.createEl('h4', {text: 'Groups'});
+
+		searchAndList = this.groupSelection.createEl('div');
+
+		new Setting(searchAndList)
+			.setName('Search')
+			.addText(txt => {
+				txt.setPlaceholder('Search for Groups...')
+				txt.onChange(search => {
+					this.searchGroups(search);
+				})
+			})
+
+		const groupList = searchAndList.createEl('div');
+		groupList.addClass('group-edit-modal-plugin-list');
+
+		this.groupListElements = new Map<string, Setting>();
+
+		const includedGroupNames = this.groupToEdit.pluginGroups.map(p => p.name);
+
+		this.sortGroups(this.availableGroups)
+			.forEach(pluginGroup => { const setting = new Setting(groupList)
+				.setName(pluginGroup.name)
+				.addToggle(tgl => {
+					let included = includedGroupNames.contains(pluginGroup.name);
+					let changeLock = false; // Used to prevent endless loop from resetting the tgl value in the onChange Function
+					tgl.setValue(included);
+					tgl.onChange(doInclude => {
+						if(changeLock) { return; }
+						changeLock = true;
+						included = this.toggleGroupForGroup(pluginGroup, !included) ? !included : included;
+						tgl.setValue(included);
+						changeLock = false;
+					});
+				});
+				this.groupListElements.set(pluginGroup.id, setting);
+			})
+	}
+
 
 	private searchPlugins(search: string) {
 		const hits = this.availablePlugins
@@ -145,6 +237,14 @@ export default class PluginGroupEditModal extends Modal {
 			.map(p => p.id);
 		this.pluginListElements.forEach(plugin => plugin.settingEl.hide());
 		hits.forEach(id => this.pluginListElements.get(id)?.settingEl.show());
+	}
+
+	private searchGroups(search: string) {
+		const hits = this.availableGroups
+			.filter(p => p.name.toLowerCase().contains(search.toLowerCase()))
+			.map(p => p.id);
+		this.groupListElements.forEach(group => group.settingEl.hide());
+		hits.forEach(id => this.groupListElements.get(id)?.settingEl.show());
 	}
 
 	private GenerateFooter(parentElement: HTMLElement) {
@@ -174,8 +274,8 @@ export default class PluginGroupEditModal extends Modal {
 
 	sortPlugins(plugins: PgPlugin[]) : PgPlugin[] {
 		return plugins.sort((a, b) => {
-			const aInGroup = this.isInGroup(a);
-			const bInGroup = this.isInGroup(b);
+			const aInGroup = this.isPluginInGroup(a);
+			const bInGroup = this.isPluginInGroup(b);
 			if(aInGroup && !bInGroup) return -1;
 			else if(!aInGroup && bInGroup) return 1;
 			else {
@@ -184,7 +284,23 @@ export default class PluginGroupEditModal extends Modal {
 		})
 	}
 
-	isInGroup(plugin: PluginInfo) :boolean {
+	isPluginInGroup(plugin: PgPlugin) :boolean {
+		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
+	}
+
+	sortGroups(groups: PluginGroup[]) : PluginGroup[] {
+		return groups.sort((a, b) => {
+			const aInGroup = this.isGroupInGroup(a);
+			const bInGroup = this.isGroupInGroup(b);
+			if(aInGroup && !bInGroup) return -1;
+			else if(!aInGroup && bInGroup) return 1;
+			else {
+				return a.name.localeCompare(b.name);
+			}
+		})
+	}
+
+	isGroupInGroup(plugin: PluginGroup) :boolean {
 		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
 	}
 
@@ -193,6 +309,14 @@ export default class PluginGroupEditModal extends Modal {
 			this.groupToEdit.addPgComponent(plugin);
 		} else {
 			this.groupToEdit.removePgComponent(plugin);
+		}
+	}
+
+	toggleGroupForGroup(group: PluginGroup, doInclude: boolean) {
+		if(doInclude) {
+			return this.groupToEdit.addPgComponent(group);
+		} else {
+			return this.groupToEdit.removePgComponent(group);
 		}
 	}
 

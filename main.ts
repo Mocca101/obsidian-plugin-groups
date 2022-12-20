@@ -89,7 +89,6 @@ export default class PluginGroupsMain extends Plugin {
 				}));
 			});
 		}
-		console.log('save', this.settings);
 	}
 
 	async saveSettings() {

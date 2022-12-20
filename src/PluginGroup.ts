@@ -1,5 +1,6 @@
 import {PgComponent} from "./Types";
 import {PgPlugin} from "./PgPlugin";
+import {Notice} from "obsidian";
 
 export class PluginGroup implements PgComponent{
 
@@ -14,8 +15,6 @@ export class PluginGroup implements PgComponent{
 	delay = 0;
 
 	constructor(args: PluginGroupConstructorArgs) {
-		console.log(args)
-
 		if(args.pg) {
 			this.id = args.pg.id;
 			this.name = args.pg.name;
@@ -40,7 +39,6 @@ export class PluginGroup implements PgComponent{
 	}
 
 	assignAndLoadPlugins(plugins?: PgPlugin[]) {
-		console.log('pl', plugins);
 		this.plugins = plugins?.map(p => new PgPlugin(p.id, p.name)) ?? [];
 	}
 
@@ -49,7 +47,6 @@ export class PluginGroup implements PgComponent{
 	}
 
 	startup() {
-		console.log('startup');
 		setTimeout(async () => {
 			this.enable()
 		}, this.delay * 1000)
@@ -72,39 +69,45 @@ export class PluginGroup implements PgComponent{
 		})
 	}
 
-	addPgComponent(component: PgComponent) {
+	addPgComponent(component: PgComponent) : boolean {
 		if((component instanceof PgPlugin)) {
-			if(this.plugins.map(p => p.id).contains(component.id)) return;
+			if(this.plugins.map(p => p.id).contains(component.id)) return false;
 
 			this.plugins.push(component);
-			return;
+			return true;
 		}
-		if((component instanceof PluginGroup) && !this.wouldHaveCyclicGroups(component.id)) {
-			if(this.pluginGroups.map(p => p.id).contains(component.id)) return;
 
-			this.pluginGroups.push(component)
-			return;
-		} else {
-			throw new Error('Couldn\'t add Group as it would cause cyclic of groups (This would lead to an endless cycle of en/disabling).')
+		if(!(component instanceof PluginGroup)) {
+			return false;
 		}
+
+		if(!component.wouldHaveCyclicGroups(this.id)) {
+			if(this.pluginGroups.map(p => p.id).contains(component.id)) return false;
+			this.pluginGroups.push(component)
+			return true;
+		} else {
+			new Notice('Couldn\'t add this group, it would create a loop of group activations:\n Group A → Group B → Group A', 4000);
+		}
+		return false;
 	}
 
-	removePgComponent(component: PgComponent) {
+	removePgComponent(component: PgComponent) : boolean{
 		if((component instanceof PgPlugin)) {
 			const indexOfPlugin: number = this.plugins.map(p => p.id).indexOf(component.id);
 
-			if(indexOfPlugin === -1) return;
+			if(indexOfPlugin === -1) return true;
 
 			this.plugins.splice(indexOfPlugin, 1);
-			return;
+			return true;
 		}
-		if((component instanceof PluginGroup) && !this.wouldHaveCyclicGroups(component.id)) {
+
+		if((component instanceof PluginGroup)) {
 			const indexOfGroup = this.pluginGroups.map(p => p.id).indexOf(component.id);
 
-			if(indexOfGroup === -1) return;
+			if(indexOfGroup === -1) return true;
 
 			this.pluginGroups.splice(indexOfGroup, 1);
-			return;
+			return true;
 		} else {
 			throw new Error('Couldn\'t add Group as it would cause cyclic of groups (This would lead to an endless cycle of en/disabling).')
 		}
@@ -115,12 +118,12 @@ export class PluginGroup implements PgComponent{
 			return true;
 		}
 
-		this.pluginGroups.forEach(pluginGroup => {
+		for (let i = 0; i < this.pluginGroups.length; i++) {
+			const pluginGroup = this.pluginGroups[i];
 			if(pluginGroup.wouldHaveCyclicGroups(idToCheck)) {
 				return true;
 			}
-		})
-
+		}
 		return false;
 	}
 }

@@ -1,4 +1,4 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
+import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PluginGroupsMain from "../main";
 import PluginGroupEditModal from "./PluginGroupEditModal";
 import {generateGroupID} from "./Utilities";
@@ -8,6 +8,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	plugin: PluginGroupsMain;
 
 	newGroupName: string;
+
+	groupNameField: TextComponent;
 
 	constructor(app: App, plugin: PluginGroupsMain) {
 		super(app, plugin);
@@ -35,16 +37,19 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		new Setting(groupParent)
 			.setName('Add Group')
-			.addText(text => text
-				.setPlaceholder('Enter group name...')
-				.onChange(val => {
-					this.newGroupName = val;
-					if(addBtnEl) {
-						val.length > 0 ?
-							addBtnEl.removeClass('btn-disabled')
-							: addBtnEl.addClass('btn-disabled');
-					}
-				})
+			.addText(text => {
+				this.groupNameField = text;
+				this.groupNameField.setPlaceholder('Enter group name...');
+				this.groupNameField.setValue(this.newGroupName);
+				this.groupNameField.onChange(val => {
+						this.newGroupName = val;
+						if (addBtnEl) {
+							val.length > 0 ?
+								addBtnEl.removeClass('btn-disabled')
+								: addBtnEl.addClass('btn-disabled');
+						}
+					})
+				}
 			)
 			.addButton(btn => {
 					btn
@@ -66,7 +71,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 					btn.setButtonText('Enable All');
 					btn.setIcon('power');
 					btn.onClick(() => {
-						console.log(group);
 						group.enable()
 					});
 				})
@@ -100,6 +104,9 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		});
 		new PluginGroupEditModal(this.app, this, newGroup).open();
 		this.newGroupName = '';
+		if(this.groupNameField) {
+			this.groupNameField.setValue('');
+		}
 	}
 
 	editGroup(group: PluginGroup) {

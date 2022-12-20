@@ -1,10 +1,5 @@
 import {PluginGroup} from "./PluginGroup";
 
-export interface PluginInfo {
-	id: string,
-	name: string,
-}
-
 export abstract class PgComponent {
 
 	public id: string;
