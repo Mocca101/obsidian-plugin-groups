@@ -1,4 +1,4 @@
-import {Plugin} from 'obsidian';
+import {Command, Plugin} from 'obsidian';
 import {PersistentSettings, PluginGroupsSettings} from "./src/Types";
 import GroupSettingsTab from "./src/GroupSettingsTab";
 import * as process from "process";
@@ -10,9 +10,15 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 }
 
 export default class PgMain extends Plugin {
-
 	static disableStartupTimeout = 20;
 	static pluginId = 'obsidian-plugin-groups';
+
+	enableGroupCommandPrefix = 'plugin-groups-enable-';
+	disableGroupCommandPrefix = 'plugin-groups-disable-';
+	cnEnablePrefix = 'Plugin Groups: Enable ';
+	cnDisablePrefix = 'Plugin Groups: Disable ';
+
+	commandMap: Map<string, Command> = new Map<string, Command>();
 
 	settings: PluginGroupsSettings;
 
@@ -33,8 +39,7 @@ export default class PgMain extends Plugin {
 		}
 
 		if(PgMain.instance.settings.generateCommands) {
-			PgMain.instance.settings.groupsMap.forEach(group => this.AddGroupCommands(group));
-		}
+			PgMain.instance.settings.groupsMap.forEach(group => this.AddGroupCommands(group.id));		}
 
 		// TODO: Improve hacky solution if possible
 		if(process.uptime()) {
@@ -52,33 +57,55 @@ export default class PgMain extends Plugin {
 		}
 	}
 
-	AddGroupCommands(group: PluginGroup) {
-		this.addCommand({
-			id: 'plugin-groups-enable' + group.id.toLowerCase(),
-			name: 'Plugin Groups: Enable ' + group.name,
+	AddGroupCommands(groupID: string) {
+		const group = PgMain.groupFromId(groupID);
+		if(!group) return;
+		const enableId = this.enableGroupCommandPrefix + group.id;
+
+		this.commandMap.set(enableId, this.addCommand({
+			id: enableId,
+			name: this.cnEnablePrefix + group.name,
 			icon: 'power',
 			checkCallback: (checking: boolean) => {
 				if(!this.shouldShowCommand(group)) return false;
 				if (checking) return true;
 				group.enable();
 			}
-		});
-		this.addCommand({
-			id: 'plugin-groups-disable' + group.id.toLowerCase(),
-			name: 'Plugin Groups: Disable ' + group.name,
+		}));
+
+		const disableId = this.disableGroupCommandPrefix + group.id;
+
+		this.commandMap.set(disableId, this.addCommand({
+			id: disableId,
+			name: this.cnDisablePrefix + group.name,
 			icon: 'power-off',
 			checkCallback: (checking: boolean) => {
 				if(!this.shouldShowCommand(group)) return false;
 				if (checking) return true;
 				group.disable();
 			}
-		});
+		}));
 	}
 
 	shouldShowCommand(group: PluginGroup): boolean {
 		if (!PgMain.instance?.settings.groupsMap.has(group.id)) return false;
 		if (!PgMain.instance?.settings.generateCommands) return false;
 		return group.generateCommands;
+	}
+
+	updateCommand(groupId: string) {
+		const group = PgMain.groupFromId(groupId);
+		if(!group) {return;}
+
+		let command = this.commandMap.get(this.enableGroupCommandPrefix + group.id);
+		if(command) {
+			command.name = this.cnEnablePrefix + group.name;
+		}
+
+		command = this.commandMap.get(this.disableGroupCommandPrefix + group.id)
+		if(command) {
+			command.name = this.cnDisablePrefix + group.name;
+		}
 	}
 
 	async loadSettings() {
@@ -102,7 +129,6 @@ export default class PgMain extends Plugin {
 	}
 
 	async saveSettings() {
-		console.log("-> PgMain.settings.groupsMap", PgMain.instance?.settings);
 
 		const persistentSettings: PersistentSettings = {
 			groups:  Array.from(PgMain.instance?.settings.groupsMap.values() ?? []),

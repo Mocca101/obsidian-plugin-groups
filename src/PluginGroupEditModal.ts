@@ -344,13 +344,14 @@ export default class PluginGroupEditModal extends Modal {
 	async addGroup(group: PluginGroup) {
 		PgMain.instance?.settings.groupsMap.set(group.id, group);
 
-		PgMain.instance?.AddGroupCommands(group);
+		PgMain.instance?.AddGroupCommands(group.id);
 
 		await this.persistChangesAndClose();
 	}
 
 	async editGroup(group: PluginGroup) {
 		PgMain.instance?.settings.groupsMap.set(group.id, group);
+		PgMain.instance?.updateCommand(group.id);
 		await this.persistChangesAndClose();
 	}
 
