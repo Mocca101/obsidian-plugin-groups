@@ -1,13 +1,8 @@
 import {PluginGroup} from "./PluginGroup";
 
-export abstract class PgComponent {
-
-	public id: string;
-	public name: string;
-
-	abstract enable() : void;
-
-	abstract disable() : void;
+export interface PgComponent {
+	id: string;
+	name: string;
 }
 
 export interface PluginGroupsSettings {

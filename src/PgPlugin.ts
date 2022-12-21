@@ -10,14 +10,4 @@ export class PgPlugin implements PgComponent {
 		this.id = id;
 		this.name = name;
 	}
-
-	enable() {
-		// @ts-ignore
-		app.plugins.enablePlugin(this.id);
-	}
-
-	disable() {
-		// @ts-ignore
-		app.plugins.disablePlugin(this.id);
-	}
 }

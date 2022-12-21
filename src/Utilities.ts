@@ -1,4 +1,4 @@
-import PluginGroupsMain from "../main";
+import PgMain from "../main";
 import {PgPlugin} from "./PgPlugin";
 import {PgComponent} from "./Types";
 
@@ -8,7 +8,7 @@ export function getAllAvailablePlugins() : PgPlugin[] {
 	const plugins: PgPlugin[] = [];
 
 	for(const key in manifests) {
-		if(manifests[key].id === PluginGroupsMain.pluginId) continue;
+		if(manifests[key].id === PgMain.pluginId) continue;
 
 		const info: PgPlugin = new PgPlugin(manifests[key].id, manifests[key].name);
 		plugins.push(info)

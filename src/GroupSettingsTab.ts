@@ -1,19 +1,17 @@
 import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
-import PluginGroupsMain from "../main";
+import PgMain from "../main";
 import PluginGroupEditModal from "./PluginGroupEditModal";
 import {generateGroupID} from "./Utilities";
 import {PluginGroup} from "./PluginGroup";
 
 export default class GroupSettingsTab extends PluginSettingTab {
-	plugin: PluginGroupsMain;
 
 	newGroupName: string;
 
 	groupNameField: TextComponent;
 
-	constructor(app: App, plugin: PluginGroupsMain) {
+	constructor(app: App, plugin: PgMain) {
 		super(app, plugin);
-		this.plugin = plugin;
 	}
 
 	display(): void {
@@ -27,8 +25,11 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		new Setting(generalParent)
 			.setName('Generate Commands for Groups')
 			.addToggle(tgl => {
-				tgl.setValue(this.plugin.settings.generateCommands);
-				tgl.onChange(value => this.plugin.settings.generateCommands = value);
+				tgl.setValue(PgMain.instance?.settings.generateCommands ?? false);
+				tgl.onChange(value => {
+					if(!PgMain.instance) {return;}
+					PgMain.instance.settings.generateCommands = value
+				});
 			})
 
 		const groupParent = containerEl.createEl('h5', {text: 'Groups'});
@@ -64,7 +65,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {
-		this.plugin.settings.groupsMap.forEach((group => {
+		PgMain.instance?.settings.groupsMap.forEach((group => {
 			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
 				.addButton(btn => {
@@ -91,7 +92,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	async addNewGroup() {
-		const id = generateGroupID(this.newGroupName,{ map: this.plugin.settings.groupsMap});
+		const id = generateGroupID(this.newGroupName,{ map: PgMain.instance?.settings.groupsMap});
 
 		if(!id) {
 			console.error('Failed to create Group, please choose a different Name as there have been to many groups with the same name')

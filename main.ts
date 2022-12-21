@@ -9,32 +9,37 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	generateCommands: true
 }
 
-export default class PluginGroupsMain extends Plugin {
+export default class PgMain extends Plugin {
 
 	static disableStartupTimeout = 20;
 	static pluginId = 'obsidian-plugin-groups';
 
 	settings: PluginGroupsSettings;
 
+	static instance?: PgMain;
+
 	async onload() {
+		if(PgMain.instance) { return; }
+		else {PgMain.instance = this; }
+
 		await this.loadSettings();
 
-		PluginGroupsMain.pluginId = this.manifest.id;
+		PgMain.pluginId = this.manifest.id;
 
 		this.addSettingTab(new GroupSettingsTab(this.app, this));
 
-		if(!this.settings.groupsMap) {
+		if(!PgMain.instance.settings.groupsMap) {
 			return;
 		}
 
-		if(this.settings.generateCommands) {
-			this.settings.groupsMap.forEach(group => this.AddGroupCommands(group));
+		if(PgMain.instance.settings.generateCommands) {
+			PgMain.instance.settings.groupsMap.forEach(group => this.AddGroupCommands(group));
 		}
 
 		// TODO: Improve hacky solution if possible
 		if(process.uptime()) {
-			if(process.uptime() < PluginGroupsMain.disableStartupTimeout) {
-				this.settings.groupsMap.forEach(group => {
+			if(process.uptime() < PgMain.disableStartupTimeout) {
+				PgMain.instance.settings.groupsMap.forEach(group => {
 					if (group.enableAtStartup) group.startup();
 				});
 			}
@@ -42,6 +47,9 @@ export default class PluginGroupsMain extends Plugin {
 	}
 
 	onunload() {
+		if(PgMain.instance) {
+			PgMain.instance = undefined;
+		}
 	}
 
 	AddGroupCommands(group: PluginGroup) {
@@ -68,21 +76,23 @@ export default class PluginGroupsMain extends Plugin {
 	}
 
 	shouldShowCommand(group: PluginGroup): boolean {
-		if (!this.settings.groupsMap.has(group.id)) return false;
-		if (!this.settings.generateCommands) return false;
-		if (!group.generateCommands) return false;
-		return true;
+		if (!PgMain.instance?.settings.groupsMap.has(group.id)) return false;
+		if (!PgMain.instance?.settings.generateCommands) return false;
+		return group.generateCommands;
 	}
 
 	async loadSettings() {
 		const savedSettings: PersistentSettings = await this.loadData();
 
-		this.settings = Object.assign({}, DEFAULT_SETTINGS);
+		if(!PgMain.instance) {return;}
+
+		PgMain.instance.settings = Object.assign({}, DEFAULT_SETTINGS);
+		console.log("-> PgMain.settings", PgMain.instance?.settings);
 
 		if(savedSettings?.groups && Array.isArray(savedSettings.groups)) {
-			this.settings.groupsMap = new Map<string, PluginGroup>();
+			PgMain.instance.settings.groupsMap = new Map<string, PluginGroup>();
 			savedSettings.groups.forEach(g => {
-				this.settings.groupsMap.set(g.id, new PluginGroup({
+				PgMain.instance?.settings.groupsMap.set(g.id, new PluginGroup({
 					id: g.id,
 					name: g.name,
 					pg: g
@@ -92,11 +102,16 @@ export default class PluginGroupsMain extends Plugin {
 	}
 
 	async saveSettings() {
-		const persistentSettings: PersistentSettings = {
-			groups:  Array.from(this.settings.groupsMap.values()),
-			generateCommands: this.settings.generateCommands,
-		}
+		console.log("-> PgMain.settings.groupsMap", PgMain.instance?.settings);
 
+		const persistentSettings: PersistentSettings = {
+			groups:  Array.from(PgMain.instance?.settings.groupsMap.values() ?? []),
+			generateCommands: PgMain.instance?.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
+		}
 		await this.saveData(persistentSettings);
+	}
+
+	static groupFromId(id:string) : PluginGroup | undefined{
+		return PgMain.instance?.settings.groupsMap.get(id);
 	}
 }

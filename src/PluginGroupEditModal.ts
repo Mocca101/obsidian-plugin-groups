@@ -2,7 +2,7 @@ import {App, Modal, Setting} from "obsidian";
 import GroupSettingsTab from "./GroupSettingsTab";
 import {getAllAvailablePlugins} from "./Utilities";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
-import PluginGroupsMain from "../main";
+import PgMain from "../main";
 import {PluginGroup} from "./PluginGroup";
 import {PgPlugin} from "./PgPlugin";
 
@@ -14,8 +14,6 @@ export default class PluginGroupEditModal extends Modal {
 	discardChanges = true;
 
 	settingsTab: GroupSettingsTab;
-
-	plugin: PluginGroupsMain;
 
 	availablePlugins: PgPlugin[];
 
@@ -30,22 +28,24 @@ export default class PluginGroupEditModal extends Modal {
 
 	groupListElements : Map<string, Setting> = new Map<string, Setting>();
 
-
-
 	constructor(app: App, settingsTab: GroupSettingsTab, group: PluginGroup) {
 		super(app);
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;
-		this.plugin = settingsTab.plugin;
 		this.availablePlugins = getAllAvailablePlugins();
-		this.availableGroups = Array.from(this.plugin.settings.groupsMap.values()).filter(g => g.id !== group.id);
+
+		if(PgMain.instance) {
+			this.availableGroups = Array.from(PgMain.instance.settings.groupsMap.values()).filter(g => g.id !== group.id);
+		}
 		this.groupToEditCache = JSON.stringify(group);
 	}
 
 	onOpen() {
-		const {contentEl} = this;
+		const {modalEl} = this;
 
-		contentEl.empty();
+		modalEl.empty();
+
+		const contentEl = modalEl.createEl('div', {cls: 'group-edit-modal-content '})
 
 		contentEl.createEl('h2', {text: 'Edit Group'});
 
@@ -71,7 +71,7 @@ export default class PluginGroupEditModal extends Modal {
 
 		this.GenerateGroupSelectionList(contentEl);
 
-		this.GenerateFooter(contentEl);
+		this.GenerateFooter(modalEl);
 	}
 
 
@@ -96,7 +96,7 @@ export default class PluginGroupEditModal extends Modal {
 			.setName('Delay')
 			.addSlider(slider => {
 				slider.setValue(this.groupToEdit.delay);
-				slider.setLimits(0, PluginGroupsMain.disableStartupTimeout, 1)
+				slider.setLimits(0, PgMain.disableStartupTimeout, 1)
 				slider.onChange(value => {
 					this.groupToEdit.delay = value;
 					this.delayElement.setDesc(value.toString());
@@ -209,7 +209,7 @@ export default class PluginGroupEditModal extends Modal {
 
 		this.groupListElements = new Map<string, Setting>();
 
-		const includedGroupNames = this.groupToEdit.pluginGroups.map(p => p.name);
+		const includedGroupNames = this.groupToEdit.groupIds.map(id => PgMain.groupFromId(id)?.name);
 
 		this.sortGroups(this.availableGroups)
 			.forEach(pluginGroup => { const setting = new Setting(groupList)
@@ -306,17 +306,17 @@ export default class PluginGroupEditModal extends Modal {
 
 	togglePluginForGroup(plugin: PgPlugin, doInclude: boolean) {
 		if(doInclude) {
-			this.groupToEdit.addPgComponent(plugin);
+			this.groupToEdit.addPlugin(plugin);
 		} else {
-			this.groupToEdit.removePgComponent(plugin);
+			this.groupToEdit.removePlugin(plugin);
 		}
 	}
 
 	toggleGroupForGroup(group: PluginGroup, doInclude: boolean) {
 		if(doInclude) {
-			return this.groupToEdit.addPgComponent(group);
+			return this.groupToEdit.addGroup(group);
 		} else {
-			return this.groupToEdit.removePgComponent(group);
+			return this.groupToEdit.removeGroup(group);
 		}
 	}
 
@@ -324,7 +324,7 @@ export default class PluginGroupEditModal extends Modal {
 		const {contentEl} = this;
 		contentEl.empty();
 
-		if(this.plugin.settings.groupsMap.has(this.groupToEdit.id) && this.discardChanges){
+		if(PgMain.instance?.settings.groupsMap.has(this.groupToEdit.id) && this.discardChanges){
 			Object.assign(
 				this.groupToEdit,
 				JSON.parse(this.groupToEditCache))
@@ -334,7 +334,7 @@ export default class PluginGroupEditModal extends Modal {
 
 	async saveChanges() {
 		this.discardChanges = false;
-		if(this.plugin.settings.groupsMap.has(this.groupToEdit.id)) {
+		if(PgMain.instance?.settings.groupsMap.has(this.groupToEdit.id)) {
 			await this.editGroup(this.groupToEdit);
 		} else {
 			await this.addGroup(this.groupToEdit)
@@ -342,28 +342,28 @@ export default class PluginGroupEditModal extends Modal {
 	}
 
 	async addGroup(group: PluginGroup) {
-		this.plugin.settings.groupsMap.set(group.id, group);
+		PgMain.instance?.settings.groupsMap.set(group.id, group);
 
-		this.plugin.AddGroupCommands(group);
+		PgMain.instance?.AddGroupCommands(group);
 
 		await this.persistChangesAndClose();
 	}
 
 	async editGroup(group: PluginGroup) {
-		this.plugin.settings.groupsMap.set(group.id, group);
+		PgMain.instance?.settings.groupsMap.set(group.id, group);
 		await this.persistChangesAndClose();
 	}
 
 	async persistChangesAndClose() {
-		await this.plugin.saveSettings();
+		await PgMain.instance?.saveSettings();
 		this.settingsTab.display();
 		this.close();
 	}
 
 
 	async deleteGroup() {
-		this.plugin.settings.groupsMap.delete(this.groupToEdit.id);
-		await this.plugin.saveSettings();
+		PgMain.instance?.settings.groupsMap.delete(this.groupToEdit.id);
+		await PgMain.instance?.saveSettings();
 		this.settingsTab.display();
 		this.close();
 	}
