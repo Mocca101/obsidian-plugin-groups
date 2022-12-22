@@ -50,14 +50,6 @@ You can enable or disable a group by clicking the "On" & "Off" buttons next to t
 
 ![commands](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/commands.gif)
 
-### Startup with Groups
-
-![startup-with-groups](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/startup-group.gif)
-
-### Manage Groups with Groups
-
-![manager-group](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/manager-group.gif) 
-
 ## Support
 
 If you find the Plugin Groups to be a useful tool, please consider supporting me through a donation via Buy Me a Coffee or starring this project on GitHub. Alternatively consider [Donating to the Internet Archive](https://archive.org/donate/) an awesome project, preserving and providing access to digital media and information, now and for future generations!
