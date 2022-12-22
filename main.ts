@@ -116,7 +116,9 @@ export default class PgMain extends Plugin {
 
 		PgMain.instance.settings = Object.assign({}, DEFAULT_SETTINGS);
 
-		if(savedSettings?.groups && Array.isArray(savedSettings.groups)) {
+		if(!savedSettings) {return;}
+
+		if(savedSettings.groups && Array.isArray(savedSettings.groups)) {
 			PgMain.instance.settings.groupsMap = new Map<string, PluginGroup>();
 			savedSettings.groups.forEach(g => {
 				PgMain.instance?.settings.groupsMap.set(g.id, new PluginGroup({
