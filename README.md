@@ -11,8 +11,6 @@ A plugin that allows you to easily group and manage your other plugins in Obsidi
 
 ## Installation
 
-
-
 Keep in mind this is an early version of this plugin so there might be some kinks left to iron out. If you encounter any, please do let me know!
 
 To install Plugin Groups, follow these steps:
@@ -29,6 +27,8 @@ Note: As soon as this plugin is available on the public obsidian plugin reposito
 To use Obsidian Groups, enable it from the Community Plugins Menu and start organizing and managing your plugins by creating groups.
 
 ### Creating a Group
+
+![gorup-creation](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/group-creation.gif)
 
 To create a new group head to the plugin settings, Enter a name for the group and click the "+" button. You can then;
 - Toggle your plugins on/off for the group to in- or exclude them from the group.
@@ -48,6 +48,7 @@ You can enable or disable a group by clicking the "On" & "Off" buttons next to t
 -   Plugin Groups Enable: "Your Group Name"
 -   Plugin Groups Disable: "Your Group Name"
 
+![commands](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/commands.gif)
 
 ## Support
 
