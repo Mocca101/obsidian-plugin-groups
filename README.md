@@ -30,6 +30,9 @@ To use Obsidian Groups, enable it from the Community Plugins Menu and start orga
 
 ### Creating a Group
 
+
+![gorup creation](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/group-creation.gif)
+
 To create a new group head to the plugin settings, Enter a name for the group and click the "+" button. You can then;
 - Toggle your plugins on/off for the group to in- or exclude them from the group.
 - Choose whether or not commands should be generated for the group.
