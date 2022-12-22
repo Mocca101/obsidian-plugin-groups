@@ -6,7 +6,8 @@ import {PluginGroup} from "./src/PluginGroup";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
-	generateCommands: true
+	generateCommands: true,
+	showNoticeOnGroupLoad: false
 }
 
 export default class PgMain extends Plugin {
@@ -114,7 +115,6 @@ export default class PgMain extends Plugin {
 		if(!PgMain.instance) {return;}
 
 		PgMain.instance.settings = Object.assign({}, DEFAULT_SETTINGS);
-		console.log("-> PgMain.settings", PgMain.instance?.settings);
 
 		if(savedSettings?.groups && Array.isArray(savedSettings.groups)) {
 			PgMain.instance.settings.groupsMap = new Map<string, PluginGroup>();
@@ -126,6 +126,9 @@ export default class PgMain extends Plugin {
 				}));
 			});
 		}
+
+		PgMain.instance.settings.generateCommands = savedSettings.generateCommands;
+		PgMain.instance.settings.showNoticeOnGroupLoad = savedSettings.showNoticeOnGroupLoad;
 	}
 
 	async saveSettings() {
@@ -133,6 +136,7 @@ export default class PgMain extends Plugin {
 		const persistentSettings: PersistentSettings = {
 			groups:  Array.from(PgMain.instance?.settings.groupsMap.values() ?? []),
 			generateCommands: PgMain.instance?.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
+			showNoticeOnGroupLoad: PgMain.instance?.settings.showNoticeOnGroupLoad ?? DEFAULT_SETTINGS.showNoticeOnGroupLoad
 		}
 		await this.saveData(persistentSettings);
 	}

@@ -26,9 +26,21 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			.setName('Generate Commands for Groups')
 			.addToggle(tgl => {
 				tgl.setValue(PgMain.instance?.settings.generateCommands ?? false);
-				tgl.onChange(value => {
+				tgl.onChange(async value => {
 					if(!PgMain.instance) {return;}
-					PgMain.instance.settings.generateCommands = value
+					PgMain.instance.settings.generateCommands = value;
+					await PgMain.instance.saveSettings();
+				});
+			})
+
+		new Setting(generalParent)
+			.setName('Show Notice upon un-/loading groups')
+			.addToggle(tgl => {
+				tgl.setValue(PgMain.instance?.settings.showNoticeOnGroupLoad ?? false);
+				tgl.onChange(async value => {
+					if(!PgMain.instance) {return;}
+					PgMain.instance.settings.showNoticeOnGroupLoad = value;
+					await PgMain.instance.saveSettings();
 				});
 			})
 

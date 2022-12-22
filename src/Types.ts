@@ -8,9 +8,11 @@ export interface PgComponent {
 export interface PluginGroupsSettings {
 	groupsMap: Map<string, PluginGroup>;
 	generateCommands: boolean;
+	showNoticeOnGroupLoad: boolean;
 }
 
 export interface PersistentSettings {
 	groups: PluginGroup[];
 	generateCommands: boolean;
+	showNoticeOnGroupLoad: boolean;
 }

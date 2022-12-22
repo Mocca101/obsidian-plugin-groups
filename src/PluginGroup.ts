@@ -49,15 +49,35 @@ export class PluginGroup implements PgComponent{
 		}, this.delay * 1000)
 	}
 
-	enable() {
-		console.log("-> enabling ", this);
-		this.plugins.forEach(plugin => {
-			// @ts-ignore
-			app.plugins.enablePlugin(plugin.id);
-		})
-		this.groupIds.forEach(groupId =>
-			PgMain.groupFromId(groupId)?.enable()
-		);
+	async enable() {
+		const pluginPromises: Promise<any>[] = [];
+
+		for (const plugin of this.plugins) {
+			if(app.plugins.enabledPlugins.has(plugin.id)) { continue; }
+			pluginPromises.push( app.plugins.enablePlugin(plugin.id));
+		}
+
+		await Promise.allSettled(pluginPromises);
+		for (const groupId of this.groupIds) {
+				await PgMain.groupFromId(groupId)?.enable()
+			}
+		if(PgMain.instance?.settings.showNoticeOnGroupLoad) {
+			let messageString: string ='Loaded ' + this.name +'\n';
+
+			this.plugins && this.plugins.length > 0
+				? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
+				: messageString += '';
+
+			this.groupIds && this.groupIds.length > 0
+				? messageString += '- Groups:\n' + this.groupIds.map(g => {
+						const group = PgMain.groupFromId(g);
+						if(group) { return ' - ' + group.name + '\n';}
+					}).join('')
+				: messageString += '';
+
+
+			new Notice(messageString);
+		}
 	}
 
 	disable() {
@@ -69,6 +89,24 @@ export class PluginGroup implements PgComponent{
 		this.groupIds.forEach(groupId => {
 			PgMain.groupFromId(groupId)?.disable();
 		})
+
+		if(PgMain.instance?.settings.showNoticeOnGroupLoad) {
+			let messageString: string ='Disabled ' + this.name +'\n';
+
+			this.plugins && this.plugins.length > 0
+				? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
+				: messageString += '';
+
+			this.groupIds && this.groupIds.length > 0
+				? messageString += '- Groups:\n' + this.groupIds.map(g => {
+					const group = PgMain.groupFromId(g);
+					if(group) { return ' - ' + group.name + '\n';}
+				}).join('')
+				: messageString += '';
+
+
+			new Notice(messageString);
+		}
 	}
 
 	addPlugin(plugin: PgPlugin) : boolean {
