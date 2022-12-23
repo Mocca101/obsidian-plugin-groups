@@ -9,10 +9,13 @@ export interface PluginGroupsSettings {
 	groupsMap: Map<string, PluginGroup>;
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: boolean;
+	devices: string[];
 }
 
 export interface PersistentSettings {
 	groups: PluginGroup[];
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: boolean;
+	devices: string[];
+
 }

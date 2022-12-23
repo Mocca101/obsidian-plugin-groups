@@ -1,8 +1,10 @@
-import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
+import {App, Modal, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
 import PluginGroupEditModal from "./PluginGroupEditModal";
 import {generateGroupID} from "./Utilities";
 import {PluginGroup} from "./PluginGroup";
+import SetDeviceNameModal from "./SetDeviceNameModal";
+import ConfirmationPopupModal from "./ConfirmationPopupModal";
 
 export default class GroupSettingsTab extends PluginSettingTab {
 
@@ -20,7 +22,13 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		const generalParent = containerEl.createEl('h5', {text: 'General'});
+		if(!window.localStorage.getItem(PgMain.deviceNameKey)) {
+			new SetDeviceNameModal(app).open();
+		} else {
+			new Notice('Loaded on: ' + window.localStorage.getItem(PgMain.deviceNameKey),5000);
+		}
+
+		const generalParent = containerEl.createEl('h4', {text: 'General'});
 
 		new Setting(generalParent)
 			.setName('Generate Commands for Groups')
@@ -44,7 +52,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				});
 			})
 
-		const groupParent = containerEl.createEl('h5', {text: 'Groups'});
+		const groupParent = containerEl.createEl('div');
+		groupParent.createEl('h5', {text: 'Groups'});
 
 		let addBtnEl: HTMLButtonElement;
 
@@ -74,10 +83,12 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			)
 
 		this.GenerateGroupList(groupParent);
+
+		this.GenerateDeviceList(containerEl);
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {
-		PgMain.instance?.settings.groupsMap.forEach((group => {
+		PgMain.instance?.settings.groupsMap.forEach(group => {
 			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
 				.addButton(btn => {
@@ -99,8 +110,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			if(group.enableAtStartup) {
 				groupSetting.setDesc('Load plugins delayed by ' + group.delay + ' seconds');
 			}
-		}));
-
+		});
 	}
 
 	async addNewGroup() {
@@ -125,4 +135,64 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	editGroup(group: PluginGroup) {
 		new PluginGroupEditModal(this.app, this, group).open();
 	}
+
+	GenerateDeviceList(contentEl: HTMLElement) {
+		contentEl.createEl('h4', {text: 'Devices'});
+
+		new Setting(contentEl)
+			.setName('New Device')
+			.addButton(btn => {
+				btn.setIcon('plus');
+				btn.onClick(evt => {
+					new SetDeviceNameModal(app).open();
+				})
+			})
+
+		PgMain.instance?.settings.devices.forEach(device => {
+			if(window.localStorage.getItem(PgMain.deviceNameKey) === device) {
+				new Setting(contentEl)
+					.setName(device)
+					.setDesc('Current Device')
+					.addButton(btn => {
+						btn.setIcon('trash');
+						btn.onClick(evt => new ConfirmationPopupModal(this.app,
+							'This is the currently active device, are you sure?',
+							void 0,
+							'Delete',
+							() => {
+								this.ResetCurrentDevice();
+							}).open());
+					})
+			} else {
+				new Setting(contentEl)
+					.setName(device)
+					.addButton(btn => {
+						btn.setButtonText('Set as Current');
+						btn.onClick(evt => window.localStorage.setItem(PgMain.deviceNameKey, device))
+					})
+					.addButton(btn => {
+						btn.setIcon('trash');
+						btn.onClick(() => new ConfirmationPopupModal(this.app,
+							'You are about to delete: ' + device,
+							void 0,
+							'Delete',
+							() => {
+								PgMain.instance?.settings.devices.remove(device);
+							}).open());
+					})
+			}
+
+		});
+	}
+
+	ResetCurrentDevice() {
+		const device: string | null = window.localStorage.getItem(PgMain.deviceNameKey);
+
+		if(!device) { return ;}
+		PgMain.instance?.settings.devices.remove(device);
+		window.localStorage.removeItem(PgMain.deviceNameKey);
+
+	}
+
+
 }

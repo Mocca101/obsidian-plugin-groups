@@ -7,12 +7,16 @@ import {PluginGroup} from "./src/PluginGroup";
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
 	generateCommands: true,
-	showNoticeOnGroupLoad: false
+	showNoticeOnGroupLoad: false,
+	devices: []
 }
 
 export default class PgMain extends Plugin {
 	static disableStartupTimeout = 20;
 	static pluginId = 'obsidian-plugin-groups';
+
+	static deviceNameKey = 'obsidian-plugin-groups-device-name';
+
 
 	enableGroupCommandPrefix = 'plugin-groups-enable-';
 	disableGroupCommandPrefix = 'plugin-groups-disable-';
@@ -118,6 +122,15 @@ export default class PgMain extends Plugin {
 
 		if(!savedSettings) {return;}
 
+		if(!PgMain.instance.settings) {return;}
+
+		Object.keys(PgMain.instance?.settings).forEach(function(key) {
+			if (key in savedSettings) {
+				// @ts-ignore
+				PgMain.instance.settings[key] = savedSettings[key];
+			}
+		});
+
 		if(savedSettings.groups && Array.isArray(savedSettings.groups)) {
 			PgMain.instance.settings.groupsMap = new Map<string, PluginGroup>();
 			savedSettings.groups.forEach(g => {
@@ -129,16 +142,14 @@ export default class PgMain extends Plugin {
 			});
 		}
 
-		PgMain.instance.settings.generateCommands = savedSettings.generateCommands;
-		PgMain.instance.settings.showNoticeOnGroupLoad = savedSettings.showNoticeOnGroupLoad;
 	}
 
 	async saveSettings() {
-
 		const persistentSettings: PersistentSettings = {
 			groups:  Array.from(PgMain.instance?.settings.groupsMap.values() ?? []),
 			generateCommands: PgMain.instance?.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
-			showNoticeOnGroupLoad: PgMain.instance?.settings.showNoticeOnGroupLoad ?? DEFAULT_SETTINGS.showNoticeOnGroupLoad
+			showNoticeOnGroupLoad: PgMain.instance?.settings.showNoticeOnGroupLoad ?? DEFAULT_SETTINGS.showNoticeOnGroupLoad,
+			devices: PgMain.instance?.settings.devices ?? DEFAULT_SETTINGS.devices
 		}
 		await this.saveData(persistentSettings);
 	}
