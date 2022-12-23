@@ -1,4 +1,4 @@
-import {App, Modal, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
+import {App, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
 import PluginGroupEditModal from "./PluginGroupEditModal";
 import {generateGroupID} from "./Utilities";
@@ -23,7 +23,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		if(!window.localStorage.getItem(PgMain.deviceNameKey)) {
-			new SetDeviceNameModal(app).open();
+			new SetDeviceNameModal(app, this).open();
 		} else {
 			new Notice('Loaded on: ' + window.localStorage.getItem(PgMain.deviceNameKey),5000);
 		}
@@ -143,8 +143,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			.setName('New Device')
 			.addButton(btn => {
 				btn.setIcon('plus');
-				btn.onClick(evt => {
-					new SetDeviceNameModal(app).open();
+				btn.onClick(() => {
+					new SetDeviceNameModal(app, this).open();
 				})
 			})
 
@@ -155,7 +155,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 					.setDesc('Current Device')
 					.addButton(btn => {
 						btn.setIcon('trash');
-						btn.onClick(evt => new ConfirmationPopupModal(this.app,
+						btn.onClick(() => new ConfirmationPopupModal(this.app,
 							'This is the currently active device, are you sure?',
 							void 0,
 							'Delete',
@@ -168,7 +168,10 @@ export default class GroupSettingsTab extends PluginSettingTab {
 					.setName(device)
 					.addButton(btn => {
 						btn.setButtonText('Set as Current');
-						btn.onClick(evt => window.localStorage.setItem(PgMain.deviceNameKey, device))
+						btn.onClick(() => {
+							window.localStorage.setItem(PgMain.deviceNameKey, device);
+							this.display();
+						});
 					})
 					.addButton(btn => {
 						btn.setIcon('trash');
@@ -178,6 +181,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 							'Delete',
 							() => {
 								PgMain.instance?.settings.devices.remove(device);
+								this.display();
 							}).open());
 					})
 			}
@@ -191,6 +195,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		if(!device) { return ;}
 		PgMain.instance?.settings.devices.remove(device);
 		window.localStorage.removeItem(PgMain.deviceNameKey);
+		this.display();
 
 	}
 

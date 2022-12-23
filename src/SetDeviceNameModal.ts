@@ -1,6 +1,6 @@
 import {App, Modal, Notice, Setting} from "obsidian";
 import PgMain from "../main";
-import ConfirmationPopupModal from "./ConfirmationPopupModal";
+import GroupSettingsTab from "./GroupSettingsTab";
 
 export default class SetDeviceNameModal extends Modal {
 
@@ -10,13 +10,16 @@ export default class SetDeviceNameModal extends Modal {
 
 	confirmText: string;
 
+	settingsTab: GroupSettingsTab;
+
 	deviceName = '';
 
-	constructor(app: App) {
+	constructor(app: App, settingsTab: GroupSettingsTab) {
 		super(app);
 		this.headerText = 'New device detected please enter a unique name.';
 		this.cancelText = 'Cancel';
 		this.confirmText = 'Confirm';
+		this.settingsTab = settingsTab;
 	}
 
 	onOpen() {
@@ -56,13 +59,17 @@ export default class SetDeviceNameModal extends Modal {
 			.addButton(btn => {
 				btn.setButtonText(this.confirmText);
 				btn.onClick(() => {
+					if(!this.deviceName || this.deviceName.replace(' ', '') === '') {return;}
+
 					if(PgMain.instance?.settings.devices.contains(this.deviceName)) {
 						new Notice('Name already in use for other device');
 						return;
 					}
+
 					window.localStorage.setItem(PgMain.deviceNameKey, this.deviceName);
 					PgMain.instance?.settings.devices.push(this.deviceName);
 					PgMain.instance?.saveSettings();
+					this.settingsTab.display();
 					this.close();
 				})
 			})

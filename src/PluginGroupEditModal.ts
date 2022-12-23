@@ -120,7 +120,7 @@ export default class PluginGroupEditModal extends Modal {
 		const headerSetting = new Setting(this.pluginSelection)
 			.addButton(btn => {
 				btn.setIcon('eye')
-				btn.onClick(e => {
+				btn.onClick(() => {
 					if(!searchAndList) { return; }
 					if (showingPlugins) {
 						btn.setIcon('eye-off');
@@ -178,7 +178,7 @@ export default class PluginGroupEditModal extends Modal {
 		const headerSetting = new Setting(this.groupSelection)
 			.addButton(btn => {
 				btn.setIcon('eye')
-				btn.onClick(e => {
+				btn.onClick(() => {
 					if(!searchAndList) { return; }
 					if (showGroups) {
 						btn.setIcon('eye-off');
@@ -255,7 +255,8 @@ export default class PluginGroupEditModal extends Modal {
 		new Setting(footer)
 			.addButton(btn => {
 				btn.setButtonText('Delete');
-				btn.onClick(() => new ConfirmationPopupModal(this.app,
+				btn.onClick(() =>
+					new ConfirmationPopupModal(this.app,
 					'You are about to delete: ' + this.groupToEdit.name,
 					void 0,
 					'Delete',
