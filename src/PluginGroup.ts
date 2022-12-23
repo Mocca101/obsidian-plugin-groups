@@ -76,7 +76,7 @@ export class PluginGroup implements PgComponent{
 				: messageString += '';
 
 
-			new Notice(messageString);
+			new Notice(messageString,5000);
 		}
 	}
 
