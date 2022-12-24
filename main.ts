@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 }
 
 export default class PgMain extends Plugin {
-	static disableStartupTimeout = 20;
+	static disableStartupTimeout = 25;
 	static pluginId = 'obsidian-plugin-groups';
 
 	static deviceNameKey = 'obsidian-plugin-groups-device-name';
@@ -47,12 +47,10 @@ export default class PgMain extends Plugin {
 			PgMain.instance.settings.groupsMap.forEach(group => this.AddGroupCommands(group.id));		}
 
 		// TODO: Improve hacky solution if possible
-		if(process.uptime()) {
-			if(process.uptime() < PgMain.disableStartupTimeout) {
-				PgMain.instance.settings.groupsMap.forEach(group => {
-					if (group.enableAtStartup) group.startup();
-				});
-			}
+		if(window.performance.now() / 1000 < PgMain.disableStartupTimeout) {
+			PgMain.instance.settings.groupsMap.forEach(group => {
+				if (group.enableAtStartup) group.startup();
+			});
 		}
 	}
 

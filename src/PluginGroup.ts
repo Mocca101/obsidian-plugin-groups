@@ -53,7 +53,9 @@ export class PluginGroup implements PgComponent{
 		const pluginPromises: Promise<any>[] = [];
 
 		for (const plugin of this.plugins) {
+			// @ts-ignore
 			if(app.plugins.enabledPlugins.has(plugin.id)) { continue; }
+			// @ts-ignore
 			pluginPromises.push( app.plugins.enablePlugin(plugin.id));
 		}
 
