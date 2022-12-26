@@ -82,24 +82,6 @@ export class PluginGroup implements PluginGroupData {
 		}
 	}
 
-	getGroupListString() : string {
-		let messageString = '';
-		this.plugins && this.plugins.length > 0
-			? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
-			: messageString += '';
-
-		this.groupIds && this.groupIds.length > 0
-			? messageString += '- Groups:\n' + this.groupIds.map(g => {
-				const group = PgMain.groupFromId(g);
-				if (group) {
-					return ' - ' + group.name + '\n';
-				}
-			}).join('')
-			: messageString += '';
-
-		return messageString;
-	}
-
 	disable() {
 		if (!this.groupActive()) {
 			return;
@@ -118,6 +100,24 @@ export class PluginGroup implements PluginGroupData {
 
 			new Notice(messageString);
 		}
+	}
+
+	getGroupListString() : string {
+		let messageString = '';
+		this.plugins && this.plugins.length > 0
+			? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
+			: messageString += '';
+
+		this.groupIds && this.groupIds.length > 0
+			? messageString += '- Groups:\n' + this.groupIds.map(g => {
+				const group = PgMain.groupFromId(g);
+				if (group && group.groupActive()) {
+					return ' - ' + group.name + '\n';
+				}
+			}).join('')
+			: messageString += '';
+
+		return messageString;
 	}
 
 	addPlugin(plugin: PgPlugin): boolean {

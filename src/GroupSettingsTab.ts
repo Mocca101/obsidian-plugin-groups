@@ -97,16 +97,18 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
 				.addButton(btn => {
-					btn.setButtonText('Enable All');
+					btn.setButtonText('Enable');
 					btn.setIcon('power');
 					btn.onClick(async () => {
 						await group.enable();
 					});
+					group.groupActive() ? btn.buttonEl.removeClass('btn-disabled') : btn.buttonEl.addClass('btn-disabled');
 				})
 				.addButton(btn => {
-					btn.setButtonText('Disable All');
+					btn.setButtonText('Disable');
 					btn.setIcon('power-off');
 					btn.onClick(() => group.disable());
+					group.groupActive() ? btn.buttonEl.removeClass('btn-disabled') : btn.buttonEl.addClass('btn-disabled');
 				})
 				.addButton(btn => {
 					btn.setIcon('pencil')
