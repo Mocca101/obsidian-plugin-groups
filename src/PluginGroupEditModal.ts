@@ -1,6 +1,6 @@
 import {App, Modal, Setting} from "obsidian";
 import GroupSettingsTab from "./GroupSettingsTab";
-import {getAllAvailablePlugins} from "./Utilities";
+import {generateGroupID, getAllAvailablePlugins} from "./Utilities";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
 import PgMain from "../main";
 import {PluginGroup} from "./PluginGroup";
@@ -66,33 +66,15 @@ export default class PluginGroupEditModal extends Modal {
 				}
 			)
 
-		const getDevicesDescription = () => {
-			let description = 'Active on All devices';
-
-			if(!this.groupToEdit.assignedDevices) {return description;}
-			const arr : string[] = this.groupToEdit.assignedDevices.filter(device => PgMain.instance?.settings.devices.contains(device));
-			if(arr?.length > 0) {
-				description = 'Active on: ' + arr.reduce((acc, curr, i, arr) => {
-					if (i < 3) {
-						return acc + ', ' + curr;
-					} else if (i === arr.length - 1) {
-						return acc + ', ... and ' + (i - 2) + ' other' + (i - 2 > 1 ? 's' : '');
-					}
-					return acc;
-				})
-			}
-			return description;
-		};
-
-		const devicesSetting = new Setting(contentEl)
+				const devicesSetting = new Setting(contentEl)
 			.setName('Devices')
-			.setDesc(getDevicesDescription())
+			.setDesc(this.getDevicesDescription())
 			.addButton(btn => {
 				btn.setIcon('pencil')
 					.onClick(() => {
 						new DeviceSelectionModal(app, (evt: CustomEvent) => {
 							this.groupToEdit.assignedDevices = evt.detail.devices;
-							devicesSetting.setDesc(getDevicesDescription());
+							devicesSetting.setDesc(this.getDevicesDescription());
 						}, this.groupToEdit.assignedDevices).open();
 					})
 			})
@@ -106,6 +88,23 @@ export default class PluginGroupEditModal extends Modal {
 		this.GenerateFooter(modalEl);
 	}
 
+	getDevicesDescription () {
+		let description = 'Active on All devices';
+
+		if(!this.groupToEdit.assignedDevices) {return description;}
+		const arr : string[] = this.groupToEdit.assignedDevices.filter(device => PgMain.instance?.settings.devices.contains(device));
+		if(arr?.length > 0) {
+			description = 'Active on: ' + arr.reduce((acc, curr, i, arr) => {
+				if (i < 3) {
+					return acc + ', ' + curr;
+				} else if (i === arr.length - 1) {
+					return acc + ', ... and ' + (i - 2) + ' other' + (i - 2 > 1 ? 's' : '');
+				}
+				return acc;
+			})
+		}
+		return description;
+	}
 
 	private GenerateStartupSettings(contentEl: HTMLElement) {
 
@@ -294,6 +293,11 @@ export default class PluginGroupEditModal extends Modal {
 				btn.setButtonText('Save');
 				btn.onClick(() => this.saveChanges());
 			})
+			.addExtraButton(btn => {
+				btn.setIcon('copy')
+					.setTooltip('Duplicate this group')
+					.onClick(() => this.duplicate());
+			})
 			.settingEl.addClass('modal-footer');
 	}
 
@@ -364,6 +368,20 @@ export default class PluginGroupEditModal extends Modal {
 		} else {
 			await this.addGroup(this.groupToEdit)
 		}
+	}
+
+	async duplicate() {
+		const duplicateGroup = new PluginGroup(this.groupToEdit);
+		const groupMap = PgMain.instance?.settings.groupsMap;
+
+		if(!groupMap) { return; }
+		duplicateGroup.name += '-Duplicate';
+		const genId = generateGroupID(duplicateGroup.name);
+
+		if(!genId) { return; }
+		duplicateGroup.id = genId;
+
+		await this.addGroup(duplicateGroup)
 	}
 
 	async addGroup(group: PluginGroup) {
