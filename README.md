@@ -7,7 +7,7 @@ A plugin that allows you to easily group and manage your other plugins in Obsidi
 -   **Grouping:** Organize your plugins into logical groups to make it easier to manage them.
 -   **Bulk actions:** Enable or disable the plugins in a group with a single click or command.
 -   **Delayed Group Loading:** You can set your groups to load after a custom delay following Obsidian's startup. This can be useful for reducing the load on your system during startup, resulting in shorter loading times.
--   **Group Nesting:** Manage your groups with groups.  E.g. you have a group for style related plugin and one for Plugins you use often but don't need immediately on start up. Create both of them and add them To a parent group that loads these delayed on start up so you can get to work quickly without having to wait for all of them to load.
+-   **Group Nesting:** Manage your groups with groups.  E.g. you have a group for style related plugin and one for Plugins you use often but don't need immediately on start up. Create both of them and add them To a parent group that loads these delayed on start up, so you can get to work quickly without having to wait for all of them to load.
 
 ## Installation
 
@@ -28,11 +28,11 @@ To use Obsidian Groups, enable it from the Community Plugins Menu and start orga
 
 ### Creating a Group
 
-![gorup-creation](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/group-creation.gif)
+![group-creation](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/group-creation.gif)
 
 To create a new group head to the plugin settings, Enter a name for the group and click the "+" button. You can then;
 - Toggle your plugins on/off for the group to in- or exclude them from the group.
-- Choose whether or not commands should be generated for the group.
+- Choose whether commands should be generated for the group.
 - Set the group to launch on Obsidian's startup (with or without delay).
 - Include other groups to be controlled by this group.
   Click "Save" to finish the creation process.

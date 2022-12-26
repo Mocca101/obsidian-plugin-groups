@@ -1,6 +1,5 @@
-import {App, Modal, Notice, Setting} from "obsidian";
+import {App, Modal, Setting} from "obsidian";
 import PgMain from "../main";
-import GroupSettingsTab from "./GroupSettingsTab";
 
 export default class DeviceSelectionModal extends Modal {
 
@@ -9,10 +8,6 @@ export default class DeviceSelectionModal extends Modal {
 	cancelText: string;
 
 	confirmText: string;
-
-	settingsTab: GroupSettingsTab;
-
-	deviceName = '';
 
 	eventTarget: EventTarget = new EventTarget();
 

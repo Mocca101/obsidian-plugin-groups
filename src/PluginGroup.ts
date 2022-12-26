@@ -33,21 +33,19 @@ export class PluginGroup implements PluginGroupData {
 		this.assignedDevices = args.assignedDevices;
 	}
 
-	groupActive() : boolean {
-		if(!this.assignedDevices || this.assignedDevices.length === 0) {
+	groupActive(): boolean {
+		if (!this.assignedDevices || this.assignedDevices.length === 0) {
 			return true;
 		}
 
-		const activeDevice : string | null = getCurrentlyActiveDevice();
+		const activeDevice: string | null = getCurrentlyActiveDevice();
 		if (!activeDevice) {
 			return true;
 		}
 
-		if(this.assignedDevices?.contains(activeDevice)) {
-			return true;
-		}
+		return !!this.assignedDevices?.contains(activeDevice);
 
-		return false;
+
 	}
 
 	assignAndLoadPlugins(plugins?: PgPlugin[]) {
@@ -61,42 +59,49 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	async enable() {
-		if(!this.groupActive()) {
+		if (!this.groupActive()) {
 			return;
 		}
 
-		const pluginPromises: Promise<any>[] = [];
+		const pluginPromises: Promise<boolean>[] = [];
 
 		for (const plugin of this.plugins) {
-			if(checkPluginEnabled(plugin)) { continue; }
-			pluginPromises.push( enablePlugin(plugin));
+			if (checkPluginEnabled(plugin)) {
+				continue;
+			}
+			pluginPromises.push(enablePlugin(plugin));
 		}
 
 		await Promise.allSettled(pluginPromises);
 		for (const groupId of this.groupIds) {
-				await PgMain.groupFromId(groupId)?.enable()
-			}
-		if(PgMain.instance?.settings.showNoticeOnGroupLoad) {
-			let messageString: string ='Loaded ' + this.name +'\n';
-
-			this.plugins && this.plugins.length > 0
-				? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
-				: messageString += '';
-
-			this.groupIds && this.groupIds.length > 0
-				? messageString += '- Groups:\n' + this.groupIds.map(g => {
-						const group = PgMain.groupFromId(g);
-						if(group) { return ' - ' + group.name + '\n';}
-					}).join('')
-				: messageString += '';
-
-
-			new Notice(messageString,5000);
+			await PgMain.groupFromId(groupId)?.enable()
+		}
+		if (PgMain.instance?.settings.showNoticeOnGroupLoad) {
+			const messageString: string = 'Loaded ' + this.name + '\n' + this.getGroupListString();
+			new Notice(messageString, 5000);
 		}
 	}
 
+	getGroupListString() : string {
+		let messageString = '';
+		this.plugins && this.plugins.length > 0
+			? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
+			: messageString += '';
+
+		this.groupIds && this.groupIds.length > 0
+			? messageString += '- Groups:\n' + this.groupIds.map(g => {
+				const group = PgMain.groupFromId(g);
+				if (group) {
+					return ' - ' + group.name + '\n';
+				}
+			}).join('')
+			: messageString += '';
+
+		return messageString;
+	}
+
 	disable() {
-		if(!this.groupActive()) {
+		if (!this.groupActive()) {
 			return;
 		}
 
@@ -108,35 +113,23 @@ export class PluginGroup implements PluginGroupData {
 			PgMain.groupFromId(groupId)?.disable();
 		})
 
-		if(PgMain.instance?.settings.showNoticeOnGroupLoad) {
-			let messageString: string ='Disabled ' + this.name +'\n';
-
-			this.plugins && this.plugins.length > 0
-				? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
-				: messageString += '';
-
-			this.groupIds && this.groupIds.length > 0
-				? messageString += '- Groups:\n' + this.groupIds.map(g => {
-					const group = PgMain.groupFromId(g);
-					if(group) { return ' - ' + group.name + '\n';}
-				}).join('')
-				: messageString += '';
-
+		if (PgMain.instance?.settings.showNoticeOnGroupLoad) {
+			const messageString: string = 'Disabled ' + this.name + '\n' + this.getGroupListString();
 
 			new Notice(messageString);
 		}
 	}
 
-	addPlugin(plugin: PgPlugin) : boolean {
-		if(this.plugins.map(p => p.id).contains(plugin.id)) return false;
+	addPlugin(plugin: PgPlugin): boolean {
+		if (this.plugins.map(p => p.id).contains(plugin.id)) return false;
 
 		this.plugins.push(plugin);
 		return true;
 	}
 
-	addGroup(group: PluginGroup) : boolean {
-		if(!group.wouldHaveCyclicGroups(this.id)) {
-			if(this.groupIds.contains(group.id)) return false;
+	addGroup(group: PluginGroup): boolean {
+		if (!group.wouldHaveCyclicGroups(this.id)) {
+			if (this.groupIds.contains(group.id)) return false;
 
 			this.groupIds.push(group.id)
 			return true;
@@ -149,7 +142,7 @@ export class PluginGroup implements PluginGroupData {
 	removePlugin(plugin: PgPlugin): boolean {
 		const indexOfPlugin: number = this.plugins.map(p => p.id).indexOf(plugin.id);
 
-		if(indexOfPlugin === -1) return true;
+		if (indexOfPlugin === -1) return true;
 
 		return this.plugins.splice(indexOfPlugin, 1).length > 0;
 	}
@@ -157,19 +150,19 @@ export class PluginGroup implements PluginGroupData {
 	removeGroup(group: PluginGroup): boolean {
 		const indexOfGroup = this.groupIds.indexOf(group.id);
 
-		if(indexOfGroup === -1) return true;
+		if (indexOfGroup === -1) return true;
 
 		return this.groupIds.splice(indexOfGroup, 1).length > 0;
 	}
 
-	wouldHaveCyclicGroups(idToCheck: string) : boolean {
-		if(this.id === idToCheck) {
+	wouldHaveCyclicGroups(idToCheck: string): boolean {
+		if (this.id === idToCheck) {
 			return true;
 		}
 
 		for (let i = 0; i < this.groupIds.length; i++) {
 			const groupId = this.groupIds[i];
-			if(PgMain.groupFromId(groupId)?.wouldHaveCyclicGroups(idToCheck)) {
+			if (PgMain.groupFromId(groupId)?.wouldHaveCyclicGroups(idToCheck)) {
 				return true;
 			}
 		}
@@ -177,7 +170,7 @@ export class PluginGroup implements PluginGroupData {
 	}
 }
 
-interface PluginGroupData extends  PgComponent{
+interface PluginGroupData extends PgComponent {
 	plugins?: PgPlugin[];
 	groupIds?: string[];
 	generateCommands?: boolean;
