@@ -1,9 +1,12 @@
 import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
 import PluginGroupEditModal from "./PluginGroupEditModal";
-import {generateGroupID} from "./Utilities";
+import {
+	generateGroupID,
+	getCurrentlyActiveDevice,
+	setCurrentlyActiveDevice
+} from "./Utilities";
 import {PluginGroup} from "./PluginGroup";
-import DeviceSelectionModal from "./DeviceSelectionModal";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
 
 export default class GroupSettingsTab extends PluginSettingTab {
@@ -22,10 +25,9 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		// @ts-ignore
-		if(app.loadLocalStorage(PgMain.deviceNameKey) && PgMain.instance?.settings.showNoticeOnGroupLoad) {
-			// @ts-ignore
-			new Notice('Loaded on following device: ' + app.loadLocalStorage(PgMain.deviceNameKey),5000);
+
+		if(getCurrentlyActiveDevice() && PgMain.instance?.settings.showNoticeOnGroupLoad) {
+			new Notice('Loaded on following device: ' + getCurrentlyActiveDevice(),5000);
 		}
 
 		const generalParent = containerEl.createEl('h4', {text: 'General'});
@@ -152,8 +154,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			PgMain.instance?.settings.devices.push(newDeviceName);
 			PgMain.instance?.saveSettings();
 
-			// @ts-ignore
-			if(!app.loadLocalStorage(PgMain.deviceNameKey)) { app.saveLocalStorage(PgMain.deviceNameKey, newDeviceName); }
+
+			if(!getCurrentlyActiveDevice()) { setCurrentlyActiveDevice(newDeviceName); }
 
 			this.display();
 
@@ -198,11 +200,10 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			})
 
 		PgMain.instance?.settings.devices.forEach(device => {
-			const devSetting = new Setting(contentEl)
+			const deviceSetting = new Setting(contentEl)
 				.setName(device);
-			// @ts-ignore
-			if(app.loadLocalStorage(PgMain.deviceNameKey) === device) {
-				devSetting
+			if(getCurrentlyActiveDevice() === device) {
+				deviceSetting
 					.setDesc('Current Device')
 					.addButton(btn => {
 						btn.setIcon('trash');
@@ -215,12 +216,11 @@ export default class GroupSettingsTab extends PluginSettingTab {
 							}).open());
 					})
 			} else {
-				devSetting
+				deviceSetting
 					.addButton(btn => {
 						btn.setButtonText('Set as Current');
 						btn.onClick(() => {
-							// @ts-ignore
-							app.saveLocalStorage(PgMain.deviceNameKey, device);
+							setCurrentlyActiveDevice(device);
 							this.display();
 						});
 					})
@@ -242,13 +242,11 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	ResetCurrentDevice() {
-		// @ts-ignore
-		const device: string | null = app.loadLocalStorage(PgMain.deviceNameKey);
+		const device: string | null = getCurrentlyActiveDevice();
 
 		if(!device) { return ;}
 		PgMain.instance?.settings.devices.remove(device);
-		// @ts-ignore
-		app.saveLocalStorage(PgMain.deviceNameKey, null);
+		setCurrentlyActiveDevice(null);
 		this.display();
 
 	}

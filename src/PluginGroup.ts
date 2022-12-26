@@ -2,6 +2,7 @@ import {PgComponent} from "./Types";
 import {PgPlugin} from "./PgPlugin";
 import {Notice} from "obsidian";
 import PgMain from "../main";
+import {checkPluginEnabled, disablePlugin, enablePlugin, getCurrentlyActiveDevice} from "./Utilities";
 
 export class PluginGroup implements PluginGroupData {
 
@@ -43,13 +44,16 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	async enable() {
+		const activeDevice : string | null = getCurrentlyActiveDevice();
+		if(this.assignedDevices && activeDevice && !this.assignedDevices.contains(activeDevice)) {
+			return;
+		}
+
 		const pluginPromises: Promise<any>[] = [];
 
 		for (const plugin of this.plugins) {
-			// @ts-ignore
-			if(app.plugins.enabledPlugins.has(plugin.id)) { continue; }
-			// @ts-ignore
-			pluginPromises.push( app.plugins.enablePlugin(plugin.id));
+			if(checkPluginEnabled(plugin)) { continue; }
+			pluginPromises.push( enablePlugin(plugin));
 		}
 
 		await Promise.allSettled(pluginPromises);
@@ -77,8 +81,7 @@ export class PluginGroup implements PluginGroupData {
 
 	disable() {
 		this.plugins.forEach(plugin => {
-			// @ts-ignore
-			app.plugins.disablePlugin(plugin.id);
+			disablePlugin(plugin);
 		})
 
 		this.groupIds.forEach(groupId => {

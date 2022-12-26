@@ -36,4 +36,39 @@ export function generateGroupID(name: string, existingGroupID: { map?: Map<strin
 	return undefined;
 }
 
+export function saveVaultLocalStorage (key: string, object: any) : void {
+	// @ts-ignore
+	app.saveLocalStorage(key, object);
+}
+
+export function loadVaultLocalStorage (key: string) : unknown {
+	// @ts-ignore
+	return app.loadLocalStorage(key);
+}
+
+export function getCurrentlyActiveDevice () : string | null {
+	if(loadVaultLocalStorage(PgMain.deviceNameKey) instanceof String || typeof loadVaultLocalStorage(PgMain.deviceNameKey) === 'string') {
+		return loadVaultLocalStorage(PgMain.deviceNameKey) as string;
+	}
+	return null;
+}
+
+export function setCurrentlyActiveDevice (device: string | null) {
+	saveVaultLocalStorage(PgMain.deviceNameKey, device);
+}
+
+export function checkPluginEnabled (plugin: PgPlugin) : boolean {
+	// @ts-ignore
+	return app.plugins.enabledPlugins.has(plugin.id);
+}
+
+export async function enablePlugin (plugin: PgPlugin) : Promise<boolean> {
+	// @ts-ignore
+	return app.plugins.enablePlugin(plugin.id);
+}
+
+export function disablePlugin (plugin: PgPlugin) {
+	// @ts-ignore
+	app.plugins.disablePlugin(plugin.id);
+}
 
