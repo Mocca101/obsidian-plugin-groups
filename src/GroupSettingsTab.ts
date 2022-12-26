@@ -61,16 +61,19 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			.setName('Add Group')
 			.addText(text => {
 				this.groupNameField = text;
-				this.groupNameField.setPlaceholder('Enter group name...');
-				this.groupNameField.setValue(this.newGroupName);
-				this.groupNameField.onChange(val => {
+				this.groupNameField.setPlaceholder('Enter group name...')
+					.setValue(this.newGroupName)
+					.onChange(val => {
 						this.newGroupName = val;
 						if (addBtnEl) {
-							val.length > 0 ?
+							val.replace(' ', '').length > 0 ?
 								addBtnEl.removeClass('btn-disabled')
 								: addBtnEl.addClass('btn-disabled');
 						}
 					})
+					.inputEl.onkeydown = async e => {
+						if(e.key === 'Enter') { await this.addNewGroup() }
+					};
 				}
 			)
 			.addButton(btn => {
