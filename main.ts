@@ -1,7 +1,6 @@
 import {Command, Plugin} from 'obsidian';
 import {PersistentSettings, PluginGroupsSettings} from "./src/Types";
 import GroupSettingsTab from "./src/GroupSettingsTab";
-import * as process from "process";
 import {PluginGroup} from "./src/PluginGroup";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
@@ -14,7 +13,6 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 export default class PgMain extends Plugin {
 	static disableStartupTimeout = 25;
 	static pluginId = 'obsidian-plugin-groups';
-
 	static deviceNameKey = 'obsidian-plugin-groups-device-name';
 
 
@@ -132,11 +130,7 @@ export default class PgMain extends Plugin {
 		if(savedSettings.groups && Array.isArray(savedSettings.groups)) {
 			PgMain.instance.settings.groupsMap = new Map<string, PluginGroup>();
 			savedSettings.groups.forEach(g => {
-				PgMain.instance?.settings.groupsMap.set(g.id, new PluginGroup({
-					id: g.id,
-					name: g.name,
-					pg: g
-				}));
+				PgMain.instance?.settings.groupsMap.set(g.id, new PluginGroup(g));
 			});
 		}
 

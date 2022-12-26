@@ -3,10 +3,11 @@ import {PgPlugin} from "./PgPlugin";
 import {Notice} from "obsidian";
 import PgMain from "../main";
 
-export class PluginGroup implements PgComponent{
+export class PluginGroup implements PluginGroupData {
 
 	id: string;
 	name: string;
+
 	plugins: PgPlugin[];
 	groupIds: string[];
 
@@ -15,28 +16,20 @@ export class PluginGroup implements PgComponent{
 	enableAtStartup = false;
 	delay = 0;
 
-	constructor(args: PluginGroupConstructorArgs) {
-		if(args.pg) {
-			this.id = args.pg.id;
-			this.name = args.pg.name;
+	assignedDevices?: string[];
 
-			this.assignAndLoadPlugins(args.pg.plugins);
-			this.groupIds = args.pg.groupIds ?? [];
-
-			this.enableAtStartup = args.pg.enableAtStartup;
-			this.delay = args.pg.delay;
-			this.generateCommands = args.pg.generateCommands;
-			return;
-		}
+	constructor(args: PluginGroupData) {
 		this.id = args.id;
 		this.name = args.name;
 
 		this.assignAndLoadPlugins(args.plugins);
 		this.groupIds = args.groupIds ?? [];
 
-		this.enableAtStartup = args.isStartup ?? false;
+		this.enableAtStartup = args.enableAtStartup ?? false;
 		this.delay = args.delay ?? 2;
 		this.generateCommands = args.generateCommands ?? false;
+
+		this.assignedDevices = args.assignedDevices;
 	}
 
 	assignAndLoadPlugins(plugins?: PgPlugin[]) {
@@ -45,7 +38,7 @@ export class PluginGroup implements PgComponent{
 
 	startup() {
 		setTimeout(async () => {
-			this.enable()
+			await this.enable()
 		}, this.delay * 1000)
 	}
 
@@ -161,15 +154,11 @@ export class PluginGroup implements PgComponent{
 	}
 }
 
-
-interface PluginGroupConstructorArgs {
-	id: string;
-	name:string;
-	pg?: PluginGroup;
+interface PluginGroupData extends  PgComponent{
 	plugins?: PgPlugin[];
 	groupIds?: string[];
-	active?: boolean;
-	isStartup?: boolean;
-	delay?: number;
 	generateCommands?: boolean;
+	enableAtStartup?: boolean;
+	delay?: number;
+	assignedDevices?: string[];
 }

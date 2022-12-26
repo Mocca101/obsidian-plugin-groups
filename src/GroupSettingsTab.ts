@@ -1,9 +1,9 @@
-import {App, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
+import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
 import PluginGroupEditModal from "./PluginGroupEditModal";
 import {generateGroupID} from "./Utilities";
 import {PluginGroup} from "./PluginGroup";
-import SetDeviceNameModal from "./SetDeviceNameModal";
+import DeviceSelectionModal from "./DeviceSelectionModal";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
 
 export default class GroupSettingsTab extends PluginSettingTab {
@@ -22,10 +22,10 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		if(!window.localStorage.getItem(PgMain.deviceNameKey)) {
-			new SetDeviceNameModal(app, this).open();
-		} else {
-			new Notice('Loaded on: ' + window.localStorage.getItem(PgMain.deviceNameKey),5000);
+		// @ts-ignore
+		if(app.loadLocalStorage(PgMain.deviceNameKey) && PgMain.instance?.settings.showNoticeOnGroupLoad) {
+			// @ts-ignore
+			new Notice('Loaded on following device: ' + app.loadLocalStorage(PgMain.deviceNameKey),5000);
 		}
 
 		const generalParent = containerEl.createEl('h4', {text: 'General'});
@@ -97,8 +97,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				.addButton(btn => {
 					btn.setButtonText('Enable All');
 					btn.setIcon('power');
-					btn.onClick(() => {
-						group.enable()
+					btn.onClick(async () => {
+						await group.enable();
 					});
 				})
 				.addButton(btn => {
@@ -140,21 +140,69 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {
+		let newDeviceName = '';
+		const CreateNewDevice = () => {
+			if(!newDeviceName || newDeviceName.replace(' ', '') === '') {return;}
+
+			if(PgMain.instance?.settings.devices.contains(newDeviceName)) {
+				new Notice('Name already in use for other device');
+				return;
+			}
+
+			PgMain.instance?.settings.devices.push(newDeviceName);
+			PgMain.instance?.saveSettings();
+
+			// @ts-ignore
+			if(!app.loadLocalStorage(PgMain.deviceNameKey)) { app.saveLocalStorage(PgMain.deviceNameKey, newDeviceName); }
+
+			this.display();
+
+			newDeviceName = '';
+			newDevNameText.setValue(newDeviceName);
+		};
+
+
 		contentEl.createEl('h4', {text: 'Devices'});
 
-		new Setting(contentEl)
-			.setName('New Device')
+
+		let deviceAddBtn: ButtonComponent;
+
+		const deviceNameSetting = new Setting(contentEl).setName('New Device');
+
+		const newDevNameText = new TextComponent(deviceNameSetting.controlEl);
+		newDevNameText
+			.setValue(newDeviceName)
+			.onChange(value => {
+				newDeviceName = value;
+				if (deviceAddBtn) {
+					value.replace(' ', '').length > 0 ?
+						deviceAddBtn.buttonEl.removeClass('btn-disabled')
+						: deviceAddBtn.buttonEl.addClass('btn-disabled');
+				}
+			})
+			.setPlaceholder('Device Name')
+			.inputEl.onkeydown = e => {
+				if(e.key === 'Enter') { CreateNewDevice(); }
+			};
+
+
+		deviceNameSetting
 			.addButton(btn => {
-				btn.setIcon('plus');
-				btn.onClick(() => {
-					new SetDeviceNameModal(app, this).open();
-				})
+				deviceAddBtn = btn;
+				deviceAddBtn
+					.setIcon('plus')
+					.onClick(() => {
+					CreateNewDevice();
+					})
+					.buttonEl.addClass('btn-disabled');
 			})
 
 		PgMain.instance?.settings.devices.forEach(device => {
-			if(window.localStorage.getItem(PgMain.deviceNameKey) === device) {
-				new Setting(contentEl)
-					.setName(device)
+			const devSetting = new Setting(contentEl)
+				.setName(device);
+			// @ts-ignore
+			if(app.loadLocalStorage(PgMain.deviceNameKey) === device) {
+				devSetting
 					.setDesc('Current Device')
 					.addButton(btn => {
 						btn.setIcon('trash');
@@ -167,12 +215,12 @@ export default class GroupSettingsTab extends PluginSettingTab {
 							}).open());
 					})
 			} else {
-				new Setting(contentEl)
-					.setName(device)
+				devSetting
 					.addButton(btn => {
 						btn.setButtonText('Set as Current');
 						btn.onClick(() => {
-							window.localStorage.setItem(PgMain.deviceNameKey, device);
+							// @ts-ignore
+							app.saveLocalStorage(PgMain.deviceNameKey, device);
 							this.display();
 						});
 					})
@@ -184,6 +232,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 							'Delete',
 							() => {
 								PgMain.instance?.settings.devices.remove(device);
+								PgMain.instance?.saveSettings();
 								this.display();
 							}).open());
 					})
@@ -193,11 +242,13 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	ResetCurrentDevice() {
-		const device: string | null = window.localStorage.getItem(PgMain.deviceNameKey);
+		// @ts-ignore
+		const device: string | null = app.loadLocalStorage(PgMain.deviceNameKey);
 
 		if(!device) { return ;}
 		PgMain.instance?.settings.devices.remove(device);
-		window.localStorage.removeItem(PgMain.deviceNameKey);
+		// @ts-ignore
+		app.saveLocalStorage(PgMain.deviceNameKey, null);
 		this.display();
 
 	}

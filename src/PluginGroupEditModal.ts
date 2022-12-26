@@ -5,6 +5,7 @@ import ConfirmationPopupModal from "./ConfirmationPopupModal";
 import PgMain from "../main";
 import {PluginGroup} from "./PluginGroup";
 import {PgPlugin} from "./PgPlugin";
+import DeviceSelectionModal from "./DeviceSelectionModal";
 
 export default class PluginGroupEditModal extends Modal {
 
@@ -64,6 +65,37 @@ export default class PluginGroupEditModal extends Modal {
 					tgl.onChange(value => this.groupToEdit.generateCommands = value)
 				}
 			)
+
+		const getDevicesDescription = () => {
+			let description = 'Active on All devices';
+
+			if(!this.groupToEdit.assignedDevices) {return description;}
+			const arr : string[] = this.groupToEdit.assignedDevices.filter(device => PgMain.instance?.settings.devices.contains(device));
+			if(arr?.length > 0) {
+				description = 'Active on: ' + arr.reduce((acc, curr, i, arr) => {
+					if (i < 3) {
+						return acc + ', ' + curr;
+					} else if (i === arr.length - 1) {
+						return acc + ', ... and ' + (i - 2) + ' other' + (i - 2 > 1 ? 's' : '');
+					}
+					return acc;
+				})
+			}
+			return description;
+		};
+
+		const devicesSetting = new Setting(contentEl)
+			.setName('Devices')
+			.setDesc(getDevicesDescription())
+			.addButton(btn => {
+				btn.setIcon('pencil')
+					.onClick(() => {
+						new DeviceSelectionModal(app, (evt: CustomEvent) => {
+							this.groupToEdit.assignedDevices = evt.detail.devices;
+							devicesSetting.setDesc(getDevicesDescription());
+						}, this.groupToEdit.assignedDevices).open();
+					})
+			})
 
 		this.GenerateStartupSettings(contentEl);
 
@@ -151,17 +183,16 @@ export default class PluginGroupEditModal extends Modal {
 
 		this.pluginListElements = new Map<string, Setting>();
 
-		const includedPluginNames = (this.groupToEdit.plugins).map(p => p.name)
-
 		this.sortPlugins(this.availablePlugins)
 			.forEach(plugin => { const setting = new Setting(pluginList)
 					.setName(plugin.name)
-					.addToggle(tgl => {
-						tgl.setValue(includedPluginNames.contains(plugin.name));
-						tgl.onChange(doInclude => {
-							this.togglePluginForGroup(plugin, doInclude);
-						});
-					});
+				.addButton(btn=> {
+					btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id) ? 'check-circle' : 'circle')
+						.onClick(() => {
+							this.togglePluginForGroup(plugin);
+							btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id) ? 'check-circle' : 'circle')
+						})
+				});
 
 				this.pluginListElements.set(plugin.id, setting);
 		})
@@ -209,22 +240,15 @@ export default class PluginGroupEditModal extends Modal {
 
 		this.groupListElements = new Map<string, Setting>();
 
-		const includedGroupNames = this.groupToEdit.groupIds.map(id => PgMain.groupFromId(id)?.name);
-
 		this.sortGroups(this.availableGroups)
 			.forEach(pluginGroup => { const setting = new Setting(groupList)
 				.setName(pluginGroup.name)
-				.addToggle(tgl => {
-					let included = includedGroupNames.contains(pluginGroup.name);
-					let changeLock = false; // Used to prevent endless loop from resetting the tgl value in the onChange Function
-					tgl.setValue(included);
-					tgl.onChange(doInclude => {
-						if(changeLock) { return; }
-						changeLock = true;
-						included = this.toggleGroupForGroup(pluginGroup, !included) ? !included : included;
-						tgl.setValue(included);
-						changeLock = false;
-					});
+				.addButton(btn=> {
+					btn.setIcon(this.groupToEdit.groupIds.contains(pluginGroup.id) ? 'check-circle' : 'circle')
+						.onClick(() => {
+							this.toggleGroupForGroup(pluginGroup) ;
+							btn.setIcon(this.groupToEdit.groupIds.contains(pluginGroup.id) ? 'check-circle' : 'circle');
+						})
 				});
 				this.groupListElements.set(pluginGroup.id, setting);
 			})
@@ -305,19 +329,19 @@ export default class PluginGroupEditModal extends Modal {
 		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
 	}
 
-	togglePluginForGroup(plugin: PgPlugin, doInclude: boolean) {
-		if(doInclude) {
-			this.groupToEdit.addPlugin(plugin);
-		} else {
+	togglePluginForGroup(plugin: PgPlugin) {
+		if(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id)) {
 			this.groupToEdit.removePlugin(plugin);
+		} else {
+			this.groupToEdit.addPlugin(plugin);
 		}
 	}
 
-	toggleGroupForGroup(group: PluginGroup, doInclude: boolean) {
-		if(doInclude) {
-			return this.groupToEdit.addGroup(group);
-		} else {
+	toggleGroupForGroup(group: PluginGroup) {
+		if(this.groupToEdit.groupIds.contains(group.id)) {
 			return this.groupToEdit.removeGroup(group);
+		} else {
+			return this.groupToEdit.addGroup(group);
 		}
 	}
 
