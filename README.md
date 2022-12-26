@@ -17,7 +17,7 @@ To install Plugin Groups, follow these steps:
 
 1.  Head to the releases tab and download the latest version.
 2.  Open your plugins folder in the `.obsidian` folder of your vault.
-3.  Create a new folder named `obsidian-plguin-groups` and paste the `manifest.json`, `style.css` and `main.js` into it. Or directly copy the whole folder from the zipped file.
+3.  Create a new folder named `obsidian-plugin-groups` and paste the `manifest.json`, `style.css` and `main.js` into it. Or directly copy the whole folder from the zipped file.
 4.  Done
 
 Note: As soon as this plugin is available on the public obsidian plugin repository it will also be available from the Community plugin list directly.
@@ -33,7 +33,7 @@ To use Obsidian Groups, enable it from the Community Plugins Menu and start orga
 To create a new group head to the plugin settings, Enter a name for the group and click the "+" button. You can then;
 - Toggle your plugins on/off for the group to in- or exclude them from the group.
 - Choose whether or not commands should be generated for the group.
-- Set the group to launch on Obsidian's startup (with or without dely).
+- Set the group to launch on Obsidian's startup (with or without delay).
 - Include other groups to be controlled by this group.
   Click "Save" to finish the creation process.
 
