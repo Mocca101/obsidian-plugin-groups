@@ -113,7 +113,24 @@ export default class GroupSettingsTab extends PluginSettingTab {
 					btn.onClick(() => this.editGroup(group))
 				});
 			if(group.enableAtStartup) {
-				groupSetting.setDesc('Load plugins delayed by ' + group.delay + ' seconds');
+				const descFrag = new DocumentFragment();
+				const startupEl = descFrag
+					.createEl('span');
+				startupEl
+					.createEl('b', {
+						text: 'Startup: ',
+						})
+				startupEl
+					.createEl('span',{text: 'Delayed by ' + group.delay + ' seconds'});
+
+				if(!group.groupActive()) {
+					const activeEl = descFrag.createEl('span')
+					activeEl.createEl('br');
+					activeEl.createEl('b', {text: 'Inactive: '});
+					activeEl.createEl('span', {text: 'Not enabled for current Device'});
+				}
+
+				groupSetting.setDesc(descFrag);
 			}
 		});
 	}

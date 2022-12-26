@@ -33,6 +33,23 @@ export class PluginGroup implements PluginGroupData {
 		this.assignedDevices = args.assignedDevices;
 	}
 
+	groupActive() : boolean {
+		if(!this.assignedDevices || this.assignedDevices.length === 0) {
+			return true;
+		}
+
+		const activeDevice : string | null = getCurrentlyActiveDevice();
+		if (!activeDevice) {
+			return true;
+		}
+
+		if(this.assignedDevices?.contains(activeDevice)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	assignAndLoadPlugins(plugins?: PgPlugin[]) {
 		this.plugins = plugins ?? [];
 	}
@@ -44,8 +61,7 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	async enable() {
-		const activeDevice : string | null = getCurrentlyActiveDevice();
-		if(this.assignedDevices && activeDevice && !this.assignedDevices.contains(activeDevice)) {
+		if(!this.groupActive()) {
 			return;
 		}
 
@@ -80,6 +96,10 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	disable() {
+		if(!this.groupActive()) {
+			return;
+		}
+
 		this.plugins.forEach(plugin => {
 			disablePlugin(plugin);
 		})

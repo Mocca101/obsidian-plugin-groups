@@ -91,6 +91,7 @@ export default class PgMain extends Plugin {
 	shouldShowCommand(group: PluginGroup): boolean {
 		if (!PgMain.instance?.settings.groupsMap.has(group.id)) return false;
 		if (!PgMain.instance?.settings.generateCommands) return false;
+		if(!group.groupActive()) { return false; }
 		return group.generateCommands;
 	}
 
