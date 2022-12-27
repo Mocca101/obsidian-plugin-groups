@@ -19,6 +19,8 @@ export class PluginGroup implements PluginGroupData {
 
 	assignedDevices?: string[];
 
+	autoAdd?: boolean;
+
 	constructor(args: PluginGroupData) {
 		this.id = args.id;
 		this.name = args.name;
@@ -31,6 +33,7 @@ export class PluginGroup implements PluginGroupData {
 		this.generateCommands = args.generateCommands ?? false;
 
 		this.assignedDevices = args.assignedDevices;
+		this.autoAdd = args.autoAdd;
 	}
 
 	groupActive(): boolean {
@@ -177,4 +180,5 @@ interface PluginGroupData extends PgComponent {
 	enableAtStartup?: boolean;
 	delay?: number;
 	assignedDevices?: string[];
+	autoAdd?: boolean;
 }

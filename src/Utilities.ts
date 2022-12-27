@@ -44,14 +44,47 @@ export function saveVaultLocalStorage (key: string, object: any) : void {
 	app.saveLocalStorage(key, object);
 }
 
-export function loadVaultLocalStorage (key: string) : unknown {
+export function loadVaultLocalStorage (key: string) : string | null | undefined {
 	// @ts-ignore
 	return app.loadLocalStorage(key);
 }
 
+export function getKnownPluginIds () : Set<string> | null {
+	const ids = loadVaultLocalStorage(PgMain.knownPluginIdsKey);
+	if(!ids) { return null; }
+	return new Set<string>(JSON.parse(ids));
+}
+
+export function setKnownPluginIds (ids: Set<string> | null) {
+	if(!ids) { return; }
+	const setAsString = JSON.stringify([...ids]);
+	saveVaultLocalStorage(PgMain.knownPluginIdsKey, setAsString);
+}
+
+export function getInstalledPluginIds() : Set<string>{
+	const manifests = this.app.plugins.manifests;
+
+	const installedPlugins = new Set<string>();
+
+	for(const key in manifests) {
+		installedPlugins.add(key);
+	}
+
+	return installedPlugins;
+}
+
+export function getInstalledPluginFromId(id: string) : PgPlugin | null {
+	if(!this.app.plugins.manifests[id]) {
+		return null;
+	}
+	return new PgPlugin(this.app.plugins.manifests[id].id, this.app.plugins.manifests[id].name);
+}
+
+
 export function getCurrentlyActiveDevice () : string | null {
-	if(loadVaultLocalStorage(PgMain.deviceNameKey) instanceof String || typeof loadVaultLocalStorage(PgMain.deviceNameKey) === 'string') {
-		return loadVaultLocalStorage(PgMain.deviceNameKey) as string;
+	const device = loadVaultLocalStorage(PgMain.deviceNameKey);
+	if(typeof device === 'string') {
+		return device as string;
 	}
 	return null;
 }
