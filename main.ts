@@ -6,7 +6,7 @@ import {PluginGroup} from "./src/PluginGroup";
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
 	generateCommands: true,
-	showNoticeOnGroupLoad: false,
+	showNoticeOnGroupLoad: 'none',
 	devices: []
 }
 

@@ -77,8 +77,13 @@ export class PluginGroup implements PluginGroupData {
 			await PgMain.groupFromId(groupId)?.enable()
 		}
 		if (PgMain.instance?.settings.showNoticeOnGroupLoad) {
-			const messageString: string = 'Loaded ' + this.name + '\n' + this.getGroupListString();
-			new Notice(messageString, 5000);
+			const messageString: string = 'Loaded ' + this.name;
+
+			if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'short') {
+				new Notice(messageString);
+			} else if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'normal') {
+				new Notice(messageString + '\n' + this.getGroupListString());
+			}
 		}
 	}
 
@@ -95,10 +100,15 @@ export class PluginGroup implements PluginGroupData {
 			PgMain.groupFromId(groupId)?.disable();
 		})
 
-		if (PgMain.instance?.settings.showNoticeOnGroupLoad) {
-			const messageString: string = 'Disabled ' + this.name + '\n' + this.getGroupListString();
+		if (PgMain.instance?.settings.showNoticeOnGroupLoad !== 'none') {
 
-			new Notice(messageString);
+			const messageString: string = 'Disabled ' + this.name;
+
+			if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'short') {
+				new Notice(messageString);
+			} else if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'normal') {
+				new Notice(messageString + '\n' + this.getGroupListString());
+			}
 		}
 	}
 
