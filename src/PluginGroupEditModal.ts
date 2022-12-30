@@ -66,7 +66,16 @@ export default class PluginGroupEditModal extends Modal {
 				}
 			)
 
-				const devicesSetting = new Setting(contentEl)
+		new Setting(contentEl)
+			.setName('Auto Add')
+			.setDesc('Automatically add new Plugins to this group')
+			.addToggle(tgl => {
+					tgl.setValue(this.groupToEdit.autoAdd ?? false)
+					tgl.onChange(value => this.groupToEdit.autoAdd = value)
+				}
+			)
+
+		const devicesSetting = new Setting(contentEl)
 			.setName('Devices')
 			.setDesc(this.getDevicesDescription())
 			.addButton(btn => {

@@ -2,6 +2,7 @@ import {Command, Plugin} from 'obsidian';
 import {PersistentSettings, PluginGroupsSettings} from "./src/Types";
 import GroupSettingsTab from "./src/GroupSettingsTab";
 import {PluginGroup} from "./src/PluginGroup";
+import {getInstalledPluginFromId, getInstalledPluginIds, getKnownPluginIds, setKnownPluginIds} from "./src/Utilities";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
@@ -14,6 +15,7 @@ export default class PgMain extends Plugin {
 	static disableStartupTimeout = 25;
 	static pluginId = 'obsidian-plugin-groups';
 	static deviceNameKey = 'obsidian-plugin-groups-device-name';
+	static knownPluginIdsKey = 'obsidian-plugin-groups-known-plugins';
 
 
 	enableGroupCommandPrefix = 'plugin-groups-enable-';
@@ -30,10 +32,11 @@ export default class PgMain extends Plugin {
 	async onload() {
 		if(PgMain.instance) { return; }
 		else {PgMain.instance = this; }
+		PgMain.pluginId = this.manifest.id;
 
 		await this.loadSettings();
 
-		PgMain.pluginId = this.manifest.id;
+		this.loadNewPlugins();
 
 		this.addSettingTab(new GroupSettingsTab(this.app, this));
 
@@ -49,6 +52,32 @@ export default class PgMain extends Plugin {
 			PgMain.instance.settings.groupsMap.forEach(group => {
 				if (group.loadAtStartup) group.startup();
 			});
+		}
+	}
+
+	private loadNewPlugins() {
+		if (getKnownPluginIds() === null) {
+			setKnownPluginIds(getInstalledPluginIds());
+		} else {
+			const knownPlugins = getKnownPluginIds();
+			const installedPlugins = getInstalledPluginIds();
+			setKnownPluginIds(installedPlugins);
+
+			const newPlugins = new Set([...installedPlugins].filter(id => !knownPlugins?.has(id)));
+
+			if(newPlugins.size <= 0) { return; }
+
+			PgMain.instance?.settings.groupsMap.forEach(g => {
+				if(g.autoAdd) {
+					newPlugins.forEach(pluginId => {
+						const plugin = getInstalledPluginFromId(pluginId);
+						if(plugin) {
+							g.addPlugin(plugin);
+						}
+					})
+				}
+			});
+
 		}
 	}
 
