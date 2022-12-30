@@ -47,7 +47,7 @@ export default class PgMain extends Plugin {
 		// TODO: Improve hacky solution if possible
 		if(window.performance.now() / 1000 < PgMain.disableStartupTimeout) {
 			PgMain.instance.settings.groupsMap.forEach(group => {
-				if (group.enableAtStartup) group.startup();
+				if (group.loadAtStartup) group.startup();
 			});
 		}
 	}

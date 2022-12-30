@@ -111,19 +111,44 @@ export default class PluginGroupEditModal extends Modal {
 		const startupParent = contentEl.createEl('div');
 		startupParent.createEl('h3', {text: 'Startup'});
 
+		// eslint-disable-next-line prefer-const
+		let delaySetting: Setting;
+
+		// eslint-disable-next-line prefer-const
+		let behaviourElement: HTMLElement;
+
+		const ChangeOptionVisibility = () => {
+			if(delaySetting) {
+				this.groupToEdit.loadAtStartup ? delaySetting.settingEl.show() : delaySetting.settingEl.hide();
+			}
+			if(behaviourElement) {
+				this.groupToEdit.loadAtStartup ? behaviourElement.show() : behaviourElement.hide();
+			}
+		}
+
+
 		new Setting(startupParent)
-			.setName('Enable on Startup')
+			.setName('Load on Startup')
+			.addDropdown(drp => {
+				behaviourElement = drp.selectEl;
+				drp.addOption('enable', 'Enable');
+				drp.addOption('disable', 'Disable');
+				drp.setValue(this.groupToEdit.disableOnStartup ? 'disable' : 'enable');
+				drp.onChange(value => {
+					value === 'disable'
+						? this.groupToEdit.disableOnStartup = true
+						: this.groupToEdit.disableOnStartup = false;
+				})
+			})
 			.addToggle(tgl => {
 				tgl.onChange(value => {
-					this.groupToEdit.enableAtStartup = value;
-					if (this.delayElement) {
-						value ? this.delayElement.settingEl.show() : this.delayElement.settingEl.hide();
-					}
+					this.groupToEdit.loadAtStartup = value;
+					ChangeOptionVisibility();
 				});
-				tgl.setValue(this.groupToEdit.enableAtStartup);
+				tgl.setValue(this.groupToEdit.loadAtStartup);
 			});
 
-		this.delayElement = new Setting(startupParent)
+		delaySetting = new Setting(startupParent)
 			.setName('Delay')
 			.addSlider(slider => {
 				slider.setValue(this.groupToEdit.delay);
@@ -135,9 +160,7 @@ export default class PluginGroupEditModal extends Modal {
 			})
 			.setDesc(this.groupToEdit.delay.toString());
 
-		if(!this.groupToEdit.enableAtStartup) {
-			this.delayElement.settingEl.hide();
-		}
+		ChangeOptionVisibility();
 	}
 
 	private GeneratePluginSelectionList(parentElement: HTMLElement) {

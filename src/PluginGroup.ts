@@ -14,23 +14,25 @@ export class PluginGroup implements PluginGroupData {
 
 	generateCommands: boolean;
 
-	enableAtStartup = false;
+	loadAtStartup = false;
+	disableOnStartup = false;
 	delay = 0;
 
 	assignedDevices?: string[];
 
-	constructor(args: PluginGroupData) {
-		this.id = args.id;
-		this.name = args.name;
+	constructor(pgData: PluginGroupData) {
+		this.id = pgData.id;
+		this.name = pgData.name;
 
-		this.assignAndLoadPlugins(args.plugins);
-		this.groupIds = args.groupIds ?? [];
+		this.assignAndLoadPlugins(pgData.plugins);
+		this.groupIds = pgData.groupIds ?? [];
 
-		this.enableAtStartup = args.enableAtStartup ?? false;
-		this.delay = args.delay ?? 2;
-		this.generateCommands = args.generateCommands ?? false;
+		this.loadAtStartup = pgData.loadAtStartup ?? false;
+		this.disableOnStartup = pgData.disableOnStartup ?? false;
+		this.delay = pgData.delay ?? 2;
+		this.generateCommands = pgData.generateCommands ?? false;
 
-		this.assignedDevices = args.assignedDevices;
+		this.assignedDevices = pgData.assignedDevices;
 	}
 
 	groupActive(): boolean {
@@ -53,9 +55,21 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	startup() {
+		if(!this.loadAtStartup) {
+			return;
+		}
+
+		if(this.disableOnStartup) {
+			setTimeout(async () => {
+				await this.disable();
+			}, this.delay * 1000);
+			return;
+		}
+
 		setTimeout(async () => {
-			await this.enable()
-		}, this.delay * 1000)
+				await this.enable();
+		}, this.delay * 1000);
+		return;
 	}
 
 	async enable() {
@@ -184,7 +198,9 @@ interface PluginGroupData extends PgComponent {
 	plugins?: PgPlugin[];
 	groupIds?: string[];
 	generateCommands?: boolean;
-	enableAtStartup?: boolean;
+	loadAtStartup?: boolean;
+	disableOnStartup?: boolean;
 	delay?: number;
+	startupBehaviour?: string;
 	assignedDevices?: string[];
 }

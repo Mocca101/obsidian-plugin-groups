@@ -25,11 +25,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-
-		if(getCurrentlyActiveDevice() && PgMain.instance?.settings.showNoticeOnGroupLoad !== 'none') {
-			new Notice('Loaded on following device: ' + getCurrentlyActiveDevice(),5000);
-		}
-
 		const generalParent = containerEl.createEl('h4', {text: 'General'});
 
 		new Setting(generalParent)
@@ -47,8 +42,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			.setName('Notice upon un-/loading groups')
 			.addDropdown(drp => {
 				drp.addOption('none', 'None')
-					.addOption('normal', 'Normal')
-					.addOption('short', 'Short');
+					.addOption('short', 'Short')
+					.addOption('normal', 'Normal');
 				drp.setValue(PgMain.instance?.settings.showNoticeOnGroupLoad ?? 'none');
 				drp.onChange(async value => {
 					if(!PgMain.instance) { return; }
@@ -119,7 +114,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 					btn.setIcon('pencil')
 					btn.onClick(() => this.editGroup(group))
 				});
-			if(group.enableAtStartup) {
+			if(group.loadAtStartup) {
 				const descFrag = new DocumentFragment();
 				const startupEl = descFrag
 					.createEl('span');
