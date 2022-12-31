@@ -21,6 +21,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 	display(): void {
 
+		PgMain.instance?.loadNewPlugins();
+
 		const {containerEl} = this;
 
 		containerEl.empty();

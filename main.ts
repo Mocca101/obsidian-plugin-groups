@@ -55,7 +55,7 @@ export default class PgMain extends Plugin {
 		}
 	}
 
-	private loadNewPlugins() {
+	loadNewPlugins() {
 		if (getKnownPluginIds() === null) {
 			setKnownPluginIds(getInstalledPluginIds());
 		} else {
