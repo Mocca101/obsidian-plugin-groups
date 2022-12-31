@@ -78,6 +78,8 @@ export default class PgMain extends Plugin {
 				}
 			});
 
+			PgMain.instance?.saveSettings();
+
 		}
 	}
 

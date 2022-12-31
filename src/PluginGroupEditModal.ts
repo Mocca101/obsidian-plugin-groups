@@ -20,8 +20,6 @@ export default class PluginGroupEditModal extends Modal {
 
 	availableGroups: PluginGroup[];
 
-	delayElement: Setting;
-
 	pluginSelection: HTMLElement;
 
 	groupSelection: HTMLElement;
@@ -164,7 +162,7 @@ export default class PluginGroupEditModal extends Modal {
 				slider.setLimits(0, PgMain.disableStartupTimeout, 1)
 				slider.onChange(value => {
 					this.groupToEdit.delay = value;
-					this.delayElement.setDesc(value.toString());
+					delaySetting.setDesc(value.toString());
 				})
 			})
 			.setDesc(this.groupToEdit.delay.toString());
