@@ -32,7 +32,59 @@
 .group-edit-modal-content {
 }
 
+.pg-tabs {
+	display: flex;
+	flex: 0 1 auto;
+	overflow: auto;
+	margin: 6px -5px calc(var(--tab-outline-width) * -1);
+	padding: 1px 15px 0;
+}
+
+.pg-tab {
+	background: var(--tab-container-background);
+	align-items: center;
+	display: flex;
+	gap: var(--size-2-1);
+	height: 100%;
+	border-radius: var(--tab-radius);
+	overflow: hidden;
+	padding: 8px 8px;
+	width: 100%;
+}
+
+.pg-tab:before {
+	position: absolute;
+	bottom: 0;
+	content: '';
+	width: calc(var(--tab-curve) * 2);
+	height: calc(var(--tab-curve) * 2);
+	border-radius: 100%;
+	box-shadow: 0 0 0 calc(var(--tab-curve) * 3) transparent;
+}
+
+.pg-tab.is-active {
+	background: var(--tab-background-active);
+}
+
+.pg-tab.is-active:before {
+	box-shadow: inset 0 0 0 var(--tab-outline-width) var(--tab-outline-color), 0 0 0 calc(var(--tab-curve) * 4) var(--tab-background-active);
+}
+
+.pg-tab:hover {
+	background: var(--interactive-hover);
+}
+
+.pg-tabbed-content {
+	display: none;
+	padding: 8px 8px;
+}
+
+.pg-tabbed-content.is-active {
+	display: block;
+}
+
 :root {
 	--pg-group-edit-modal-footer-height: 60px;
 }
+
 

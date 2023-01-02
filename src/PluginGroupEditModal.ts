@@ -20,9 +20,6 @@ export default class PluginGroupEditModal extends Modal {
 
 	availableGroups: PluginGroup[];
 
-	pluginSelection: HTMLElement;
-
-	groupSelection: HTMLElement;
 	pluginListElements : Map<string, Setting> = new Map<string, Setting>();
 
 	groupListElements : Map<string, Setting> = new Map<string, Setting>();
@@ -45,17 +42,75 @@ export default class PluginGroupEditModal extends Modal {
 		modalEl.empty();
 
 		const contentEl = modalEl.createEl('div', {cls: 'group-edit-modal-content '})
+		// eslint-disable-next-line prefer-const
+		let generalSettings: HTMLElement;
+		// eslint-disable-next-line prefer-const
+		let pluginsSection: HTMLElement;
+		// eslint-disable-next-line prefer-const
+		let groupsSection: HTMLElement;
 
-		contentEl.createEl('h2', {text: 'Edit Group'});
-
-		new Setting(contentEl)
-			.setName('Name')
+		const nameSettingNameEl = new Setting(contentEl)
 			.addText(txt => {
 				txt.setValue(this.groupToEdit.name)
-				txt.onChange(val => this.groupToEdit.name = val);
-			})
+				txt.onChange(val => {
+					this.groupToEdit.name = val;
+					nameSettingNameEl.setText("Editing \"" + this.groupToEdit.name + "\"")
+				});
+			}).nameEl.createEl("h2", {text: "Editing \"" + this.groupToEdit.name + "\""})
 
-		new Setting(contentEl)
+		const tabContainer = contentEl.createDiv({cls: "pg-tabs"});
+
+		const generalTab = tabContainer.createDiv({cls: "pg-tab is-active"});
+			generalTab.createSpan({text: "General"});
+		const pluginsTab = tabContainer.createDiv({cls: "pg-tab"});
+			pluginsTab.createSpan({text: "Plugins"});
+		const groupsTab = tabContainer.createDiv({cls: "pg-tab"});
+			groupsTab.createSpan({text: "Groups"});
+
+		const switchActive = (clicked: string) => {
+			generalTab.removeClass("is-active");
+			pluginsTab.removeClass("is-active");
+			groupsTab.removeClass("is-active");
+
+			generalSettings?.removeClass("is-active");
+			pluginsSection?.removeClass("is-active");
+			groupsSection?.removeClass("is-active");
+			switch (clicked) {
+				case "Plugins":
+					pluginsSection?.addClass("is-active");
+					pluginsTab?.addClass("is-active");
+					break;
+				case "Groups":
+					groupsSection?.addClass("is-active");
+					groupsTab.addClass("is-active");
+					break;
+				default:
+					generalSettings?.addClass("is-active");
+					generalTab.addClass("is-active");
+					break;
+			}
+		}
+
+		generalTab.onClickEvent(() => switchActive("General"));
+		pluginsTab.onClickEvent(() =>  switchActive("Plugins"));
+		groupsTab.onClickEvent(() => switchActive("Groups"));
+
+
+		generalSettings = this.generateGeneralSettingsSection(contentEl);
+
+		pluginsSection = this.generatePluginSection(contentEl);
+
+		groupsSection = this.generateGroupsSection(contentEl);
+
+		this.generateFooter(modalEl);
+	}
+
+	private generateGeneralSettingsSection(contentEl: HTMLDivElement) : HTMLElement {
+		const generalSettingsSection = contentEl.createDiv({cls:"pg-tabbed-content is-active"})
+
+		generalSettingsSection.createEl("h5", {text: "General"})
+
+		new Setting(generalSettingsSection)
 			.setName('Commands')
 			.setDesc('Add Commands to enable/disable this group')
 			.addToggle(tgl => {
@@ -64,7 +119,7 @@ export default class PluginGroupEditModal extends Modal {
 				}
 			)
 
-		new Setting(contentEl)
+		new Setting(generalSettingsSection)
 			.setName('Auto Add')
 			.setDesc('Automatically add new Plugins to this group')
 			.addToggle(tgl => {
@@ -73,7 +128,7 @@ export default class PluginGroupEditModal extends Modal {
 				}
 			)
 
-		const devicesSetting = new Setting(contentEl)
+		const devicesSetting = new Setting(generalSettingsSection)
 			.setName('Devices')
 			.setDesc(this.getDevicesDescription())
 			.addButton(btn => {
@@ -86,13 +141,9 @@ export default class PluginGroupEditModal extends Modal {
 					})
 			})
 
-		this.GenerateStartupSettings(contentEl);
+		this.GenerateStartupSettings(generalSettingsSection);
 
-		this.GeneratePluginSelectionList(contentEl);
-
-		this.GenerateGroupSelectionList(contentEl);
-
-		this.GenerateFooter(modalEl);
+		return generalSettingsSection;
 	}
 
 	getDevicesDescription () {
@@ -116,7 +167,7 @@ export default class PluginGroupEditModal extends Modal {
 	private GenerateStartupSettings(contentEl: HTMLElement) {
 
 		const startupParent = contentEl.createEl('div');
-		startupParent.createEl('h3', {text: 'Startup'});
+		startupParent.createEl('h6', {text: 'Startup'});
 
 		// eslint-disable-next-line prefer-const
 		let delaySetting: Setting;
@@ -170,33 +221,15 @@ export default class PluginGroupEditModal extends Modal {
 		ChangeOptionVisibility();
 	}
 
-	private GeneratePluginSelectionList(parentElement: HTMLElement) {
+	private generatePluginSection(parentElement: HTMLElement) : HTMLElement {
 
 		let searchAndList: HTMLElement | undefined = undefined;
 
-		this.pluginSelection = parentElement.createEl('div');
+		const pluginSection = parentElement.createDiv({cls:"pg-tabbed-content"});
 
-		let showingPlugins = true;
+		pluginSection.createEl('h5', {text: 'Plugins'});
 
-		const headerSetting = new Setting(this.pluginSelection)
-			.addButton(btn => {
-				btn.setIcon('eye')
-				btn.onClick(() => {
-					if(!searchAndList) { return; }
-					if (showingPlugins) {
-						btn.setIcon('eye-off');
-						searchAndList.hide();
-						showingPlugins = false;
-					} else {
-						btn.setIcon('eye');
-						searchAndList.show();
-						showingPlugins = true;
-					}
-				});
-			});
-		headerSetting.nameEl.createEl('h4', {text: 'Plugins'});
-
-		searchAndList = this.pluginSelection.createEl('div');
+		searchAndList = pluginSection.createEl('div');
 
 		new Setting(searchAndList)
 			.setName('Search')
@@ -225,35 +258,18 @@ export default class PluginGroupEditModal extends Modal {
 
 				this.pluginListElements.set(plugin.id, setting);
 		})
+		return pluginSection;
 	}
 
-	private GenerateGroupSelectionList(parentElement: HTMLElement) {
+	private generateGroupsSection(parentElement: HTMLElement) : HTMLElement {
 
 		let searchAndList: HTMLElement | undefined = undefined;
 
-		this.groupSelection = parentElement.createEl('div');
+		const groupSection :HTMLElement = parentElement.createDiv({cls:"pg-tabbed-content"});
 
-		let showGroups = true;
+		groupSection.createEl("h5", {text: "Groups"});
 
-		const headerSetting = new Setting(this.groupSelection)
-			.addButton(btn => {
-				btn.setIcon('eye')
-				btn.onClick(() => {
-					if(!searchAndList) { return; }
-					if (showGroups) {
-						btn.setIcon('eye-off');
-						searchAndList.hide();
-						showGroups = false;
-					} else {
-						btn.setIcon('eye');
-						searchAndList.show();
-						showGroups = true;
-					}
-				});
-			});
-		headerSetting.nameEl.createEl('h4', {text: 'Groups'});
-
-		searchAndList = this.groupSelection.createEl('div');
+		searchAndList = groupSection.createEl('div');
 
 		new Setting(searchAndList)
 			.setName('Search')
@@ -281,6 +297,7 @@ export default class PluginGroupEditModal extends Modal {
 				});
 				this.groupListElements.set(pluginGroup.id, setting);
 			})
+		return groupSection;
 	}
 
 
@@ -300,7 +317,7 @@ export default class PluginGroupEditModal extends Modal {
 		hits.forEach(id => this.groupListElements.get(id)?.settingEl.show());
 	}
 
-	private GenerateFooter(parentElement: HTMLElement) {
+	private generateFooter(parentElement: HTMLElement) {
 		const footer = parentElement.createEl('div');
 
 		footer.addClass('group-edit-modal-footer');
@@ -433,7 +450,6 @@ export default class PluginGroupEditModal extends Modal {
 		this.settingsTab.display();
 		this.close();
 	}
-
 
 	async deleteGroup() {
 		PgMain.instance?.settings.groupsMap.delete(this.groupToEdit.id);
