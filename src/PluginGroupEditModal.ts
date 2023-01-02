@@ -1,4 +1,4 @@
-import {App, Modal, Setting} from "obsidian";
+import {App, ButtonComponent, Modal, Setting} from "obsidian";
 import GroupSettingsTab from "./GroupSettingsTab";
 import {generateGroupID, getAllAvailablePlugins} from "./Utilities";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
@@ -20,7 +20,9 @@ export default class PluginGroupEditModal extends Modal {
 
 	availableGroups: PluginGroup[];
 
-	pluginListElements : Map<string, Setting> = new Map<string, Setting>();
+	pluginListElements : Map<string, {setting: Setting, btn: ButtonComponent}> = new Map<string, {setting: Setting, btn: ButtonComponent}>();
+
+	filteredPlugins: PgPlugin[];
 
 	groupListElements : Map<string, Setting> = new Map<string, Setting>();
 
@@ -29,6 +31,7 @@ export default class PluginGroupEditModal extends Modal {
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;
 		this.availablePlugins = getAllAvailablePlugins();
+		this.filteredPlugins = this.availablePlugins;
 
 		if(PgMain.instance) {
 			this.availableGroups = Array.from(PgMain.instance.settings.groupsMap.values()).filter(g => g.id !== group.id);
@@ -223,13 +226,11 @@ export default class PluginGroupEditModal extends Modal {
 
 	private generatePluginSection(parentElement: HTMLElement) : HTMLElement {
 
-		let searchAndList: HTMLElement | undefined = undefined;
-
 		const pluginSection = parentElement.createDiv({cls:"pg-tabbed-content"});
 
 		pluginSection.createEl('h5', {text: 'Plugins'});
 
-		searchAndList = pluginSection.createEl('div');
+		const searchAndList: HTMLElement = pluginSection.createEl('div');
 
 		new Setting(searchAndList)
 			.setName('Search')
@@ -243,33 +244,50 @@ export default class PluginGroupEditModal extends Modal {
 		const pluginList = searchAndList.createEl('div');
 		pluginList.addClass('group-edit-modal-plugin-list');
 
-		this.pluginListElements = new Map<string, Setting>();
+		new Setting(pluginList).addButton(btn => {
+			btn.setIcon('circle');
+			btn.setTooltip('Deselect all');
+			btn.onClick(() => {
+				this.deselectAllFilteredPlugins();
+			})
+		})
+			.addButton(btn => {
+				btn.setIcon('check-circle');
+				btn.setTooltip('Select all');
+				btn.onClick(() => {
+					this.selectAllFilteredPlugins();
+				})
+			})
+
+		this.pluginListElements = new Map<string, {setting: Setting, btn: ButtonComponent}>();
 
 		this.sortPlugins(this.availablePlugins)
-			.forEach(plugin => { const setting = new Setting(pluginList)
-					.setName(plugin.name)
-				.addButton(btn=> {
-					btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id) ? 'check-circle' : 'circle')
-						.onClick(() => {
-							this.togglePluginForGroup(plugin);
-							btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id) ? 'check-circle' : 'circle')
-						})
-				});
+			.forEach(plugin => {
+				const setting = new Setting(pluginList)
+					.setName(plugin.name);
+				const btn: ButtonComponent = new ButtonComponent(setting.settingEl);
+				this.setIconForPluginBtn(btn, plugin.id);
+				btn.onClick(() => {
+					this.togglePluginForGroup(plugin);
+					this.setIconForPluginBtn(btn, plugin.id);
+				})
 
-				this.pluginListElements.set(plugin.id, setting);
+				this.pluginListElements.set(plugin.id, {setting: setting, btn: btn});
 		})
 		return pluginSection;
 	}
 
-	private generateGroupsSection(parentElement: HTMLElement) : HTMLElement {
+	private setIconForPluginBtn(btn: ButtonComponent, pluginId: string) {
+		btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(pluginId) ? 'check-circle' : 'circle')
+	}
 
-		let searchAndList: HTMLElement | undefined = undefined;
+	private generateGroupsSection(parentElement: HTMLElement) : HTMLElement {
 
 		const groupSection :HTMLElement = parentElement.createDiv({cls:"pg-tabbed-content"});
 
 		groupSection.createEl("h5", {text: "Groups"});
 
-		searchAndList = groupSection.createEl('div');
+		const searchAndList: HTMLElement = groupSection.createEl('div');
 
 		new Setting(searchAndList)
 			.setName('Search')
@@ -300,13 +318,31 @@ export default class PluginGroupEditModal extends Modal {
 		return groupSection;
 	}
 
-
 	private searchPlugins(search: string) {
-		const hits = this.availablePlugins
-			.filter(p => p.name.toLowerCase().contains(search.toLowerCase()))
-			.map(p => p.id);
-		this.pluginListElements.forEach(plugin => plugin.settingEl.hide());
-		hits.forEach(id => this.pluginListElements.get(id)?.settingEl.show());
+		this.filteredPlugins = this.availablePlugins
+			.filter(p => p.name.toLowerCase().contains(search.toLowerCase()));
+		this.pluginListElements.forEach(el => el.setting.settingEl.hide());
+		this.showFilteredPlugins();
+	}
+
+	private showFilteredPlugins() {
+		this.filteredPlugins.forEach(plugin => this.pluginListElements.get(plugin.id)?.setting.settingEl.show());
+	}
+
+	private deselectAllFilteredPlugins() {
+		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.removePlugin(plugin));
+		this.setAllPluginListBtnIcons();
+	}
+
+	private selectAllFilteredPlugins() {
+		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.addPlugin(plugin));
+		this.setAllPluginListBtnIcons();
+	}
+
+	private setAllPluginListBtnIcons() {
+		for (const [id, el] of this.pluginListElements) {
+			this.setIconForPluginBtn(el.btn, id);
+		}
 	}
 
 	private searchGroups(search: string) {

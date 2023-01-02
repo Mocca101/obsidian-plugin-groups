@@ -2,7 +2,13 @@ import {PgComponent} from "./Types";
 import {PgPlugin} from "./PgPlugin";
 import {Notice} from "obsidian";
 import PgMain from "../main";
-import {checkPluginEnabled, disablePlugin, enablePlugin, getCurrentlyActiveDevice} from "./Utilities";
+import {
+	checkPluginEnabled,
+	disablePlugin,
+	enablePlugin,
+	getAllAvailablePlugins,
+	getCurrentlyActiveDevice
+} from "./Utilities";
 
 export class PluginGroup implements PluginGroupData {
 
@@ -129,9 +135,10 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	getGroupListString() : string {
+		const existingPluginsInGroup = getAllAvailablePlugins().filter(p => this.plugins.map(p => p.id).contains(p.id));
 		let messageString = '';
 		this.plugins && this.plugins.length > 0
-			? messageString += '- Plugins:\n' + this.plugins.map(p => ' - ' + p.name + '\n').join('')
+			? messageString += '- Plugins:\n' + existingPluginsInGroup.map(p => ' - ' + p.name + '\n').join('')
 			: messageString += '';
 
 		this.groupIds && this.groupIds.length > 0
