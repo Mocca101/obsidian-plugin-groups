@@ -41,12 +41,12 @@
 }
 
 .pg-tab {
-	background: var(--tab-container-background);
+	background: var(--color-base-20);
 	align-items: center;
 	display: flex;
 	gap: var(--size-2-1);
 	height: 100%;
-	border-radius: var(--tab-radius);
+	border-radius: 4px 4px 0 0;
 	overflow: hidden;
 	padding: 8px 8px;
 	width: 100%;
@@ -64,10 +64,9 @@
 
 .pg-tab.is-active {
 	background: var(--tab-background-active);
-}
-
-.pg-tab.is-active:before {
-	box-shadow: inset 0 0 0 var(--tab-outline-width) var(--tab-outline-color), 0 0 0 calc(var(--tab-curve) * 4) var(--tab-background-active);
+	border-top: 1px solid var(--color-base-30);
+	border-right: 1px solid var(--color-base-30);
+	border-left: 1px solid var(--color-base-30);
 }
 
 .pg-tab:hover {
@@ -76,7 +75,9 @@
 
 .pg-tabbed-content {
 	display: none;
-	padding: 8px 8px;
+	margin: 0 6px;
+	padding: 0 4px 8px;
+	border-top: 1px solid var(--color-base-30);
 }
 
 .pg-tabbed-content.is-active {
