@@ -6,17 +6,16 @@ import {getAllAvailablePlugins} from "../Utilities";
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
 
-	availablePlugins: PgPlugin[];
+	private readonly availablePlugins: PgPlugin[] = getAllAvailablePlugins();
 
-	pluginListElements : Map<string, {setting: Setting, btn: ButtonComponent}> = new Map<string, {setting: Setting, btn: ButtonComponent}>();
+	private pluginListElements : Map<string, {setting: Setting, btn: ButtonComponent}> = new Map<string, {setting: Setting, btn: ButtonComponent}>();
 
-	filteredPlugins: PgPlugin[];
+	private filteredPlugins: PgPlugin[];
 
-	groupToEdit: PluginGroup;
+	private groupToEdit: PluginGroup;
 
 	constructor(group: PluginGroup, parentEl: HTMLElement) {
 		this.groupToEdit = group;
-		this.availablePlugins = getAllAvailablePlugins();
 		this.filteredPlugins = this.availablePlugins;
 
 		this.containerEl = this.generatePluginSection(parentEl)
