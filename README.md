@@ -9,6 +9,14 @@ A plugin that allows you to easily group and manage your other plugins in Obsidi
 -   **Delayed Group Loading:** You can set your groups to load after a custom delay following Obsidian's startup. This can be useful for reducing the load on your system during startup, resulting in shorter loading times.
 -   **Group Nesting:** Manage your groups with groups.  E.g. you have a group for style related plugin and one for Plugins you use often but don't need immediately on start up. Create both of them and add them To a parent group that loads these delayed on start up, so you can get to work quickly without having to wait for all of them to load.
 
+## Limitations
+
+Some plugins don't work with delayed loading, as they need to load before the workspace is loaded. In the future, I hope it will be possible to load those delayed as well. Until then here's a list of plugins that don't work with delayed loading:
+
+-	[Pane Relief](https://github.com/pjeby/pane-relief)
+
+*If you notice a plugin that has issues with delayed loading, please let me know or open a PR with the Plugin added to the list in this README.md*
+
 ## Installation
 
 Keep in mind this is an early version of this plugin so there might be some kinks left to iron out. If you encounter any, please do let me know!
