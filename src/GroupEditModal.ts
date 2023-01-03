@@ -1,13 +1,13 @@
-import {App, ButtonComponent, Modal, Setting} from "obsidian";
+import {App, Modal, Setting} from "obsidian";
 import GroupSettingsTab from "./GroupSettingsTab";
-import {generateGroupID, getAllAvailablePlugins} from "./Utilities";
+import {generateGroupID} from "./Utilities";
 import ConfirmationPopupModal from "./ConfirmationPopupModal";
 import PgMain from "../main";
 import {PluginGroup} from "./PluginGroup";
-import {PgPlugin} from "./PgPlugin";
 import DeviceSelectionModal from "./DeviceSelectionModal";
+import GroupEditPluginsTab from "./GroupEditModal/GroupEditPluginsTab";
 
-export default class PluginGroupEditModal extends Modal {
+export default class GroupEditModal extends Modal {
 
 	groupToEdit: PluginGroup;
 
@@ -16,13 +16,7 @@ export default class PluginGroupEditModal extends Modal {
 
 	settingsTab: GroupSettingsTab;
 
-	availablePlugins: PgPlugin[];
-
 	availableGroups: PluginGroup[];
-
-	pluginListElements : Map<string, {setting: Setting, btn: ButtonComponent}> = new Map<string, {setting: Setting, btn: ButtonComponent}>();
-
-	filteredPlugins: PgPlugin[];
 
 	groupListElements : Map<string, Setting> = new Map<string, Setting>();
 
@@ -30,8 +24,6 @@ export default class PluginGroupEditModal extends Modal {
 		super(app);
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;
-		this.availablePlugins = getAllAvailablePlugins();
-		this.filteredPlugins = this.availablePlugins;
 
 		if(PgMain.instance) {
 			this.availableGroups = Array.from(PgMain.instance.settings.groupsMap.values()).filter(g => g.id !== group.id);
@@ -98,10 +90,9 @@ export default class PluginGroupEditModal extends Modal {
 		pluginsTab.onClickEvent(() =>  switchActive("Plugins"));
 		groupsTab.onClickEvent(() => switchActive("Groups"));
 
-
 		generalSettings = this.generateGeneralSettingsSection(contentEl);
 
-		pluginsSection = this.generatePluginSection(contentEl);
+		pluginsSection = new GroupEditPluginsTab(this.groupToEdit, contentEl).containerEl;
 
 		groupsSection = this.generateGroupsSection(contentEl);
 
@@ -224,63 +215,6 @@ export default class PluginGroupEditModal extends Modal {
 		ChangeOptionVisibility();
 	}
 
-	private generatePluginSection(parentElement: HTMLElement) : HTMLElement {
-
-		const pluginSection = parentElement.createDiv({cls:"pg-tabbed-content"});
-
-		pluginSection.createEl('h5', {text: 'Plugins'});
-
-		const searchAndList: HTMLElement = pluginSection.createEl('div');
-
-		new Setting(searchAndList)
-			.setName('Search')
-			.addText(txt => {
-				txt.setPlaceholder('Search for Plugin...')
-				txt.onChange(search => {
-					this.searchPlugins(search);
-				})
-			})
-
-		const pluginList = searchAndList.createEl('div');
-		pluginList.addClass('group-edit-modal-plugin-list');
-
-		new Setting(pluginList).addButton(btn => {
-			btn.setIcon('circle');
-			btn.setTooltip('Deselect all');
-			btn.onClick(() => {
-				this.deselectAllFilteredPlugins();
-			})
-		})
-			.addButton(btn => {
-				btn.setIcon('check-circle');
-				btn.setTooltip('Select all');
-				btn.onClick(() => {
-					this.selectAllFilteredPlugins();
-				})
-			})
-
-		this.pluginListElements = new Map<string, {setting: Setting, btn: ButtonComponent}>();
-
-		this.sortPlugins(this.availablePlugins)
-			.forEach(plugin => {
-				const setting = new Setting(pluginList)
-					.setName(plugin.name);
-				const btn: ButtonComponent = new ButtonComponent(setting.settingEl);
-				this.setIconForPluginBtn(btn, plugin.id);
-				btn.onClick(() => {
-					this.togglePluginForGroup(plugin);
-					this.setIconForPluginBtn(btn, plugin.id);
-				})
-
-				this.pluginListElements.set(plugin.id, {setting: setting, btn: btn});
-		})
-		return pluginSection;
-	}
-
-	private setIconForPluginBtn(btn: ButtonComponent, pluginId: string) {
-		btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(pluginId) ? 'check-circle' : 'circle')
-	}
-
 	private generateGroupsSection(parentElement: HTMLElement) : HTMLElement {
 
 		const groupSection :HTMLElement = parentElement.createDiv({cls:"pg-tabbed-content"});
@@ -316,33 +250,6 @@ export default class PluginGroupEditModal extends Modal {
 				this.groupListElements.set(pluginGroup.id, setting);
 			})
 		return groupSection;
-	}
-
-	private searchPlugins(search: string) {
-		this.filteredPlugins = this.availablePlugins
-			.filter(p => p.name.toLowerCase().contains(search.toLowerCase()));
-		this.pluginListElements.forEach(el => el.setting.settingEl.hide());
-		this.showFilteredPlugins();
-	}
-
-	private showFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => this.pluginListElements.get(plugin.id)?.setting.settingEl.show());
-	}
-
-	private deselectAllFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.removePlugin(plugin));
-		this.setAllPluginListBtnIcons();
-	}
-
-	private selectAllFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.addPlugin(plugin));
-		this.setAllPluginListBtnIcons();
-	}
-
-	private setAllPluginListBtnIcons() {
-		for (const [id, el] of this.pluginListElements) {
-			this.setIconForPluginBtn(el.btn, id);
-		}
 	}
 
 	private searchGroups(search: string) {
@@ -384,22 +291,6 @@ export default class PluginGroupEditModal extends Modal {
 			.settingEl.addClass('modal-footer');
 	}
 
-	sortPlugins(plugins: PgPlugin[]) : PgPlugin[] {
-		return plugins.sort((a, b) => {
-			const aInGroup = this.isPluginInGroup(a);
-			const bInGroup = this.isPluginInGroup(b);
-			if(aInGroup && !bInGroup) return -1;
-			else if(!aInGroup && bInGroup) return 1;
-			else {
-				return a.name.localeCompare(b.name);
-			}
-		})
-	}
-
-	isPluginInGroup(plugin: PgPlugin) :boolean {
-		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
-	}
-
 	sortGroups(groups: PluginGroup[]) : PluginGroup[] {
 		return groups.sort((a, b) => {
 			const aInGroup = this.isGroupInGroup(a);
@@ -414,14 +305,6 @@ export default class PluginGroupEditModal extends Modal {
 
 	isGroupInGroup(plugin: PluginGroup) :boolean {
 		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
-	}
-
-	togglePluginForGroup(plugin: PgPlugin) {
-		if(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id)) {
-			this.groupToEdit.removePlugin(plugin);
-		} else {
-			this.groupToEdit.addPlugin(plugin);
-		}
 	}
 
 	toggleGroupForGroup(group: PluginGroup) {

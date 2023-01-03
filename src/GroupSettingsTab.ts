@@ -1,6 +1,6 @@
 import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
-import PluginGroupEditModal from "./PluginGroupEditModal";
+import GroupEditModal from "./GroupEditModal";
 import {
 	generateGroupID,
 	getCurrentlyActiveDevice,
@@ -151,7 +151,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			id: id,
 			name: this.newGroupName
 		});
-		new PluginGroupEditModal(this.app, this, newGroup).open();
+		new GroupEditModal(this.app, this, newGroup).open();
 		this.newGroupName = '';
 		if(this.groupNameField) {
 			this.groupNameField.setValue('');
@@ -159,7 +159,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	editGroup(group: PluginGroup) {
-		new PluginGroupEditModal(this.app, this, group).open();
+		new GroupEditModal(this.app, this, group).open();
 	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {
