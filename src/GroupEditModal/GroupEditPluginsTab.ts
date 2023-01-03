@@ -2,6 +2,7 @@ import {ButtonComponent, Setting} from "obsidian";
 import {PgPlugin} from "../PgPlugin";
 import {PluginGroup} from "../PluginGroup";
 import {getAllAvailablePlugins} from "../Utilities";
+import ButtonWithDropdown from "./ButtonWithDropdown";
 
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
@@ -41,20 +42,12 @@ export default class GroupEditPluginsTab {
 		const pluginList = searchAndList.createEl('div');
 		pluginList.addClass('group-edit-modal-plugin-list');
 
-		new Setting(pluginList).addButton(btn => {
-			btn.setIcon('circle');
-			btn.setTooltip('Deselect all');
-			btn.onClick(() => {
-				this.deselectAllFilteredPlugins();
-			})
-		})
-			.addButton(btn => {
-				btn.setIcon('check-circle');
-				btn.setTooltip('Select all');
-				btn.onClick(() => {
-					this.selectAllFilteredPlugins();
-				})
-			})
+		const filtersAndSelection = new Setting(pluginList);
+
+		new ButtonWithDropdown(filtersAndSelection.settingEl, {label: 'Bulk Select'}, [
+			{label: 'Select all', func: () => this.selectAllFilteredPlugins()},
+			{label: 'Deselect all',	func: () =>	this.deselectAllFilteredPlugins()},
+		])
 
 		this.pluginListElements = new Map<string, {setting: Setting, btn: ButtonComponent}>();
 
