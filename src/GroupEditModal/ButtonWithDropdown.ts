@@ -19,29 +19,21 @@ export default class ButtonWithDropdown {
 		}
 		this.containerEL.onClickEvent(() => this.toggleDropdown());
 
-		const btn = this.containerEL;
-
-		const activeOptionBtn = btn.createSpan({cls: 'pg-drp-btn-main-label'});
+		const activeOptionBtn = this.containerEL.createSpan({cls: 'pg-drp-btn-main-label'});
 		this.setElementTextOrIcon(activeOptionBtn, mainLabel.label, mainLabel.icon)
 
-		btn.createSpan({text: '▼'})
+		this.containerEL.createSpan({text: '▼'})
 
-		this.drpList = btn.createEl('ul', {cls: 'pg-drp-btn-list'});
+		this.drpList = this.containerEL.createEl('ul', {cls: 'pg-drp-btn-list'});
 		dropdownOptions.forEach(option => {
 			const item = this.drpList.createEl('li', );
 			this.setElementTextOrIcon(item, option.label, option.icon);
 
-			item.onClickEvent(() => {
+			item.onClickEvent(evt => {
+				evt.stopPropagation();
 				option.func();
 				this.closeDropdown();
 			});
-		});
-
-		document.addEventListener('click', (event) => {
-			event.target
-			if (!btn.contains(event.targetNode)) {
-				this.closeDropdown();
-			}
 		});
 	}
 
@@ -54,11 +46,24 @@ export default class ButtonWithDropdown {
 	}
 
 	private toggleDropdown() {
-		this.drpList.hasClass('is-active') ? this.closeDropdown() : this.drpList.addClass('is-active');
+		this.drpList.hasClass('is-active') ? this.closeDropdown() : this.openDropdown();
 	}
 
 	private closeDropdown() {
 		this.drpList.removeClass('is-active');
+	}
+
+	private openDropdown() {
+		this.drpList.addClass('is-active');
+		const outsideClickController = new AbortController();
+		document.addEventListener('click', (event) => {
+					if (!this.containerEL.contains(event.targetNode) && this.drpList.hasClass('is-active')) {
+						this.closeDropdown();
+						outsideClickController.abort();
+					}
+				}
+			, outsideClickController);
+
 	}
 
 }
