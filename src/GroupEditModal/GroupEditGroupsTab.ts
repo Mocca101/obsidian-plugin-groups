@@ -1,6 +1,7 @@
 import {Setting} from "obsidian";
 import {PluginGroup} from "../PluginGroup";
 import PgMain from "../../main";
+import Manager from "../Manager";
 
 
 export default class GroupEditGroupsTab {
@@ -16,9 +17,7 @@ export default class GroupEditGroupsTab {
 	constructor(group: PluginGroup, parentEl: HTMLElement) {
 		this.groupToEdit = group;
 
-		if(PgMain.instance) {
-			this.availableGroups = Array.from(PgMain.instance.settings.groupsMap.values()).filter(g => g.id !== group.id);
-		}
+		this.availableGroups = Array.from(Manager.getInstance().groupsMap.values()).filter(g => g.id !== group.id);
 
 		this.containerEl = this.generateGroupsSection(parentEl)
 	}

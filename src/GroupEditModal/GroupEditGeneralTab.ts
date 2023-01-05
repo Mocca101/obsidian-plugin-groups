@@ -2,6 +2,8 @@ import {PluginGroup} from "../PluginGroup";
 import {Setting} from "obsidian";
 import DeviceSelectionModal from "../DeviceSelectionModal";
 import PgMain from "../../main";
+import {disableStartupTimeout} from "../Constants";
+import Manager from "../Manager";
 
 export default class GroupEditGeneralTab {
 
@@ -60,7 +62,7 @@ export default class GroupEditGeneralTab {
 		let description = 'Active on All devices';
 
 		if(!this.groupToEdit.assignedDevices) {return description;}
-		const arr : string[] = this.groupToEdit.assignedDevices.filter(device => PgMain.instance?.settings.devices.contains(device));
+		const arr : string[] = this.groupToEdit.assignedDevices.filter(device => Manager.getInstance().devices.contains(device));
 		if(arr?.length > 0) {
 			description = 'Active on: ' + arr.reduce((acc, curr, i, arr) => {
 				if (i < 3) {
@@ -120,7 +122,7 @@ export default class GroupEditGeneralTab {
 			.setName('Delay')
 			.addSlider(slider => {
 				slider.setValue(this.groupToEdit.delay);
-				slider.setLimits(0, PgMain.disableStartupTimeout, 1)
+				slider.setLimits(0, disableStartupTimeout, 1)
 				slider.onChange(value => {
 					this.groupToEdit.delay = value;
 					delaySetting.setDesc(value.toString());

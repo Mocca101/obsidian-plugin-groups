@@ -7,8 +7,9 @@ import {
 	disablePlugin,
 	enablePlugin,
 	getAllAvailablePlugins,
-	getCurrentlyActiveDevice
+	getCurrentlyActiveDevice, groupFromId
 } from "./Utilities";
+import Manager from "./Manager";
 
 export class PluginGroup implements PluginGroupData {
 
@@ -96,14 +97,14 @@ export class PluginGroup implements PluginGroupData {
 
 		await Promise.allSettled(pluginPromises);
 		for (const groupId of this.groupIds) {
-			await PgMain.groupFromId(groupId)?.enable()
+			await groupFromId(groupId)?.enable()
 		}
-		if (PgMain.instance?.settings.showNoticeOnGroupLoad) {
+		if (Manager.getInstance().showNoticeOnGroupLoad) {
 			const messageString: string = 'Loaded ' + this.name;
 
-			if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'short') {
+			if(Manager.getInstance().showNoticeOnGroupLoad === 'short') {
 				new Notice(messageString);
-			} else if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'normal') {
+			} else if(Manager.getInstance().showNoticeOnGroupLoad === 'normal') {
 				new Notice(messageString + '\n' + this.getGroupListString());
 			}
 		}
@@ -119,16 +120,16 @@ export class PluginGroup implements PluginGroupData {
 		})
 
 		this.groupIds.forEach(groupId => {
-			PgMain.groupFromId(groupId)?.disable();
+			groupFromId(groupId)?.disable();
 		})
 
-		if (PgMain.instance?.settings.showNoticeOnGroupLoad !== 'none') {
+		if (Manager.getInstance().showNoticeOnGroupLoad !== 'none') {
 
 			const messageString: string = 'Disabled ' + this.name;
 
-			if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'short') {
+			if(Manager.getInstance().showNoticeOnGroupLoad === 'short') {
 				new Notice(messageString);
-			} else if(PgMain.instance?.settings.showNoticeOnGroupLoad === 'normal') {
+			} else if(Manager.getInstance().showNoticeOnGroupLoad === 'normal') {
 				new Notice(messageString + '\n' + this.getGroupListString());
 			}
 		}
@@ -143,7 +144,7 @@ export class PluginGroup implements PluginGroupData {
 
 		this.groupIds && this.groupIds.length > 0
 			? messageString += '- Groups:\n' + this.groupIds.map(g => {
-				const group = PgMain.groupFromId(g);
+				const group = groupFromId(g);
 				if (group && group.groupActive()) {
 					return ' - ' + group.name + '\n';
 				}
@@ -195,7 +196,7 @@ export class PluginGroup implements PluginGroupData {
 
 		for (let i = 0; i < this.groupIds.length; i++) {
 			const groupId = this.groupIds[i];
-			if (PgMain.groupFromId(groupId)?.wouldHaveCyclicGroups(idToCheck)) {
+			if (groupFromId(groupId)?.wouldHaveCyclicGroups(idToCheck)) {
 				return true;
 			}
 		}

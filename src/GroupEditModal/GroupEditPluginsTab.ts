@@ -1,7 +1,7 @@
 import {ButtonComponent, Setting} from "obsidian";
 import {PgPlugin} from "../PgPlugin";
 import {PluginGroup} from "../PluginGroup";
-import {getAllAvailablePlugins} from "../Utilities";
+import {getAllAvailablePlugins, groupFromId} from "../Utilities";
 import ButtonWithDropdown from "./ButtonWithDropdown";
 import PgMain from "../../main";
 
@@ -50,7 +50,6 @@ export default class GroupEditPluginsTab {
 		filtersAndSelection.addToggle(tgl => {
 			tgl.onChange(value => {
 				value ? this.excludedGroupIds.add(this.groupToEdit.id) : this.excludedGroupIds.delete(this.groupToEdit.id);
-				console.log("-> value on toggle", value);
 				this.filterPlugins();
 			})
 		})
@@ -89,7 +88,6 @@ export default class GroupEditPluginsTab {
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
 	private filterPlugins() {
-		console.log("-> filterPlugins");
 
 		this.filteredPlugins = this.availablePlugins;
 		if(this.searchTerm && this.searchTerm !== '') {
@@ -98,7 +96,6 @@ export default class GroupEditPluginsTab {
 		}
 
 		const pluginsToExclude = this.excludedPlugins();
-		console.log("-> pluginsToExclude", pluginsToExclude);
 
 		if(pluginsToExclude) {
 			this.filteredPlugins = this.filteredPlugins.filter(plugin => !pluginsToExclude.has(plugin.id))
@@ -109,13 +106,12 @@ export default class GroupEditPluginsTab {
 
 	private excludedPlugins() : Set<string> | null {
 		let pluginsToExclude: Set<string> | null = null;
-		console.log("-> pluginsToExclude in excluded Plugins", pluginsToExclude);
 
 		// TODO: Do I also want to be able to know the plugins inside compound groups (groups that contain groups)
 		if(this.excludedGroupIds && this.excludedGroupIds.size > 0) {
 			let arr: string[] = [];
 			this.excludedGroupIds.forEach(id => {
-					arr = [...arr, ...(PgMain.groupFromId(id)?.plugins.map(plugin => plugin.id) ?? [])];
+					arr = [...arr, ...(groupFromId(id)?.plugins.map(plugin => plugin.id) ?? [])];
 				}
 			)
 			if(arr && arr.length > 0) {

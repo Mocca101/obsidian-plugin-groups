@@ -8,6 +8,8 @@ import DeviceSelectionModal from "./DeviceSelectionModal";
 import GroupEditPluginsTab from "./GroupEditModal/GroupEditPluginsTab";
 import GroupEditGroupsTab from "./GroupEditModal/GroupEditGroupsTab";
 import GroupEditGeneralTab from "./GroupEditModal/GroupEditGeneralTab";
+import Manager from "./Manager";
+import CommandManager from "./CommandManager";
 
 export default class GroupEditModal extends Modal {
 
@@ -128,7 +130,7 @@ export default class GroupEditModal extends Modal {
 		const {contentEl} = this;
 		contentEl.empty();
 
-		if(PgMain.instance?.settings.groupsMap.has(this.groupToEdit.id) && this.discardChanges){
+		if(Manager.getInstance().groupsMap.has(this.groupToEdit.id) && this.discardChanges){
 			Object.assign(
 				this.groupToEdit,
 				JSON.parse(this.groupToEditCache))
@@ -138,7 +140,7 @@ export default class GroupEditModal extends Modal {
 
 	async saveChanges() {
 		this.discardChanges = false;
-		if(PgMain.instance?.settings.groupsMap.has(this.groupToEdit.id)) {
+		if(Manager.getInstance().groupsMap.has(this.groupToEdit.id)) {
 			await this.editGroup(this.groupToEdit);
 		} else {
 			await this.addGroup(this.groupToEdit)
@@ -147,7 +149,7 @@ export default class GroupEditModal extends Modal {
 
 	async duplicate() {
 		const duplicateGroup = new PluginGroup(this.groupToEdit);
-		const groupMap = PgMain.instance?.settings.groupsMap;
+		const groupMap = Manager.getInstance().groupsMap;
 
 		if(!groupMap) { return; }
 		duplicateGroup.name += '-Duplicate';
@@ -160,28 +162,28 @@ export default class GroupEditModal extends Modal {
 	}
 
 	async addGroup(group: PluginGroup) {
-		PgMain.instance?.settings.groupsMap.set(group.id, group);
+		Manager.getInstance().groupsMap.set(group.id, group);
 
-		PgMain.instance?.AddGroupCommands(group.id);
+		CommandManager.getInstance().AddGroupCommands(group.id);
 
 		await this.persistChangesAndClose();
 	}
 
 	async editGroup(group: PluginGroup) {
-		PgMain.instance?.settings.groupsMap.set(group.id, group);
-		PgMain.instance?.updateCommand(group.id);
+		Manager.getInstance().groupsMap.set(group.id, group);
+		CommandManager.getInstance().updateCommand(group.id);
 		await this.persistChangesAndClose();
 	}
 
 	async persistChangesAndClose() {
-		await PgMain.instance?.saveSettings();
+		await Manager.getInstance().saveSettings();
 		this.settingsTab.display();
 		this.close();
 	}
 
 	async deleteGroup() {
-		PgMain.instance?.settings.groupsMap.delete(this.groupToEdit.id);
-		await PgMain.instance?.saveSettings();
+		Manager.getInstance().groupsMap.delete(this.groupToEdit.id);
+		await Manager.getInstance().saveSettings();
 		this.settingsTab.display();
 		this.close();
 	}

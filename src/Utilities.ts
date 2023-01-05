@@ -1,5 +1,8 @@
 import PgMain from "../main";
 import {PgPlugin} from "./PgPlugin";
+import {deviceNameKey, knownPluginIdsKey, pluginId} from "./Constants";
+import {PluginGroup} from "./PluginGroup";
+import Manager from "./Manager";
 
 export function getAllAvailablePlugins() : PgPlugin[] {
 	const manifests = this.app.plugins.manifests;
@@ -7,7 +10,7 @@ export function getAllAvailablePlugins() : PgPlugin[] {
 	const plugins: PgPlugin[] = [];
 
 	for(const key in manifests) {
-		if(manifests[key].id === PgMain.pluginId) continue;
+		if(manifests[key].id === pluginId) continue;
 
 		const info: PgPlugin = new PgPlugin(manifests[key].id, manifests[key].name);
 		plugins.push(info)
@@ -19,7 +22,7 @@ export function getAllAvailablePlugins() : PgPlugin[] {
 export function generateGroupID(name: string, delay?:number) : string | undefined {
 	let id = nameToId( (delay ? 'stg-' : 'pg-' ) + name);
 
-	const groupMap = PgMain.instance?.settings.groupsMap;
+	const groupMap = Manager.getInstance().groupsMap;
 
 	if(!groupMap) {return undefined; }
 
@@ -50,7 +53,7 @@ export function loadVaultLocalStorage (key: string) : string | null | undefined 
 }
 
 export function getKnownPluginIds () : Set<string> | null {
-	const ids = loadVaultLocalStorage(PgMain.knownPluginIdsKey);
+	const ids = loadVaultLocalStorage(knownPluginIdsKey);
 	if(!ids) { return null; }
 	return new Set<string>(JSON.parse(ids));
 }
@@ -58,7 +61,7 @@ export function getKnownPluginIds () : Set<string> | null {
 export function setKnownPluginIds (ids: Set<string> | null) {
 	if(!ids) { return; }
 	const setAsString = JSON.stringify([...ids]);
-	saveVaultLocalStorage(PgMain.knownPluginIdsKey, setAsString);
+	saveVaultLocalStorage(knownPluginIdsKey, setAsString);
 }
 
 export function getInstalledPluginIds() : Set<string>{
@@ -82,7 +85,7 @@ export function getInstalledPluginFromId(id: string) : PgPlugin | null {
 
 
 export function getCurrentlyActiveDevice () : string | null {
-	const device = loadVaultLocalStorage(PgMain.deviceNameKey);
+	const device = loadVaultLocalStorage(deviceNameKey);
 	if(typeof device === 'string') {
 		return device as string;
 	}
@@ -90,7 +93,7 @@ export function getCurrentlyActiveDevice () : string | null {
 }
 
 export function setCurrentlyActiveDevice (device: string | null) {
-	saveVaultLocalStorage(PgMain.deviceNameKey, device);
+	saveVaultLocalStorage(deviceNameKey, device);
 }
 
 export function checkPluginEnabled (plugin: PgPlugin) : boolean {
@@ -106,5 +109,9 @@ export async function enablePlugin (plugin: PgPlugin) : Promise<boolean> {
 export function disablePlugin (plugin: PgPlugin) {
 	// @ts-ignore
 	app.plugins.disablePlugin(plugin.id);
+}
+
+export function groupFromId(id:string) : PluginGroup | undefined{
+	return Manager.getInstance().groupsMap.get(id);
 }
 
