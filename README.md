@@ -15,7 +15,18 @@ Some plugins don't work with delayed loading, as they need to load before the wo
 
 -	[Pane Relief](https://github.com/pjeby/pane-relief)
 
+Some plugins will also have minor issues (proper view not loading). This can be resolved by closing and reopening the affected pane.
+E.g.:
+
+-	[Media Extended](https://github.com/aidenlx/media-extended)
+
+Sometimes the pane will automatically reload, however this will only happen after the plugin has loaded that is the case for e.g.:
+
+-	[Kanban](https://github.com/mgmeyers/obsidian-kanban)
+
 *If you notice a plugin that has issues with delayed loading, please let me know or open a PR with the Plugin added to the list in this README.md*
+
+Unfortunately it is not possible yet to set the order of starting plugins within a group. Therefore if plugins depend on one another and a plugin needs to be loaded before another one, I advise putting them in different groups and loading those accordingly. Though it might work without doing that I'd advise against it just to be safe.
 
 ## Installation
 
