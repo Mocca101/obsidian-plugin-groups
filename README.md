@@ -80,7 +80,7 @@ To enable loading your plugins delayed you'll need to do the following:
 	2. Set the delay for the plugins
 3. Done! On your next startup you should see an improvement in your startup time.
 
-![startupDemo](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/startup-group.gif)
+![startupDemo][(https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/startup-group.gif](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/Startup-Demo.gif)
 
 ## Support
 
