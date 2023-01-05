@@ -69,6 +69,19 @@ You can enable or disable a group by clicking the "On" & "Off" buttons next to t
 
 ![commands](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/commands.gif)
 
+### Lazy Loading (Delayed loading on Obsidians Startup)
+
+To enable loading your plugins delayed you'll need to do the following:
+
+1. Manually disable the plugins you want to load through lazy load in the community plugins tab. Or, even better delete the id's of the plugins in the file: `.obsidian/community-plugins.json`. 
+	Explanation: When the plugins are enabled in manually they are written in the file and therefore load on obsidian's startup (not through plugin groups).
+2. In the groups that contain the plugins you want to load delayed, toggle the "Load on Startup" button. 
+	1. Choose the desired behaviour (Enable or Disable).
+	2. Set the delay for the plugins
+3. Done! On your next startup you should see an improvement in your startup time.
+
+![startupDemo](https://raw.githubusercontent.com/Mocca101/obsidian-plugin-groups/master/images/startup-group.gif)
+
 ## Support
 
 If you find the Plugin Groups to be a useful tool, please consider supporting me through a donation via Buy Me a Coffee or starring this project on GitHub. Alternatively consider [Donating to the Internet Archive](https://archive.org/donate/) an awesome project, preserving and providing access to digital media and information, now and for future generations!
