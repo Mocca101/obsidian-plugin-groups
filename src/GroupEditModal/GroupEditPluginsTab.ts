@@ -65,7 +65,22 @@ export default class GroupEditPluginsTab {
 			filteredGroupsList.update(this.filteredGroups);
 		}
 
-		const groupOptionsForButton: DropdownOption[] = [];
+		const groupOptionsForButton: DropdownOption[] = [{
+			label: 'All groups',
+			func: () => {
+				if(this.filteredGroups.size === Manager.getInstance().groupsMap.size) {
+					Manager.getInstance().groupsMap.forEach(group => {
+						this.filteredGroups.delete(group.id);
+					});
+				} else {
+					Manager.getInstance().groupsMap.forEach(group => {
+						this.filteredGroups.set(group.id, group);
+					});
+				}
+				filteredGroupsList.update(this.filteredGroups);
+				this.filterAndSortPlugins();
+			}
+		}];
 		Manager.getInstance().groupsMap.forEach(group => {
 			groupOptionsForButton.push({
 				label: group.name,
