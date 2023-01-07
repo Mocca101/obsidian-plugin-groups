@@ -60,10 +60,8 @@ export default class GroupEditPluginsTab {
 			{label: 'Deselect all',	func: () =>	this.deselectAllFilteredPlugins()},
 		])
 
-		const pluginList = searchAndList.createEl('div');
-		pluginList.addClass('group-edit-modal-plugin-list');
 
-		this.pluginsList = new PluginList(pluginList, this.filteredPlugins, this.groupToEdit, (plugin: PgPlugin) => this.togglePluginForGroup(plugin));
+		this.pluginsList = new PluginList(searchAndList, this.filteredPlugins, {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
 		return pluginSection;
 	}

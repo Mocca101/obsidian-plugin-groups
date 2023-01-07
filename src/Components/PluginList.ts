@@ -15,13 +15,15 @@ export default class PluginList {
 
 	private parentEL: HTMLElement;
 
-	constructor(parentEL: HTMLElement, pluginsToDisplay: PgPlugin[], ownerGroup?:PluginGroup, onListItemToggled?: (plugin: PgPlugin) => void) {
+	constructor(parentEL: HTMLElement, pluginsToDisplay: PgPlugin[], actionOption?: ActionOption) {
 		this.plugins = pluginsToDisplay;
-		this.ownerGroup = ownerGroup;
 		this.parentEL = parentEL;
-		if(ownerGroup && onListItemToggled) {
+
+		if(actionOption) {
+			this.ownerGroup = actionOption?.group;
+
 			this.pluginListTarget.addEventListener('listToggleClicked', (evt: CustomEvent) => {
-				onListItemToggled(evt.detail)
+				actionOption.onClickAction(evt.detail)
 			});
 		}
 		this.generateList();
@@ -45,9 +47,9 @@ export default class PluginList {
 			.forEach(plugin => {
 				const setting = new Setting(this.pluginListEl)
 					.setName(plugin.name);
-				const btn: ButtonComponent = new ButtonComponent(setting.settingEl);
-				this.setIconForPluginBtn(btn, plugin.id);
 				if(this.ownerGroup) {
+					const btn: ButtonComponent = new ButtonComponent(setting.settingEl);
+					this.setIconForPluginBtn(btn, plugin.id);
 					btn.onClick(() => {
 						this.pluginListTarget.dispatchEvent(new CustomEvent('listToggleClicked', {detail: plugin}));
 						this.setIconForPluginBtn(btn, plugin.id);
@@ -61,7 +63,10 @@ export default class PluginList {
 
 		btn.setIcon(this.ownerGroup.plugins.map(p => p.id).contains(pluginId) ? 'check-circle' : 'circle')
 	}
+}
 
-
+interface ActionOption {
+	group: PluginGroup;
+	onClickAction: (plugin: PgPlugin) => void;
 
 }

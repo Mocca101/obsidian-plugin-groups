@@ -64,6 +64,8 @@ export default class Manager {
 		await this.main.saveData(persistentSettings);
 	}
 
+	
+
 
 	// Getters & Setters
 
