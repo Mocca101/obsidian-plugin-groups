@@ -1,9 +1,8 @@
 import {PluginGroup} from "../PluginGroup";
 import {Setting} from "obsidian";
 import DeviceSelectionModal from "../DeviceSelectionModal";
-import PgMain from "../../main";
-import {disableStartupTimeout} from "../Constants";
-import Manager from "../Manager";
+import {disableStartupTimeout} from "../Utils/Constants";
+import Manager from "../Managers/Manager";
 
 export default class GroupEditGeneralTab {
 

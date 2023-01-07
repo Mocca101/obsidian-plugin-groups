@@ -1,23 +1,24 @@
 import {Plugin} from 'obsidian';
 import GroupSettingsTab from "./src/GroupSettingsTab";
-import {
-	getInstalledPluginFromId,
-	getInstalledPluginIds,
-	getKnownPluginIds,
-	setKnownPluginIds
-} from "./src/Utilities";
-import {disableStartupTimeout} from "./src/Constants";
-import Manager from "./src/Manager";
-import CommandManager from "./src/CommandManager";
+import {disableStartupTimeout} from "./src/Utils/Constants";
+import Manager from "./src/Managers/Manager";
+import CommandManager from "./src/Managers/CommandManager";
+import PluginManager from "./src/Managers/PluginManager";
 
 export default class PgMain extends Plugin {
 
+	readonly doLogTime: boolean = false;
+
 	async onload() {
 		await Manager.getInstance().init(this);
+		if(this.doLogTime) { console.log('pg-afterManagerInit', window.performance.now() / 1000 ); }
 
-		this.loadNewPlugins();
+		PluginManager.loadNewPlugins();
+		if(this.doLogTime) { console.log('pg-afterNewPluginLoad', window.performance.now() / 1000 ); }
 
 		this.addSettingTab(new GroupSettingsTab(this.app, this));
+		if(this.doLogTime) { console.log('pg-afterAddSettings', window.performance.now() / 1000 ); }
+
 
 		if(!Manager.getInstance().groupsMap) {
 			return; // Exit early if there are no groups yet, no need to load the rest.
@@ -25,6 +26,7 @@ export default class PgMain extends Plugin {
 
 		if(Manager.getInstance().generateCommands) {
 			Manager.getInstance().groupsMap.forEach(group => CommandManager.getInstance().AddGroupCommands(group.id));
+			if(this.doLogTime) { console.log('pg-afterGenerateCommand', window.performance.now() / 1000 ); }
 		}
 
 		// TODO: Improve hacky solution if possible
@@ -33,34 +35,10 @@ export default class PgMain extends Plugin {
 				if (group.loadAtStartup) group.startup();
 			});
 		}
+		if(this.doLogTime) { console.log('pg-afterInitStartups', window.performance.now() / 1000 ); }
+
 	}
 
-	loadNewPlugins() {
-		if (getKnownPluginIds() === null) {
-			setKnownPluginIds(getInstalledPluginIds());
-		} else {
-			const knownPlugins = getKnownPluginIds();
-			const installedPlugins = getInstalledPluginIds();
-			setKnownPluginIds(installedPlugins);
-
-			const newPlugins = new Set([...installedPlugins].filter(id => !knownPlugins?.has(id)));
-
-			if(newPlugins.size <= 0) { return; }
-
-			Manager.getInstance().groupsMap.forEach(g => {
-				if(g.autoAdd) {
-					newPlugins.forEach(pluginId => {
-						const plugin = getInstalledPluginFromId(pluginId);
-						if(plugin) {
-							g.addPlugin(plugin);
-						}
-					})
-				}
-			});
-
-			Manager.getInstance().saveSettings();
-		}
-	}
 
 	onunload() {
 	}

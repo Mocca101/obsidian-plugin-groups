@@ -1,15 +1,13 @@
 import {App, Modal, Setting} from "obsidian";
 import GroupSettingsTab from "./GroupSettingsTab";
-import {generateGroupID} from "./Utilities";
-import ConfirmationPopupModal from "./ConfirmationPopupModal";
-import PgMain from "../main";
+import {generateGroupID} from "./Utils/Utilities";
+import ConfirmationPopupModal from "./Components/ConfirmationPopupModal";
 import {PluginGroup} from "./PluginGroup";
-import DeviceSelectionModal from "./DeviceSelectionModal";
 import GroupEditPluginsTab from "./GroupEditModal/GroupEditPluginsTab";
 import GroupEditGroupsTab from "./GroupEditModal/GroupEditGroupsTab";
 import GroupEditGeneralTab from "./GroupEditModal/GroupEditGeneralTab";
-import Manager from "./Manager";
-import CommandManager from "./CommandManager";
+import Manager from "./Managers/Manager";
+import CommandManager from "./Managers/CommandManager";
 
 export default class GroupEditModal extends Modal {
 

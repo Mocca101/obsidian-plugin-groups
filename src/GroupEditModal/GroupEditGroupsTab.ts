@@ -1,7 +1,6 @@
 import {Setting} from "obsidian";
 import {PluginGroup} from "../PluginGroup";
-import PgMain from "../../main";
-import Manager from "../Manager";
+import Manager from "../Managers/Manager";
 
 
 export default class GroupEditGroupsTab {

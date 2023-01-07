@@ -1,4 +1,4 @@
-import {PluginGroup} from "./PluginGroup";
+import {PluginGroup} from "../PluginGroup";
 
 export interface PgComponent {
 	id: string;

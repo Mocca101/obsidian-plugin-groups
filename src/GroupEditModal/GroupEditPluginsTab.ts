@@ -1,14 +1,14 @@
 import {ButtonComponent, Setting} from "obsidian";
 import {PgPlugin} from "../PgPlugin";
 import {PluginGroup} from "../PluginGroup";
-import {getAllAvailablePlugins, groupFromId} from "../Utilities";
-import ButtonWithDropdown from "./ButtonWithDropdown";
-import PgMain from "../../main";
+import {groupFromId} from "../Utils/Utilities";
+import ButtonWithDropdown from "../Components/ButtonWithDropdown";
+import PluginManager from "../Managers/PluginManager";
 
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
 
-	private readonly availablePlugins: PgPlugin[] = getAllAvailablePlugins();
+	private readonly availablePlugins: PgPlugin[] = PluginManager.getAllAvailablePlugins();
 
 	private pluginListElements : Map<string, {setting: Setting, btn: ButtonComponent}> = new Map<string, {setting: Setting, btn: ButtonComponent}>();
 
@@ -65,6 +65,7 @@ export default class GroupEditPluginsTab {
 
 		this.pluginListElements = new Map<string, {setting: Setting, btn: ButtonComponent}>();
 
+		// TODO: Change this in the process of making sure plugins are loaded in the correct (user defined) order
 		this.sortPlugins(this.availablePlugins)
 			.forEach(plugin => {
 				const setting = new Setting(pluginList)

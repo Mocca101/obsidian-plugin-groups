@@ -1,5 +1,5 @@
-import {groupFromId} from "./Utilities";
-import {PluginGroup} from "./PluginGroup";
+import {groupFromId} from "../Utils/Utilities";
+import {PluginGroup} from "../PluginGroup";
 import Manager from "./Manager";
 import {Command} from "obsidian";
 

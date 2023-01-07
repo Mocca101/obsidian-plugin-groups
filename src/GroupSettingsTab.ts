@@ -5,10 +5,11 @@ import {
 	generateGroupID,
 	getCurrentlyActiveDevice,
 	setCurrentlyActiveDevice
-} from "./Utilities";
+} from "./Utils/Utilities";
 import {PluginGroup} from "./PluginGroup";
-import ConfirmationPopupModal from "./ConfirmationPopupModal";
-import Manager from "./Manager";
+import ConfirmationPopupModal from "./Components/ConfirmationPopupModal";
+import Manager from "./Managers/Manager";
+import PluginManager from "./Managers/PluginManager";
 
 export default class GroupSettingsTab extends PluginSettingTab {
 
@@ -22,7 +23,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 	display(): void {
 
-		Manager.getInstance().pluginInstance.loadNewPlugins();
+		PluginManager.loadNewPlugins();
 
 		const {containerEl} = this;
 
@@ -201,8 +202,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				}
 			})
 			.setPlaceholder('Device Name')
-			.inputEl.onkeydown = e => {
-				if(e.key === 'Enter') { CreateNewDevice(); }
+			.inputEl.onkeydown = async e => {
+				if(e.key === 'Enter') {await CreateNewDevice(); }
 			};
 
 
@@ -211,8 +212,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				deviceAddBtn = btn;
 				deviceAddBtn
 					.setIcon('plus')
-					.onClick(() => {
-					CreateNewDevice();
+					.onClick(async () => {
+					await CreateNewDevice();
 					})
 					.buttonEl.addClass('btn-disabled');
 			})

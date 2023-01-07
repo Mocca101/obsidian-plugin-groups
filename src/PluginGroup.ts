@@ -1,15 +1,11 @@
-import {PgComponent} from "./Types";
+import {PgComponent} from "./Utils/Types";
 import {PgPlugin} from "./PgPlugin";
 import {Notice} from "obsidian";
-import PgMain from "../main";
 import {
-	checkPluginEnabled,
-	disablePlugin,
-	enablePlugin,
-	getAllAvailablePlugins,
 	getCurrentlyActiveDevice, groupFromId
-} from "./Utilities";
-import Manager from "./Manager";
+} from "./Utils/Utilities";
+import Manager from "./Managers/Manager";
+import PluginManager from "./Managers/PluginManager";
 
 export class PluginGroup implements PluginGroupData {
 
@@ -89,10 +85,7 @@ export class PluginGroup implements PluginGroupData {
 		const pluginPromises: Promise<boolean>[] = [];
 
 		for (const plugin of this.plugins) {
-			if (checkPluginEnabled(plugin)) {
-				continue;
-			}
-			pluginPromises.push(enablePlugin(plugin));
+			pluginPromises.push(PluginManager.queuePluginForEnable(plugin));
 		}
 
 		await Promise.allSettled(pluginPromises);
@@ -116,7 +109,7 @@ export class PluginGroup implements PluginGroupData {
 		}
 
 		this.plugins.forEach(plugin => {
-			disablePlugin(plugin);
+			PluginManager.queueDisablePlugin(plugin);
 		})
 
 		this.groupIds.forEach(groupId => {
@@ -136,7 +129,7 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	getGroupListString() : string {
-		const existingPluginsInGroup = getAllAvailablePlugins().filter(p => this.plugins.map(p => p.id).contains(p.id));
+		const existingPluginsInGroup = PluginManager.getAllAvailablePlugins().filter(p => this.plugins.map(p => p.id).contains(p.id));
 		let messageString = '';
 		this.plugins && this.plugins.length > 0
 			? messageString += '- Plugins:\n' + existingPluginsInGroup.map(p => ' - ' + p.name + '\n').join('')

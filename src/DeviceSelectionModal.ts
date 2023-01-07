@@ -1,6 +1,5 @@
 import {App, Modal, Setting} from "obsidian";
-import PgMain from "../main";
-import Manager from "./Manager";
+import Manager from "./Managers/Manager";
 
 export default class DeviceSelectionModal extends Modal {
 

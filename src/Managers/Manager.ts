@@ -1,6 +1,6 @@
-import {PersistentSettings, PluginGroupsSettings} from "./Types";
-import PgMain from "../main";
-import {PluginGroup} from "./PluginGroup";
+import {PersistentSettings, PluginGroupsSettings} from "../Utils/Types";
+import PgMain from "../../main";
+import {PluginGroup} from "../PluginGroup";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
