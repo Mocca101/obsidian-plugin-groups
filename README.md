@@ -85,11 +85,12 @@ To enable loading your plugins delayed you'll need to do the following:
 
 ## Support
 
+Even though I try my best to keep the Readme and documentation up to date, there may be things that I miss, such as spelling mistakes or features that could be explained more clearly. If you notice any of these issues, please let me know. Or, even better, if you are able to fix the mistakes or write clearer explanations, you can create a pull request with your changes. This helps me focus more on development and allows other users to benefit from improved usage documentation!
+
 If you find the Plugin Groups to be a useful tool, please consider supporting me through a donation via Buy Me a Coffee or starring this project on GitHub. Alternatively consider [Donating to the Internet Archive](https://archive.org/donate/) an awesome project, preserving and providing access to digital media and information, now and for future generations!
 Your support helps me to continue developing and maintaining this plugin.
 
 <a href="https://www.buymeacoffee.com/Mocca101" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 30px !important;width: 108px !important;" ></a>
-
 
 If you have any questions, feedback, issues or bugs, please don't hesitate to contact me or create an issue in this Repository.
 
