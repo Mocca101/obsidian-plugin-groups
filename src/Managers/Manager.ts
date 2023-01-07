@@ -61,7 +61,21 @@ export default class Manager {
 	 * Returns a map of each plugin that is in 1 or more groups, and it's connected groups.
 	 * Format: PluginID -> Set of connected groupsId's
 	 */
-	public get mapOfPluginsConnectedGroups() : Map<string, Set<string>> {
+	public get mapOfPluginsConnectedGroupsIncludingParentGroups() : Map<string, Set<string>> {
+		const pluginsMemMap = new Map<string, Set<string>>();
+
+		this.groupsMap.forEach(group => {
+			group.getAllPluginIdsControlledByGroup().forEach(plugin => {
+				if(!pluginsMemMap.has(pluginId)) {
+					pluginsMemMap.set(plugin, new Set<string>());
+				}
+				pluginsMemMap.get(plugin)?.add(group.id);
+			})
+		})
+		return pluginsMemMap;
+	}
+
+	public get mapOfPluginsDirectlyConnectedGroups() : Map<string, Set<string>> {
 		const pluginsMemMap = new Map<string, Set<string>>();
 
 		this.groupsMap.forEach(group => {

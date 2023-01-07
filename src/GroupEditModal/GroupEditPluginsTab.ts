@@ -1,7 +1,6 @@
-import {ButtonComponent, Setting} from "obsidian";
+import {Setting} from "obsidian";
 import {PgPlugin} from "../PgPlugin";
 import {PluginGroup} from "../PluginGroup";
-import {groupFromId} from "../Utils/Utilities";
 import DropdownActionButton, {DropdownOption} from "../Components/DropdownActionButton";
 import PluginManager from "../Managers/PluginManager";
 import PluginList from "../Components/PluginList";
@@ -145,7 +144,7 @@ export default class GroupEditPluginsTab {
 	}
 
 	private filterPluginsByGroups(pluginsToFilter: PgPlugin[], groupsToExclude: Map<string, PluginGroup>) : PgPlugin[] {
-		const pluginMembershipMap = Manager.getInstance().mapOfPluginsConnectedGroups;
+		const pluginMembershipMap = Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
 		return pluginsToFilter.filter(plugin => {
 			if (!pluginMembershipMap.has(plugin.id)) { return true; }
 

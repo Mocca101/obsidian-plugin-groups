@@ -51,8 +51,6 @@ export class PluginGroup implements PluginGroupData {
 		}
 
 		return !!this.assignedDevices?.contains(activeDevice);
-
-
 	}
 
 	assignAndLoadPlugins(plugins?: PgPlugin[]) {
@@ -194,6 +192,18 @@ export class PluginGroup implements PluginGroupData {
 			}
 		}
 		return false;
+	}
+
+	getAllPluginIdsControlledByGroup() : Set<string> {
+		let pluginsArr = this.plugins.map(plugin => plugin.id)
+
+		this.groupIds.forEach(gid => {
+			const group = groupFromId(gid);
+			if(group) {
+				pluginsArr = [ ...pluginsArr, ...group.getAllPluginIdsControlledByGroup()];
+			}
+		});
+		return new Set<string>( pluginsArr);
 	}
 }
 
