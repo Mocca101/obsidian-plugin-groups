@@ -6,6 +6,7 @@ import DropdownActionButton, {DropdownOption} from "../Components/DropdownAction
 import PluginManager from "../Managers/PluginManager";
 import PluginList from "../Components/PluginList";
 import Manager from "../Managers/Manager";
+import FilteredGroupsList from "../Components/FilteredGroupsList";
 
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
@@ -57,12 +58,19 @@ export default class GroupEditPluginsTab {
 		const filtersAndSelection = searchAndList.createDiv({cls: 'pg-plugin-filter-section'});
 		const filters = filtersAndSelection.createDiv();
 
+		const filteredGroupsList = new FilteredGroupsList(searchAndList, this.filteredGroups, ()=> this.filterAndSortPlugins());
+
+		const toggleGroupFilter = (group: PluginGroup) => {
+			this.filteredGroups.has(group.id) ? this.filteredGroups.delete(group.id) : this.filteredGroups.set(group.id, group);
+			filteredGroupsList.update(this.filteredGroups);
+		}
+
 		const groupOptionsForButton: DropdownOption[] = [];
 		Manager.getInstance().groupsMap.forEach(group => {
 			groupOptionsForButton.push({
 				label: group.name,
 				func: () => {
-					this.filteredGroups.has(group.id) ? this.filteredGroups.delete(group.id) : this.filteredGroups.set(group.id, group);
+					toggleGroupFilter(group);
 					this.filterAndSortPlugins();
 				}
 			})

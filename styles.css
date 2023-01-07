@@ -163,10 +163,42 @@
 }
 
 .pg-drp-btn-list li:hover {
-	box-shadow: var(--input-shadow-hover, rgba(211, 211, 211, 0.5));
+	box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
 	background-color: var(--interactive-hover, #363636);
 }
 
+.pg-chip {
+	background-color: var(--interactive-normal, #363636);
+	border-radius: 16px;
+	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+}
+
+.pg-chip span {
+	margin-left: 12px;
+}
+
+.pg-chip .pg-chip-close-btn {
+	padding-top: 4px;
+	padding-right: 4px;
+	padding-left: 4px;
+	border-radius: 16px;
+	margin-left: 12px;
+}
+
+.pg-chip-close-btn:hover {
+	background: rgb(255 255 255 / 20%);
+}
+
+.pg-group-filter-list {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+	min-height: 1rem;
+	align-items: center;
+	flex-wrap: wrap;
+}
 
 :root {
 	--pg-group-edit-modal-footer-height: 60px;
