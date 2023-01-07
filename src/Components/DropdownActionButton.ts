@@ -1,31 +1,62 @@
 import {setIcon} from "obsidian";
 
 
-export default class ButtonWithDropdown {
+export default class DropdownActionButton {
 
 	containerEL: HTMLElement;
 
 	private drpList: HTMLElement;
 
-	constructor(parentEl: HTMLElement, mainLabel: {label: string, icon?: string}, dropdownOptions: DropdownOption[],
+	private parentEl: HTMLElement;
+
+	mainLabel: MainLabelOptions;
+
+	dropdownOptions: DropdownOption[];
+
+	minWidth: string | undefined;
+
+	drpIcon: string | undefined;
+
+
+	constructor(parentEl: HTMLElement, mainLabel: MainLabelOptions, dropdownOptions: DropdownOption[],
 				options?: {
 					drpIcon?: string,
-					maxWidth?: string
+					width?: string
 				}) {
 
-		this.containerEL = parentEl.createEl('button', {cls: 'pg-drp-btn'});
-		if(options?.maxWidth) {
-			this.containerEL.style.maxWidth = options.maxWidth;
+		this.mainLabel = mainLabel;
+		this.dropdownOptions = dropdownOptions;
+		this.parentEl = parentEl;
+
+		this.minWidth = options?.width;
+		this.drpIcon = options?.drpIcon;
+
+		this.render();
+	}
+
+	public rerender() {
+		this.containerEL.remove();
+		this.render();
+	}
+
+	private render() {
+		this.containerEL = this.parentEl.createEl('button', {cls: 'pg-drp-btn'});
+		if(this.minWidth) {
+			this.containerEL.style.minWidth = this.minWidth;
 		}
 		this.containerEL.onClickEvent(() => this.toggleDropdown());
 
 		const activeOptionBtn = this.containerEL.createSpan({cls: 'pg-drp-btn-main-label'});
-		this.setElementTextOrIcon(activeOptionBtn, mainLabel.label, mainLabel.icon)
+		this.setElementTextOrIcon(activeOptionBtn, this.mainLabel.label, this.mainLabel.icon)
 
-		this.containerEL.createSpan({text: '▼'})
+		if(this.drpIcon) {
+			setIcon(this.containerEL.createSpan(), this.drpIcon);
+		} else {
+			this.containerEL.createSpan({text: '▼'})
+		}
 
 		this.drpList = this.containerEL.createEl('ul', {cls: 'pg-drp-btn-list'});
-		dropdownOptions.forEach(option => {
+		this.dropdownOptions.forEach(option => {
 			const item = this.drpList.createEl('li', );
 			this.setElementTextOrIcon(item, option.label, option.icon);
 
@@ -68,8 +99,13 @@ export default class ButtonWithDropdown {
 
 }
 
-interface DropdownOption {
+export interface DropdownOption {
 	label: string,
 	func: () => void,
+	icon?: string
+}
+
+interface MainLabelOptions {
+	label: string,
 	icon?: string
 }

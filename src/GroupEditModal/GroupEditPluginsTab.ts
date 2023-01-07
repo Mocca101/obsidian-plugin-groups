@@ -2,9 +2,10 @@ import {ButtonComponent, Setting} from "obsidian";
 import {PgPlugin} from "../PgPlugin";
 import {PluginGroup} from "../PluginGroup";
 import {groupFromId} from "../Utils/Utilities";
-import ButtonWithDropdown from "../Components/ButtonWithDropdown";
+import DropdownActionButton, {DropdownOption} from "../Components/DropdownActionButton";
 import PluginManager from "../Managers/PluginManager";
 import PluginList from "../Components/PluginList";
+import Manager from "../Managers/Manager";
 
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
@@ -15,12 +16,18 @@ export default class GroupEditPluginsTab {
 
 	private groupToEdit: PluginGroup;
 
-	excludedGroupIds: Set<string> = new Set<string>();
+	private readonly sortModes = {
+		byName: "By Name",
+		byNameAndSelected: "By Name & Selected"
+	}
+
+	private selectedSortMode = this.sortModes.byNameAndSelected;
 
 	searchTerm: string;
 
 	private pluginsList: PluginList;
 
+	private filteredGroups: Map<string, PluginGroup> = new Map<string, PluginGroup>();
 
 	constructor(group: PluginGroup, parentEl: HTMLElement) {
 		this.groupToEdit = group;
@@ -47,32 +54,57 @@ export default class GroupEditPluginsTab {
 			})
 
 
-		const filtersAndSelection = new Setting(searchAndList);
-		filtersAndSelection.addToggle(tgl => {
-			tgl.onChange(value => {
-				value ? this.excludedGroupIds.add(this.groupToEdit.id) : this.excludedGroupIds.delete(this.groupToEdit.id);
-				this.filterPlugins();
+		const filtersAndSelection = searchAndList.createDiv({cls: 'pg-plugin-filter-section'});
+		const filters = filtersAndSelection.createDiv();
+
+		const groupOptionsForButton: DropdownOption[] = [];
+		Manager.getInstance().groupsMap.forEach(group => {
+			groupOptionsForButton.push({
+				label: group.name,
+				func: () => {
+					this.filteredGroups.has(group.id) ? this.filteredGroups.delete(group.id) : this.filteredGroups.set(group.id, group);
+					this.filterAndSortPlugins();
+				}
 			})
 		})
 
-		new ButtonWithDropdown(filtersAndSelection.settingEl, {label: 'Bulk Select'}, [
+		new DropdownActionButton(filters, {label: 'Filter for Groups'}, groupOptionsForButton);
+
+		const sortButton = new DropdownActionButton(filters, {label: 'Sort'}, [
+			{
+				label: this.sortModes.byName,
+				func: () => {
+					this.selectedSortMode = this.sortModes.byName;
+					sortButton.mainLabel.label = this.sortModes.byName;
+					sortButton.rerender();
+					this.filterAndSortPlugins();
+
+				}
+			},
+			{
+				label: this.sortModes.byNameAndSelected,
+				func: () => {
+					this.selectedSortMode = this.sortModes.byNameAndSelected;
+					sortButton.mainLabel.label = this.sortModes.byNameAndSelected;
+					sortButton.rerender();
+					this.filterAndSortPlugins();
+				}
+			},
+		], {width:'80px', drpIcon: 'sort-desc'})
+
+		new DropdownActionButton(filtersAndSelection, {label: 'Bulk Select'}, [
 			{label: 'Select all', func: () => this.selectAllFilteredPlugins()},
 			{label: 'Deselect all',	func: () =>	this.deselectAllFilteredPlugins()},
 		])
 
 
-		this.pluginsList = new PluginList(searchAndList, this.filteredPlugins, {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
+		this.pluginsList = new PluginList(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
 		return pluginSection;
 	}
 
-	private setIconForPluginBtn(btn: ButtonComponent, pluginId: string) {
-		btn.setIcon(this.groupToEdit.plugins.map(p => p.id).contains(pluginId) ? 'check-circle' : 'circle')
-	}
-
-
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
-	private filterPlugins() {
+	private filterAndSortPlugins() {
 
 		this.filteredPlugins = this.availablePlugins;
 		if(this.searchTerm && this.searchTerm !== '') {
@@ -80,36 +112,32 @@ export default class GroupEditPluginsTab {
 				.filter(p => p.name.toLowerCase().contains(this.searchTerm.toLowerCase()));
 		}
 
-		const pluginsToExclude = this.excludedPlugins();
-
-		if(pluginsToExclude) {
-			this.filteredPlugins = this.filteredPlugins.filter(plugin => !pluginsToExclude.has(plugin.id))
+		if(this.filteredGroups.size > 0) {
+			this.filteredPlugins = this.filterPluginsByGroups(this.filteredPlugins, this.filteredGroups);
 		}
+
+		this.filteredPlugins = this.sortPlugins(this.filteredPlugins, this.selectedSortMode);
 
 		this.showFilteredPlugins();
 	}
 
-	private excludedPlugins() : Set<string> | null {
-		let pluginsToExclude: Set<string> | null = null;
+	private filterPluginsByGroups(pluginsToFilter: PgPlugin[], groupsToExclude: Map<string, PluginGroup>) : PgPlugin[] {
+		const pluginMembershipMap = Manager.getInstance().mapOfPluginsConnectedGroups;
+		return pluginsToFilter.filter(plugin => {
+			if (!pluginMembershipMap.has(plugin.id)) { return true; }
 
-		// TODO: Do I also want to be able to know the plugins inside compound groups (groups that contain groups)
-		if(this.excludedGroupIds && this.excludedGroupIds.size > 0) {
-			let arr: string[] = [];
-			this.excludedGroupIds.forEach(id => {
-					arr = [...arr, ...(groupFromId(id)?.plugins.map(plugin => plugin.id) ?? [])];
+			for (const groupId of pluginMembershipMap.get(plugin.id) ?? []) {
+				if(groupsToExclude.has(groupId)) {
+					return false;
 				}
-			)
-			if(arr && arr.length > 0) {
-				pluginsToExclude = new Set<string>(arr);
 			}
-		}
-		return pluginsToExclude;
+			return true;
+		})
 	}
-
 
 	private searchPlugins(search: string) {
 		this.searchTerm = search;
-		this.filterPlugins();
+		this.filterAndSortPlugins();
 		this.showFilteredPlugins();
 	}
 
@@ -127,16 +155,25 @@ export default class GroupEditPluginsTab {
 		this.showFilteredPlugins();
 	}
 
-	sortPlugins(plugins: PgPlugin[]) : PgPlugin[] {
-		return plugins.sort((a, b) => {
-			const aInGroup = this.isPluginInGroup(a);
-			const bInGroup = this.isPluginInGroup(b);
-			if(aInGroup && !bInGroup) return -1;
-			else if(!aInGroup && bInGroup) return 1;
-			else {
-				return a.name.localeCompare(b.name);
-			}
-		})
+	sortPlugins(plugins: PgPlugin[], sortMode: string) : PgPlugin[] {
+		const sortedArray = [...plugins];
+
+		if(sortMode === this.sortModes.byName) {
+			return sortedArray.sort((a, b) => a.name.localeCompare(b.name));
+		}
+
+		if(sortMode === this.sortModes.byNameAndSelected) {
+			sortedArray.sort((a, b) => a.name.localeCompare(b.name));
+			sortedArray.sort((a, b) => {
+				const aInGroup = this.isPluginInGroup(a);
+				const bInGroup = this.isPluginInGroup(b);
+				if (aInGroup && !bInGroup) return -1;
+				else if (!aInGroup && bInGroup) return 1;
+				else return 0;
+			});
+		}
+
+		return sortedArray;
 	}
 
 	isPluginInGroup(plugin: PgPlugin) :boolean {

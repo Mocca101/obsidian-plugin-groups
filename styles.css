@@ -84,6 +84,11 @@
 	display: block;
 }
 
+.pg-plugin-filter-section {
+	display: flex;
+	justify-content: space-between;
+}
+
 .pg-drp-btn {
 	display: inline-flex;
 	align-items: center;
@@ -154,6 +159,7 @@
 
 .pg-drp-btn-list li {
 	padding: 10px;
+	white-space: normal;
 }
 
 .pg-drp-btn-list li:hover {

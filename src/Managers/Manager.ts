@@ -1,6 +1,8 @@
 import {PersistentSettings, PluginGroupsSettings} from "../Utils/Types";
 import PgMain from "../../main";
 import {PluginGroup} from "../PluginGroup";
+import {pluginId} from "../Utils/Constants";
+import PluginManager from "./PluginManager";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
@@ -54,6 +56,25 @@ export default class Manager {
 		}
 	}
 
+
+	/***
+	 * Returns a map of each plugin that is in 1 or more groups, and it's connected groups.
+	 * Format: PluginID -> Set of connected groupsId's
+	 */
+	public get mapOfPluginsConnectedGroups() : Map<string, Set<string>> {
+		const pluginsMemMap = new Map<string, Set<string>>();
+
+		this.groupsMap.forEach(group => {
+			group.plugins.forEach(plugin => {
+				if(!pluginsMemMap.has(pluginId)) {
+					pluginsMemMap.set(plugin.id, new Set<string>());
+				}
+				pluginsMemMap.get(plugin.id)?.add(group.id);
+			})
+		})
+		return pluginsMemMap;
+	}
+
 	async saveSettings() {
 		const persistentSettings: PersistentSettings = {
 			groups:  Array.from(this.groupsMap.values() ?? []),
@@ -64,7 +85,7 @@ export default class Manager {
 		await this.main.saveData(persistentSettings);
 	}
 
-	
+
 
 
 	// Getters & Setters
