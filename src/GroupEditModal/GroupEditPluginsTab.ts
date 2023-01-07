@@ -4,13 +4,12 @@ import {PluginGroup} from "../PluginGroup";
 import {groupFromId} from "../Utils/Utilities";
 import ButtonWithDropdown from "../Components/ButtonWithDropdown";
 import PluginManager from "../Managers/PluginManager";
+import PluginList from "../Components/PluginList";
 
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
 
 	private readonly availablePlugins: PgPlugin[] = PluginManager.getAllAvailablePlugins();
-
-	private pluginListElements : Map<string, {setting: Setting, btn: ButtonComponent}> = new Map<string, {setting: Setting, btn: ButtonComponent}>();
 
 	private filteredPlugins: PgPlugin[];
 
@@ -19,6 +18,8 @@ export default class GroupEditPluginsTab {
 	excludedGroupIds: Set<string> = new Set<string>();
 
 	searchTerm: string;
+
+	private pluginsList: PluginList;
 
 
 	constructor(group: PluginGroup, parentEl: HTMLElement) {
@@ -62,23 +63,8 @@ export default class GroupEditPluginsTab {
 		const pluginList = searchAndList.createEl('div');
 		pluginList.addClass('group-edit-modal-plugin-list');
 
+		this.pluginsList = new PluginList(pluginList, this.filteredPlugins, this.groupToEdit, (plugin: PgPlugin) => this.togglePluginForGroup(plugin));
 
-		this.pluginListElements = new Map<string, {setting: Setting, btn: ButtonComponent}>();
-
-		// TODO: Change this in the process of making sure plugins are loaded in the correct (user defined) order
-		this.sortPlugins(this.availablePlugins)
-			.forEach(plugin => {
-				const setting = new Setting(pluginList)
-					.setName(plugin.name);
-				const btn: ButtonComponent = new ButtonComponent(setting.settingEl);
-				this.setIconForPluginBtn(btn, plugin.id);
-				btn.onClick(() => {
-					this.togglePluginForGroup(plugin);
-					this.setIconForPluginBtn(btn, plugin.id);
-				})
-
-				this.pluginListElements.set(plugin.id, {setting: setting, btn: btn});
-			})
 		return pluginSection;
 	}
 
@@ -130,24 +116,17 @@ export default class GroupEditPluginsTab {
 	}
 
 	private showFilteredPlugins() {
-		this.pluginListElements.forEach(el => el.setting.settingEl.hide());
-		this.filteredPlugins.forEach(plugin => this.pluginListElements.get(plugin.id)?.setting.settingEl.show());
+		this.pluginsList.updateList(this.filteredPlugins);
 	}
 
 	private deselectAllFilteredPlugins() {
 		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.removePlugin(plugin));
-		this.setAllPluginListBtnIcons();
+		this.showFilteredPlugins();
 	}
 
 	private selectAllFilteredPlugins() {
 		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.addPlugin(plugin));
-		this.setAllPluginListBtnIcons();
-	}
-
-	private setAllPluginListBtnIcons() {
-		for (const [id, el] of this.pluginListElements) {
-			this.setIconForPluginBtn(el.btn, id);
-		}
+		this.showFilteredPlugins();
 	}
 
 	sortPlugins(plugins: PgPlugin[]) : PgPlugin[] {
