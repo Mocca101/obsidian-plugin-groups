@@ -85,8 +85,6 @@ To enable loading your plugins delayed you'll need to do the following:
 
 ## Support
 
-Even though I try my best to keep the Readme and documentation up to date, there may be things that I miss, such as spelling mistakes or features that could be explained more clearly. If you notice any of these issues, please let me know. Or, even better, if you are able to fix the mistakes or write clearer explanations, you can create a pull request with your changes. This helps me focus more on development and allows other users to benefit from improved usage documentation!
-
 If you find the Plugin Groups to be a useful tool, please consider supporting me through a donation via Buy Me a Coffee or starring this project on GitHub. Alternatively consider [Donating to the Internet Archive](https://archive.org/donate/) an awesome project, preserving and providing access to digital media and information, now and for future generations!
 Your support helps me to continue developing and maintaining this plugin.
 
@@ -95,3 +93,10 @@ Your support helps me to continue developing and maintaining this plugin.
 If you have any questions, feedback, issues or bugs, please don't hesitate to contact me or create an issue in this Repository.
 
 Thank you for using  Plugin Groups I hope it makes your life easier!
+
+
+## Help me with the Readme:
+
+Even though I try my best to keep the Readme and documentation up to date, there may be things that I miss, such as spelling mistakes or features that could be explained more clearly. If you notice any of these issues, please let me know. Or, even better, if you are able to fix the mistakes or write clearer explanations, you can create a pull request with your changes. This helps me focus more on development and allows other users to benefit from improved usage documentation!
+
+If you do end up helping me like that, thank you so much! If you make use of Plugins, put them into the images folder. The theme used is the light version of the obsidian standard theme.
