@@ -1,5 +1,5 @@
 import {App, Modal, Setting} from "obsidian";
-import PgMain from "../main";
+import Manager from "./Managers/Manager";
 
 export default class DeviceSelectionModal extends Modal {
 
@@ -44,7 +44,7 @@ export default class DeviceSelectionModal extends Modal {
 
 		contentEl.createEl('h6', {text: 'Existing Devices'});
 
-		PgMain.instance?.settings.devices.forEach(device => {
+		Manager.getInstance().devices.forEach(device => {
 			new Setting(contentEl)
 				.setName(device)
 				.addButton(tgl => {
