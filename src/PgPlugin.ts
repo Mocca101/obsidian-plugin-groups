@@ -1,4 +1,4 @@
-import {PgComponent} from "./Types";
+import {PgComponent} from "./Utils/Types";
 
 export class PgPlugin implements PgComponent {
 

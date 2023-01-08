@@ -1,13 +1,15 @@
 import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
-import PluginGroupEditModal from "./PluginGroupEditModal";
+import GroupEditModal from "./GroupEditModal";
 import {
 	generateGroupID,
 	getCurrentlyActiveDevice,
 	setCurrentlyActiveDevice
-} from "./Utilities";
+} from "./Utils/Utilities";
 import {PluginGroup} from "./PluginGroup";
-import ConfirmationPopupModal from "./ConfirmationPopupModal";
+import ConfirmationPopupModal from "./Components/ConfirmationPopupModal";
+import Manager from "./Managers/Manager";
+import PluginManager from "./Managers/PluginManager";
 
 export default class GroupSettingsTab extends PluginSettingTab {
 
@@ -21,7 +23,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 	display(): void {
 
-		PgMain.instance?.loadNewPlugins();
+		PluginManager.loadNewPlugins();
 
 		const {containerEl} = this;
 
@@ -32,11 +34,10 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		new Setting(generalParent)
 			.setName('Generate Commands for Groups')
 			.addToggle(tgl => {
-				tgl.setValue(PgMain.instance?.settings.generateCommands ?? false);
+				tgl.setValue(Manager.getInstance().generateCommands ?? false);
 				tgl.onChange(async value => {
-					if(!PgMain.instance) {return;}
-					PgMain.instance.settings.generateCommands = value;
-					await PgMain.instance.saveSettings();
+					Manager.getInstance().shouldGenerateCommands = value;
+					await Manager.getInstance().saveSettings();
 				});
 			})
 
@@ -46,12 +47,10 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				drp.addOption('none', 'None')
 					.addOption('short', 'Short')
 					.addOption('normal', 'Normal');
-				drp.setValue(PgMain.instance?.settings.showNoticeOnGroupLoad ?? 'none');
+				drp.setValue(Manager.getInstance().showNoticeOnGroupLoad ?? 'none');
 				drp.onChange(async value => {
-					if(!PgMain.instance) { return; }
-
-					PgMain.instance.settings.showNoticeOnGroupLoad = value;
-					await PgMain.instance.saveSettings();
+					Manager.getInstance().showNoticeOnGroupLoad = value;
+					await Manager.getInstance().saveSettings();
 
 				});
 			});
@@ -95,7 +94,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {
-		PgMain.instance?.settings.groupsMap.forEach(group => {
+		Manager.getInstance().groupsMap.forEach(group => {
 			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
 				.addButton(btn => {
@@ -151,7 +150,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			id: id,
 			name: this.newGroupName
 		});
-		new PluginGroupEditModal(this.app, this, newGroup).open();
+		new GroupEditModal(this.app, this, newGroup).open();
 		this.newGroupName = '';
 		if(this.groupNameField) {
 			this.groupNameField.setValue('');
@@ -159,22 +158,21 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	editGroup(group: PluginGroup) {
-		new PluginGroupEditModal(this.app, this, group).open();
+		new GroupEditModal(this.app, this, group).open();
 	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {
 		let newDeviceName = '';
-		const CreateNewDevice = () => {
+		const CreateNewDevice = async () => {
 			if(!newDeviceName || newDeviceName.replace(' ', '') === '') {return;}
 
-			if(PgMain.instance?.settings.devices.contains(newDeviceName)) {
+			if(Manager.getInstance().devices.contains(newDeviceName)) {
 				new Notice('Name already in use for other device');
 				return;
 			}
 
-			PgMain.instance?.settings.devices.push(newDeviceName);
-			PgMain.instance?.saveSettings();
-
+			Manager.getInstance().devices.push(newDeviceName);
+			await Manager.getInstance().saveSettings();
 
 			if(!getCurrentlyActiveDevice()) { setCurrentlyActiveDevice(newDeviceName); }
 
@@ -204,8 +202,8 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				}
 			})
 			.setPlaceholder('Device Name')
-			.inputEl.onkeydown = e => {
-				if(e.key === 'Enter') { CreateNewDevice(); }
+			.inputEl.onkeydown = async e => {
+				if(e.key === 'Enter') {await CreateNewDevice(); }
 			};
 
 
@@ -214,13 +212,13 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				deviceAddBtn = btn;
 				deviceAddBtn
 					.setIcon('plus')
-					.onClick(() => {
-					CreateNewDevice();
+					.onClick(async () => {
+					await CreateNewDevice();
 					})
 					.buttonEl.addClass('btn-disabled');
 			})
 
-		PgMain.instance?.settings.devices.forEach(device => {
+		Manager.getInstance().devices.forEach(device => {
 			const deviceSetting = new Setting(contentEl)
 				.setName(device);
 			if(getCurrentlyActiveDevice() === device) {
@@ -251,9 +249,9 @@ export default class GroupSettingsTab extends PluginSettingTab {
 							'You are about to delete: ' + device,
 							void 0,
 							'Delete',
-							() => {
-								PgMain.instance?.settings.devices.remove(device);
-								PgMain.instance?.saveSettings();
+							async () => {
+								Manager.getInstance().devices.remove(device);
+								await Manager.getInstance().saveSettings();
 								this.display();
 							}).open());
 					})
@@ -266,7 +264,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		const device: string | null = getCurrentlyActiveDevice();
 
 		if(!device) { return ;}
-		PgMain.instance?.settings.devices.remove(device);
+		Manager.getInstance().devices.remove(device);
 		setCurrentlyActiveDevice(null);
 		this.display();
 
