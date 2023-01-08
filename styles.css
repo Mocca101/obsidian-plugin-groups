@@ -168,7 +168,7 @@
 }
 
 .pg-chip {
-	background-color: var(--interactive-normal, #363636);
+	background-color: var(--color-base-20, #363636);
 	border-radius: 16px;
 	font-size: 14px;
 	display: inline-flex;
@@ -188,7 +188,7 @@
 }
 
 .pg-chip-close-btn:hover {
-	background: rgb(255 255 255 / 20%);
+	background: var(--color-base-50, rgb(255 255 255 / 20%));
 }
 
 .pg-group-filter-list {
