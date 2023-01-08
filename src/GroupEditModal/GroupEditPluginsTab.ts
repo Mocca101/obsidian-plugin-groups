@@ -54,10 +54,12 @@ export default class GroupEditPluginsTab {
 			})
 
 
-		const filtersAndSelection = searchAndList.createDiv({cls: 'pg-plugin-filter-section'});
+
+		const filtersAndSelectionContainer = searchAndList.createDiv({cls: 'pg-plugin-filter-container'});
+		const filtersAndSelection = filtersAndSelectionContainer.createDiv({cls: 'pg-plugin-filter-section'});
 		const filters = filtersAndSelection.createDiv();
 
-		const filteredGroupsList = new FilteredGroupsList(searchAndList, this.filteredGroups, ()=> this.filterAndSortPlugins());
+		const filteredGroupsList = new FilteredGroupsList(filtersAndSelectionContainer, this.filteredGroups, ()=> this.filterAndSortPlugins());
 
 		const toggleGroupFilter = (group: PluginGroup) => {
 			this.filteredGroups.has(group.id) ? this.filteredGroups.delete(group.id) : this.filteredGroups.set(group.id, group);
@@ -118,7 +120,6 @@ export default class GroupEditPluginsTab {
 			{label: 'Select all', func: () => this.selectAllFilteredPlugins()},
 			{label: 'Deselect all',	func: () =>	this.deselectAllFilteredPlugins()},
 		])
-
 
 		this.pluginsList = new PluginList(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
