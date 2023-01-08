@@ -50,7 +50,9 @@ export default class DropdownActionButton {
 		this.setElementTextOrIcon(activeOptionBtn, this.mainLabel.label, this.mainLabel.icon)
 
 		if(this.drpIcon) {
-			setIcon(this.containerEL.createSpan(), this.drpIcon);
+			const iconSpan = this.containerEL.createSpan();
+			setIcon(iconSpan, this.drpIcon);
+			iconSpan.style.paddingTop = '12px'
 		} else {
 			this.containerEL.createSpan({text: '▼'})
 		}

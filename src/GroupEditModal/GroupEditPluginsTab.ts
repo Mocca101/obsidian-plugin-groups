@@ -90,7 +90,7 @@ export default class GroupEditPluginsTab {
 			})
 		})
 
-		new DropdownActionButton(filters, {label: 'Filter for Groups'}, groupOptionsForButton);
+		new DropdownActionButton(filters, {label: 'Filter Groups'}, groupOptionsForButton, {drpIcon: 'filter'});
 
 		const sortButton = new DropdownActionButton(filters, {label: 'Sort'}, [
 			{
