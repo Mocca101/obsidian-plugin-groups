@@ -3,7 +3,7 @@ import {ButtonComponent, Setting} from "obsidian";
 import {PluginGroup} from "../PluginGroup";
 
 
-export default class PluginList {
+export default class PluginListToggle {
 
 	pluginListEl: HTMLElement;
 

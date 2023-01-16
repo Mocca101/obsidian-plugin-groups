@@ -12,14 +12,19 @@ export default class ConfirmationPopupModal extends Modal {
 
 	confirmText: string;
 
+	private onConfirmListener?: EventListener
+
 	constructor(app: App, headerText: string, cancelText?: string, confirmText?: string, onConfirmListener?: EventListener) {
 		super(app);
 		this.headerText = headerText;
 		this.eventTarget = new EventTarget();
 		this.cancelText = cancelText ?? 'Cancel';
 		this.confirmText = confirmText ?? 'Confirm';
-		if(onConfirmListener) {
-			this.eventTarget.addEventListener(this.onConfirm.type, onConfirmListener);
+
+		this.onConfirmListener = onConfirmListener;
+		if(this.onConfirmListener) {
+
+			this.eventTarget.addEventListener(this.onConfirm.type, this.onConfirmListener);
 		}
 	}
 
@@ -40,6 +45,9 @@ export default class ConfirmationPopupModal extends Modal {
 				btn.setButtonText(this.confirmText);
 				btn.onClick(() => {
 					this.eventTarget.dispatchEvent(this.onConfirm);
+					if(this.onConfirmListener) {
+						this.eventTarget.removeEventListener(this.onConfirm.type, this.onConfirmListener);
+					}
 					this.close();
 				})
 			})

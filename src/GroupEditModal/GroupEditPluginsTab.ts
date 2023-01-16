@@ -3,7 +3,7 @@ import {PgPlugin} from "../PgPlugin";
 import {PluginGroup} from "../PluginGroup";
 import DropdownActionButton, {DropdownOption} from "../Components/DropdownActionButton";
 import PluginManager from "../Managers/PluginManager";
-import PluginList from "../Components/PluginList";
+import PluginListToggle from "../Components/PluginListToggle";
 import Manager from "../Managers/Manager";
 import FilteredGroupsList from "../Components/FilteredGroupsList";
 
@@ -25,7 +25,7 @@ export default class GroupEditPluginsTab {
 
 	searchTerm: string;
 
-	private pluginsList: PluginList;
+	private pluginsList: PluginListToggle;
 
 	private filteredGroups: Map<string, PluginGroup> = new Map<string, PluginGroup>();
 
@@ -121,7 +121,7 @@ export default class GroupEditPluginsTab {
 			{label: 'Deselect all',	func: () =>	this.deselectAllFilteredPlugins()},
 		])
 
-		this.pluginsList = new PluginList(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
+		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
 		return pluginSection;
 	}
