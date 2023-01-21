@@ -60,6 +60,7 @@ export default class GroupEditPluginsTab {
 		const filtersAndSelection = filtersAndSelectionContainer.createDiv({cls: 'pg-plugin-filter-section'});
 		const filters = filtersAndSelection.createDiv();
 
+		// TODO: Look into the group filtering and why it doesn't work if one group has all the plugins
 		const filteredGroupsList = new FilteredGroupsList(filtersAndSelectionContainer, this.filteredGroups, ()=> this.filterAndSortPlugins());
 
 		const toggleGroupFilter = (group: PluginGroup) => {
@@ -93,38 +94,62 @@ export default class GroupEditPluginsTab {
 			})
 		})
 
-		new DropdownActionButton(filters, {label: 'Filter Groups'}, groupOptionsForButton, {drpIcon: 'filter'});
-
-		const sortButton = new DropdownActionButton(filters, {label: 'Sort'}, [
-			{
-				label: this.sortModes.byName,
-				func: () => {
-					this.selectedSortMode = this.sortModes.byName;
-					sortButton.mainLabel.label = this.sortModes.byName;
-					sortButton.rerender();
-					this.filterAndSortPlugins();
-
-				}
+		new DropdownActionButton(filters, {
+			mainLabel: {
+				label: 'Filter Groups'
 			},
-			{
-				label: this.sortModes.byNameAndSelected,
-				func: () => {
-					this.selectedSortMode = this.sortModes.byNameAndSelected;
-					sortButton.mainLabel.label = this.sortModes.byNameAndSelected;
-					sortButton.rerender();
-					this.filterAndSortPlugins();
-				}
-			},
-		], {width:'80px', drpIcon: 'sort-desc'})
+			dropDownOptions: groupOptionsForButton,
+			drpIcon: 'filter'
+		});
 
-		new DropdownActionButton(filtersAndSelection, {label: 'Bulk Select'}, [
-			{label: 'Select all', func: () => this.selectAllFilteredPlugins()},
-			{label: 'Deselect all',	func: () =>	this.deselectAllFilteredPlugins()},
-		])
+		const sortButton = new DropdownActionButton(filters, {
+			mainLabel: {
+				label: 'Sort'
+			},
+			dropDownOptions: [
+				{
+					label: this.sortModes.byName,
+					func: () => {
+						this.selectedSortMode = this.sortModes.byName;
+						sortButton.options.mainLabel.label = this.sortModes.byName;
+						sortButton.update();
+						this.filterAndSortPlugins();
+
+					}
+				},
+				{
+					label: this.sortModes.byNameAndSelected,
+					func: () => {
+						this.selectedSortMode = this.sortModes.byNameAndSelected;
+						sortButton.options.mainLabel.label = this.sortModes.byNameAndSelected;
+						sortButton.update();
+						this.filterAndSortPlugins();
+					}
+				},
+			],
+			minWidth:'80px',
+			drpIcon: 'sort-desc'
+		});
+
+		new DropdownActionButton(filtersAndSelection, {
+			mainLabel: {
+				label: 'Bulk Select',
+			},
+			dropDownOptions: [
+				{
+					label: 'Select all',
+					func: () => this.selectAllFilteredPlugins()
+				},
+				{
+					label: 'Deselect all',
+					func: () =>	this.deselectAllFilteredPlugins()
+				},
+			]
+		});
 
 		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
-		new ReorderablePluginList(pluginSection.createDiv(), this.groupToEdit.plugins);
+		new ReorderablePluginList(pluginSection.createDiv(), {items: this.groupToEdit.plugins});
 
 		return pluginSection;
 	}

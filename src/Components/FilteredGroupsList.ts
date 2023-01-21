@@ -29,9 +29,12 @@ export default class FilteredGroupsList {
 		this.listEL.createSpan({text: 'Filters:'});
 
 		this.groups.forEach(group => {
-			new RemovableChip(this.listEL, group.name, ()=> {
-				this.groups.delete(group.id);
-				this.onChipClosed();
+			new RemovableChip(this.listEL, {
+				label: group.name,
+				onClose: ()=> {
+					this.groups.delete(group.id);
+					this.onChipClosed();
+				}
 			})
 		})
 	}

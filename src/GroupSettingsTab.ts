@@ -1,7 +1,7 @@
 import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
 import GroupEditModal from "./GroupEditModal";
-import {generateGroupID, getCurrentlyActiveDevice, groupFromId, setCurrentlyActiveDevice} from "./Utils/Utilities";
+import {generateGroupID, getCurrentlyActiveDevice, setCurrentlyActiveDevice} from "./Utils/Utilities";
 import {PluginGroup} from "./DataStructures/PluginGroup";
 import ConfirmationPopupModal from "./Components/ConfirmationPopupModal";
 import Manager from "./Managers/Manager";
@@ -294,7 +294,6 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		const pluginsAndParentGroups : PluginAndDesc[] = PluginManager.getAllAvailablePlugins()
 			.map(plugin => {
-				let description: string | undefined;
 				const groups = Manager.getInstance().getGroupsOfPlugin(plugin.id);
 
 				return {
@@ -303,7 +302,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				}
 			})
 
-		new DescriptionsPluginList(contentEl, pluginsAndParentGroups)
+		new DescriptionsPluginList(contentEl, {items: pluginsAndParentGroups})
 
 	}
 

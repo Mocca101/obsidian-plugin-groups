@@ -2,15 +2,10 @@ import SettingsList from "./BaseComponents/SettingsList";
 import {PgPlugin} from "../DataStructures/PgPlugin";
 import {Setting} from "obsidian";
 
-export default class DescriptionsPluginList extends SettingsList {
+export default class DescriptionsPluginList extends SettingsList<PluginAndDesc, {items: PluginAndDesc[]}> {
 
-	constructor(parentEL: HTMLElement, pluginsToDisplay: PluginAndDesc[]) {
-		super(parentEL, pluginsToDisplay);
-	}
-
-
-	override update(pluginsToDisplay: PluginAndDesc[]) {
-		super.update(pluginsToDisplay);
+	constructor(parentEL: HTMLElement, options: { items: PluginAndDesc[]}) {
+		super(parentEL, options);
 	}
 
 	generateListItem(listEl: HTMLElement, plugin: PluginAndDesc): Setting {

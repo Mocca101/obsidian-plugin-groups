@@ -12,7 +12,12 @@ export default abstract class HtmlComponent<OptionsType> {
 		}
 	}
 
-	abstract update(options: OptionsType) : void;
+	update(options?: OptionsType) : void {
+		if(options) {
+			this.options = options;
+		}
+		this.render();
+	}
 
 	render() {
 		this.mainEl?.remove();

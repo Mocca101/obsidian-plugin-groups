@@ -6,9 +6,9 @@ export default abstract class ReorderableList<ItemType, OptionsType extends { it
 	moveItemUp(item: ItemType) : void {
 		const currentIndex = this.findIndexInItems(item);
 
-		if(currentIndex < this.listItems.length - 1 && currentIndex > -1) {
-			this.listItems[currentIndex] = this.listItems[currentIndex + 1];
-			this.listItems[currentIndex + 1] = item
+		if(currentIndex < this.options.items.length - 1 && currentIndex > -1) {
+			this.options.items[currentIndex] = this.options.items[currentIndex + 1];
+			this.options.items[currentIndex + 1] = item
 		}
 		this.render();
 	}
@@ -17,14 +17,14 @@ export default abstract class ReorderableList<ItemType, OptionsType extends { it
 		const currentIndex = this.findIndexInItems(item);
 
 		if(currentIndex > 0) {
-			this.listItems[currentIndex] = this.listItems[currentIndex - 1];
-			this.listItems[currentIndex - 1] = item;
+			this.options.items[currentIndex] = this.options.items[currentIndex - 1];
+			this.options.items[currentIndex - 1] = item;
 		}
 		this.render();
 	}
 
 	protected findIndexInItems(item: ItemType) : number {
-		return this.listItems.findIndex(listItem => listItem === item);
+		return this.options.items.findIndex(listItem => listItem === item);
 	}
 
 	generateListItem(listEl: HTMLElement, item: ItemType): Setting {
