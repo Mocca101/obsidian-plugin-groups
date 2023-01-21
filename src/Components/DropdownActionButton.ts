@@ -6,9 +6,7 @@ interface DropdownActionButtonOptions {
 	dropDownOptions: DropdownOption[];
 	minWidth?: string;
 	drpIcon?: string;
-
 }
-
 
 export default class DropdownActionButton extends HtmlComponent<DropdownActionButtonOptions>{
 
@@ -21,11 +19,10 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 	}
 
 	protected generateComponent(): void {
-		this.mainEl = this.parentEl.createEl('button', {cls: 'pg-drp-btn'});
+		this.mainEl = this.parentEl.createEl('button', {cls: 'pg-drp-btn pg-has-dropdown-single'});
 		if(this.options.minWidth) {
 			this.mainEl.style.minWidth = this.options.minWidth;
 		}
-		this.mainEl.onClickEvent(() => this.toggleDropdown());
 
 		const activeOptionBtn = this.mainEl.createSpan({cls: 'pg-drp-btn-main-label'});
 		this.setElementTextOrIcon(activeOptionBtn, this.options.mainLabel.label, this.options.mainLabel.icon)
@@ -38,15 +35,13 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 			this.mainEl.createSpan({text: '▼'})
 		}
 
-		this.drpList = this.mainEl.createEl('ul', {cls: 'pg-drp-btn-list'});
+		this.drpList = this.mainEl.createEl('ul', {cls: 'pg-dropdown'});
 		this.options.dropDownOptions.forEach(option => {
-			const item = this.drpList.createEl('li', );
+			const item = this.drpList.createEl('li', {cls: 'pg-dropdown-item'});
 			this.setElementTextOrIcon(item, option.label, option.icon);
 
 			item.onClickEvent(evt => {
-				evt.stopPropagation();
 				option.func();
-				this.closeDropdown();
 			});
 		});
 	}
@@ -57,27 +52,6 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 		} else {
 			element.setText(label);
 		}
-	}
-
-	private toggleDropdown() {
-		this.drpList.hasClass('is-active') ? this.closeDropdown() : this.openDropdown();
-	}
-
-	private closeDropdown() {
-		this.drpList.removeClass('is-active');
-	}
-
-	private openDropdown() {
-		this.drpList.addClass('is-active');
-		const outsideClickController = new AbortController();
-		document.addEventListener('click', (event) => {
-					if (!this.mainEl?.contains(event.targetNode) && this.drpList.hasClass('is-active')) {
-						this.closeDropdown();
-						outsideClickController.abort();
-					}
-				}
-			, outsideClickController);
-
 	}
 
 }

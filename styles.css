@@ -90,81 +90,77 @@
 }
 
 .pg-drp-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--text-normal, white);
-	font-size: var(--font-ui-small, small);
-	border-radius: var(--button-radius, 5px);
-	border: 0;
-	padding: 1px 1px;
-	height: var(--input-height, 30px);
-	font-weight: var(--input-font-weight);
-	cursor: var(--cursor);
-	font-family: inherit;
-	outline: none;
-	user-select: none;
-	white-space: nowrap;
 	position: relative;
+
+	padding: 1px 1px;
 	margin: 2px;
-	background-color: var(--interactive-normal, #363636);
-	box-shadow: var(--input-shadow);
 }
 
-
 .pg-drp-btn span {
-	display: inline-block;
 	padding: 6px;
+	padding-bottom: 8px;
 }
 
 .pg-drp-btn-main-label {
 	width: 75%;
 }
 
-.pg-drp-btn-list {
-	display: none;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	z-index: 1;
+.pg-has-dropdown-single:focus .pg-dropdown {
+	opacity: 1;
+	display: flex;
+	pointer-events: auto;
+}
 
+.pg-has-dropdown:focus-within .pg-dropdown {
+	opacity: 1;
+	display: flex;
+	pointer-events: auto;
+}
+
+.pg-dropdown {
+	opacity: 0;
+	pointer-events: none;
+
+	position: absolute;
+
+	display: none;
 	align-items: center;
 	justify-content: center;
+	flex-direction: column;
+
+	z-index: 1;
+	top: 2em;
+	padding: 0;
+	width: 100%;
+	transition: opacity .15s ease-out;
+
+	list-style: none;
+
+	box-shadow: var(--input-shadow, rgba(211, 211, 211, 0.5));
+
 	color: var(--text-normal, white);
-	font-size: var(--font-ui-small, small);
+	background-color: var(--interactive-normal, #363636);
+
 	border-radius: var(--button-radius, 5px);
 	border: 0;
-	font-weight: var(--input-font-weight, normal);
-	cursor: var(--cursor, default);
-	font-family: inherit;
-	outline: none;
-	user-select: none;
-	white-space: nowrap;
-	background-color: var(--interactive-normal, #363636);
-	box-shadow: var(--input-shadow, rgba(211, 211, 211, 0.5));
-}
-.pg-drp-btn-list.is-active {
-	display: inline-block;
 }
 
+.pg-dropdown-item {
+	padding: 10px;
+	white-space: normal;
+	width: 100%;
+	height: 100%;
+}
+
+.pg-dropdown-item:hover {
+	box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+	background-color: var(--interactive-hover, #363636);
+	border-radius: var(--button-radius, 5px);
+}
 
 .pg-drp-btn .pg-drp-btn-divider {
 	padding: 0;
 	margin: 4px 1px;
-}
-
-.pg-drp-btn-list li {
-	padding: 10px;
-	white-space: normal;
-}
-
-.pg-drp-btn-list li:hover {
-	box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
-	background-color: var(--interactive-hover, #363636);
 }
 
 .pg-chip {
