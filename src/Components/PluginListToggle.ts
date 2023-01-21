@@ -1,6 +1,6 @@
-import {PgPlugin} from "../PgPlugin";
+import {PgPlugin} from "../DataStructures/PgPlugin";
 import {ButtonComponent, Setting} from "obsidian";
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 
 
 export default class PluginListToggle {

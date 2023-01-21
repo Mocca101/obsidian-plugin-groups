@@ -1,5 +1,5 @@
 import {Setting} from "obsidian";
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
 
 

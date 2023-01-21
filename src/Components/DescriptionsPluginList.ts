@@ -1,5 +1,5 @@
 import SettingsList from "./BaseComponents/SettingsList";
-import {PgPlugin} from "../PgPlugin";
+import {PgPlugin} from "../DataStructures/PgPlugin";
 import {Setting} from "obsidian";
 
 export default class DescriptionsPluginList extends SettingsList {

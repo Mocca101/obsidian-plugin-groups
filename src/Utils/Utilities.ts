@@ -1,5 +1,5 @@
 import {deviceNameKey} from "./Constants";
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
 
 export function generateGroupID(name: string, delay?:number) : string | undefined {

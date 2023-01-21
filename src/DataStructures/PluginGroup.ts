@@ -1,11 +1,11 @@
-import {PgComponent} from "./Utils/Types";
+import {PgComponent} from "../Utils/Types";
 import {PgPlugin} from "./PgPlugin";
 import {Notice} from "obsidian";
 import {
 	getCurrentlyActiveDevice, groupFromId
-} from "./Utils/Utilities";
-import Manager from "./Managers/Manager";
-import PluginManager from "./Managers/PluginManager";
+} from "../Utils/Utilities";
+import Manager from "../Managers/Manager";
+import PluginManager from "../Managers/PluginManager";
 
 export class PluginGroup implements PluginGroupData {
 

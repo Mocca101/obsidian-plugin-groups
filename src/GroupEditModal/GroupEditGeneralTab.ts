@@ -1,6 +1,6 @@
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 import {Setting} from "obsidian";
-import DeviceSelectionModal from "../DeviceSelectionModal";
+import DeviceSelectionModal from "../Components/DeviceSelectionModal";
 import {disableStartupTimeout} from "../Utils/Constants";
 import Manager from "../Managers/Manager";
 

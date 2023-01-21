@@ -1,4 +1,4 @@
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 import RemovableChip from "./RemovableChip";
 
 

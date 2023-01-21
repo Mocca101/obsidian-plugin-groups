@@ -1,11 +1,12 @@
 import {Setting} from "obsidian";
-import {PgPlugin} from "../PgPlugin";
-import {PluginGroup} from "../PluginGroup";
+import {PgPlugin} from "../DataStructures/PgPlugin";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 import DropdownActionButton, {DropdownOption} from "../Components/DropdownActionButton";
 import PluginManager from "../Managers/PluginManager";
 import PluginListToggle from "../Components/PluginListToggle";
 import Manager from "../Managers/Manager";
 import FilteredGroupsList from "../Components/FilteredGroupsList";
+import ReorderablePluginList from "../Components/ReorderablePluginList";
 
 export default class GroupEditPluginsTab {
 	containerEl: HTMLElement;
@@ -122,6 +123,8 @@ export default class GroupEditPluginsTab {
 		])
 
 		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
+
+		new ReorderablePluginList(pluginSection.createDiv(), this.groupToEdit.plugins);
 
 		return pluginSection;
 	}

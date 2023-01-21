@@ -1,4 +1,4 @@
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 
 export interface PgComponent {
 	id: string;
@@ -9,6 +9,7 @@ export interface PluginGroupsSettings {
 	groupsMap: Map<string, PluginGroup>;
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: string;
+	logDetailedTime: boolean;
 	devices: string[];
 }
 
@@ -17,5 +18,5 @@ export interface PersistentSettings {
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: string;
 	devices: string[];
-
+	logDetailedTime: boolean;
 }

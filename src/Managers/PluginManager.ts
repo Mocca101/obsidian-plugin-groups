@@ -1,4 +1,4 @@
-import {PgPlugin} from "../PgPlugin";
+import {PgPlugin} from "../DataStructures/PgPlugin";
 import { loadVaultLocalStorage, saveVaultLocalStorage
 } from "../Utils/Utilities";
 import Manager from "./Manager";

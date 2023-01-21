@@ -1,10 +1,9 @@
 import SettingsList from "./SettingsList";
-import {PgPlugin} from "../../PgPlugin";
 import {setIcon, Setting} from "obsidian";
 
-export default abstract class ReorderableList extends SettingsList{
+export default abstract class ReorderableList<ItemType, OptionsType extends { items: ItemType[]}> extends SettingsList<ItemType, OptionsType>{
 
-	moveItemUp(item: unknown) : void {
+	moveItemUp(item: ItemType) : void {
 		const currentIndex = this.findIndexInItems(item);
 
 		if(currentIndex < this.listItems.length - 1 && currentIndex > -1) {
@@ -14,7 +13,7 @@ export default abstract class ReorderableList extends SettingsList{
 		this.render();
 	}
 
-	moveItemDown(item: unknown) : void {
+	moveItemDown(item: ItemType) : void {
 		const currentIndex = this.findIndexInItems(item);
 
 		if(currentIndex > 0) {
@@ -24,11 +23,11 @@ export default abstract class ReorderableList extends SettingsList{
 		this.render();
 	}
 
-	protected findIndexInItems(item: unknown) : number {
+	protected findIndexInItems(item: ItemType) : number {
 		return this.listItems.findIndex(listItem => listItem === item);
 	}
 
-	generateListItem(listEl: HTMLElement, item: unknown): Setting {
+	generateListItem(listEl: HTMLElement, item: ItemType): Setting {
 		const itemEl = new Setting(listEl)
 			.addButton(btn => {
 				setIcon(btn.buttonEl,'arrow-down');

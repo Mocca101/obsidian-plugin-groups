@@ -1,19 +1,18 @@
-import {PgPlugin} from "../../PgPlugin";
 import {Setting} from "obsidian";
 import HtmlComponent from "./HtmlComponent";
 
-export default abstract class SettingsList extends HtmlComponent{
+export default abstract class SettingsList<ItemType, OptionsType extends { items: ItemType[]}> extends HtmlComponent<OptionsType>{
 
-	protected listItems: unknown[];
+	protected listItems: ItemType[];
 
-	constructor(parentEL: HTMLElement, listItems: unknown[]) {
+	constructor(parentEL: HTMLElement, listItems: ItemType[]) {
 		super(parentEL);
 		this.listItems = listItems;
 		this.generateComponent();
 	}
 
-	update(listItems: unknown[]) {
-		this.listItems = listItems;
+	update(options: OptionsType) {
+		this.listItems = options.items;
 		this.render();
 	}
 
@@ -29,7 +28,7 @@ export default abstract class SettingsList extends HtmlComponent{
 
 	}
 
-	abstract generateListItem(listEl: HTMLElement, item: unknown) : Setting;
+	abstract generateListItem(listEl: HTMLElement, item: ItemType) : Setting;
 
 
 }

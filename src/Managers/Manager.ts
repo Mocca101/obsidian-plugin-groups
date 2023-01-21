@@ -1,13 +1,13 @@
 import {PersistentSettings, PluginGroupsSettings} from "../Utils/Types";
 import PgMain from "../../main";
-import {PluginGroup} from "../PluginGroup";
+import {PluginGroup} from "../DataStructures/PluginGroup";
 import {pluginId} from "../Utils/Constants";
-import PluginManager from "./PluginManager";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
 	generateCommands: true,
 	showNoticeOnGroupLoad: 'none',
+	logDetailedTime: false,
 	devices: []
 }
 
@@ -89,21 +89,35 @@ export default class Manager {
 		return pluginsMemMap;
 	}
 
+	public getGroupsOfPlugin(pluginId: string) : PluginGroup[] {
+		const groups: PluginGroup[] = [];
+		for (const group of this.groupsMap.values()) {
+			if(group.plugins.find(plugin => plugin.id === pluginId)) {
+				groups.push(group);
+			}
+		}
+		return groups;
+	}
+
 	async saveSettings() {
 		const persistentSettings: PersistentSettings = {
 			groups:  Array.from(this.groupsMap.values() ?? []),
 			generateCommands: this.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
 			showNoticeOnGroupLoad: this.settings.showNoticeOnGroupLoad ?? DEFAULT_SETTINGS.showNoticeOnGroupLoad,
+			logDetailedTime: this.settings.logDetailedTime ?? DEFAULT_SETTINGS.logDetailedTime,
 			devices: this.settings.devices ?? DEFAULT_SETTINGS.devices
 		}
 		await this.main.saveData(persistentSettings);
 	}
 
-
-
-
 	// Getters & Setters
 
+	get logDetailedTime() : boolean {
+		return this.settings.logDetailedTime;
+	}
+	set logDetailedTime(value: boolean) {
+		this.settings.logDetailedTime = value;
+	}
 
 	get pluginInstance() : PgMain {
 		return this.main;

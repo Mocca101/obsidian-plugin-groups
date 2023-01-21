@@ -1,15 +1,12 @@
 import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import PgMain from "../main";
 import GroupEditModal from "./GroupEditModal";
-import {
-	generateGroupID,
-	getCurrentlyActiveDevice,
-	setCurrentlyActiveDevice
-} from "./Utils/Utilities";
-import {PluginGroup} from "./PluginGroup";
+import {generateGroupID, getCurrentlyActiveDevice, groupFromId, setCurrentlyActiveDevice} from "./Utils/Utilities";
+import {PluginGroup} from "./DataStructures/PluginGroup";
 import ConfirmationPopupModal from "./Components/ConfirmationPopupModal";
 import Manager from "./Managers/Manager";
 import PluginManager from "./Managers/PluginManager";
+import DescriptionsPluginList, {PluginAndDesc} from "./Components/DescriptionsPluginList";
 
 export default class GroupSettingsTab extends PluginSettingTab {
 
@@ -29,6 +26,55 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		this.generateGeneralSettings(containerEl);
+
+		this.generateGroupSettings(containerEl);
+
+		this.GenerateDeviceList(containerEl);
+
+		this.GeneratePluginsList(containerEl);
+	}
+
+	private generateGroupSettings(containerEl: HTMLElement) {
+		const groupParent = containerEl.createEl('div');
+		groupParent.createEl('h5', {text: 'Groups'});
+
+		let addBtnEl: HTMLButtonElement;
+
+		new Setting(groupParent)
+			.setName('Add Group')
+			.addText(text => {
+					this.groupNameField = text;
+					this.groupNameField.setPlaceholder('Enter group name...')
+						.setValue(this.newGroupName)
+						.onChange(val => {
+							this.newGroupName = val;
+							if (addBtnEl) {
+								val.replace(' ', '').length > 0 ?
+									addBtnEl.removeClass('btn-disabled')
+									: addBtnEl.addClass('btn-disabled');
+							}
+						})
+						.inputEl.onkeydown = async e => {
+						if (e.key === 'Enter') {
+							await this.addNewGroup()
+						}
+					};
+				}
+			)
+			.addButton(btn => {
+					btn
+						.setIcon('plus')
+						.onClick(() => this.addNewGroup());
+					addBtnEl = btn.buttonEl;
+					addBtnEl.addClass('btn-disabled');
+				}
+			)
+
+		this.GenerateGroupList(groupParent);
+	}
+
+	private generateGeneralSettings(containerEl: HTMLElement) {
 		const generalParent = containerEl.createEl('h4', {text: 'General'});
 
 		new Setting(generalParent)
@@ -55,42 +101,15 @@ export default class GroupSettingsTab extends PluginSettingTab {
 				});
 			});
 
-		const groupParent = containerEl.createEl('div');
-		groupParent.createEl('h5', {text: 'Groups'});
-
-		let addBtnEl: HTMLButtonElement;
-
-		new Setting(groupParent)
-			.setName('Add Group')
-			.addText(text => {
-				this.groupNameField = text;
-				this.groupNameField.setPlaceholder('Enter group name...')
-					.setValue(this.newGroupName)
-					.onChange(val => {
-						this.newGroupName = val;
-						if (addBtnEl) {
-							val.replace(' ', '').length > 0 ?
-								addBtnEl.removeClass('btn-disabled')
-								: addBtnEl.addClass('btn-disabled');
-						}
-					})
-					.inputEl.onkeydown = async e => {
-						if(e.key === 'Enter') { await this.addNewGroup() }
-					};
-				}
-			)
-			.addButton(btn => {
-					btn
-						.setIcon('plus')
-						.onClick(() => this.addNewGroup());
-					addBtnEl = btn.buttonEl;
-					addBtnEl.addClass('btn-disabled');
-				}
-			)
-
-		this.GenerateGroupList(groupParent);
-
-		this.GenerateDeviceList(containerEl);
+		new Setting(generalParent)
+			.setName('Log Startup time')
+			.addToggle(tgl => {
+				tgl.setValue(Manager.getInstance().logDetailedTime);
+				tgl.onChange(async value => {
+					Manager.getInstance().logDetailedTime = value;
+					await Manager.getInstance().saveSettings();
+				})
+			})
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {
@@ -267,6 +286,24 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		Manager.getInstance().devices.remove(device);
 		setCurrentlyActiveDevice(null);
 		this.display();
+
+	}
+
+	GeneratePluginsList(contentEl: HTMLElement) {
+		contentEl.createEl('h4', {text: 'Plugins'});
+
+		const pluginsAndParentGroups : PluginAndDesc[] = PluginManager.getAllAvailablePlugins()
+			.map(plugin => {
+				let description: string | undefined;
+				const groups = Manager.getInstance().getGroupsOfPlugin(plugin.id);
+
+				return {
+					plugin: plugin,
+					description: groups.map(group => group.name).join(', ')
+				}
+			})
+
+		new DescriptionsPluginList(contentEl, pluginsAndParentGroups)
 
 	}
 

@@ -1,19 +1,18 @@
 
-
-export default abstract class HtmlComponent {
+export default abstract class HtmlComponent<OptionsType> {
 	mainEl?: HTMLElement;
 
-	options: unknown;
+	options: OptionsType;
 
 	protected parentEl: HTMLElement;
-	protected constructor(parentElement: HTMLElement, options?: unknown) {
+	protected constructor(parentElement: HTMLElement, options?: OptionsType) {
 		this.parentEl = parentElement;
 		if(options) {
 			this.options = options;
 		}
 	}
 
-	abstract update(options: unknown) : void;
+	abstract update(options: OptionsType) : void;
 
 	render() {
 		this.mainEl?.remove();

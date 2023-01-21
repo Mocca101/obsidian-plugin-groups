@@ -1,5 +1,5 @@
 import {App, Modal, Setting} from "obsidian";
-import Manager from "./Managers/Manager";
+import Manager from "../Managers/Manager";
 
 export default class DeviceSelectionModal extends Modal {
 
