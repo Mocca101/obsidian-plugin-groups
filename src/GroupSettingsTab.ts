@@ -18,9 +18,9 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		super(app, plugin);
 	}
 
-	display(): void {
+	async display(): Promise<void> {
 
-		PluginManager.loadNewPlugins();
+		await PluginManager.loadNewPlugins();
 
 		const {containerEl} = this;
 

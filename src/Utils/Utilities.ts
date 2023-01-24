@@ -27,12 +27,12 @@ export function nameToId(name: string): string {
 
 export function saveVaultLocalStorage (key: string, object: any) : void {
 	// @ts-ignore
-	app.saveLocalStorage(key, object);
+	Manager.getInstance().pluginInstance.app.saveLocalStorage(key, object);
 }
 
 export function loadVaultLocalStorage (key: string) : string | null | undefined {
 	// @ts-ignore
-	return app.loadLocalStorage(key);
+	return Manager.getInstance().pluginInstance.app.loadLocalStorage(key);
 }
 
 export function getCurrentlyActiveDevice () : string | null {

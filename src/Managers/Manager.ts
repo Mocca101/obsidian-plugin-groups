@@ -56,7 +56,6 @@ export default class Manager {
 		}
 	}
 
-
 	/***
 	 * Returns a map of each plugin that is in 1 or more groups, and it's connected groups.
 	 * Format: PluginID -> Set of connected groupsId's
@@ -121,6 +120,15 @@ export default class Manager {
 
 	get pluginInstance() : PgMain {
 		return this.main;
+	}
+
+	public get pluginsManifests() {
+		return this.obsidianPluginsObject.manifests;
+	}
+
+	public get obsidianPluginsObject() {
+		// @ts-ignore
+		return this.main.app.plugins;
 	}
 
 	get groupsMap() : Map<string, PluginGroup> {

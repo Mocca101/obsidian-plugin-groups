@@ -6,11 +6,10 @@ import {knownPluginIdsKey, pluginId} from "../Utils/Constants";
 
 
 export default class PluginManager {
+
 	private static enablePluginQueue: Set<string> = new Set<string>();
 	private static disablePluginQueue: Set<string> = new Set<string>();
-
 	private static pgEnabledPlugins: Set<string> = new Set<string>();
-
 
 	public static async queuePluginForEnable (plugin: PgPlugin) : Promise<boolean> {
 		if(this.checkPluginEnabled(plugin)) { return false; }
@@ -37,31 +36,30 @@ export default class PluginManager {
 		this.disablePluginQueue.delete(plugin.id);
 	}
 
-
-	public static loadNewPlugins() {
+	public static async loadNewPlugins() {
 		if (PluginManager.getKnownPluginIds() === null) {
 			PluginManager.setKnownPluginIds(PluginManager.getInstalledPluginIds());
 		} else {
 			const knownPlugins = PluginManager.getKnownPluginIds();
-			const installedPlugins = PluginManager.getInstalledPluginIds();
+			const installedPlugins: Set<string> = PluginManager.getInstalledPluginIds();
+
+			if(!installedPlugins) {	return;	}
+
 			PluginManager.setKnownPluginIds(installedPlugins);
 
-			const newPlugins = new Set([...installedPlugins].filter(id => !knownPlugins?.has(id)));
-
-			if(newPlugins.size <= 0) { return; }
-
-			Manager.getInstance().groupsMap.forEach(g => {
-				if(g.autoAdd) {
-					newPlugins.forEach(pluginId => {
-						const plugin = PluginManager.getInstalledPluginFromId(pluginId);
-						if(plugin) {
-							g.addPlugin(plugin);
+			installedPlugins?.forEach((id) => {
+				if(!knownPlugins?.has(id)) {
+					Manager.getInstance().groupsMap.forEach(g => {
+						if(g.autoAdd) {
+							const plugin = PluginManager.getInstalledPluginFromId(id);
+							if(plugin) {
+								g.addPlugin(plugin);
+							}
 						}
-					})
+					});
 				}
-			});
-
-			Manager.getInstance().saveSettings();
+			})
+			return Manager.getInstance().saveSettings();
 		}
 	}
 
@@ -78,8 +76,7 @@ export default class PluginManager {
 	}
 
 	public static getInstalledPluginIds() : Set<string>{
-		// @ts-ignore
-		const manifests = app.plugins.manifests;
+		const manifests = Manager.getInstance().pluginsManifests;
 
 		const installedPlugins = new Set<string>();
 
@@ -91,21 +88,15 @@ export default class PluginManager {
 	}
 
 	public static getInstalledPluginFromId (id: string) : PgPlugin | null {
-
-		// @ts-ignore
-		if(!app.plugins.manifests[id]) {
+		if(!Manager.getInstance().pluginsManifests[id]) {
 			return null;
 		}
 
-		// @ts-ignore
-		return new PgPlugin(this.app.plugins.manifests[id].id, this.app.plugins.manifests[id].name);
+		return new PgPlugin(Manager.getInstance().pluginsManifests[id].id, Manager.getInstance().pluginsManifests[id].name);
 	}
 
-
 	public static getAllAvailablePlugins() : PgPlugin[] {
-
-		// @ts-ignore
-		const manifests = app.plugins.manifests;
+		const manifests = Manager.getInstance().pluginsManifests;
 
 		const plugins: PgPlugin[] = [];
 
@@ -120,8 +111,7 @@ export default class PluginManager {
 	}
 
 	public static checkPluginEnabled (plugin: PgPlugin) : boolean {
-		// @ts-ignore
-		return app.plugins.enabledPlugins.has(plugin.id) ||	this.checkPluginEnabledFromPluginGroups(plugin);
+		return Manager.getInstance().obsidianPluginsObject.enabledPlugins.has(plugin.id) ||	this.checkPluginEnabledFromPluginGroups(plugin);
 	}
 
 	private static checkPluginEnabledFromPluginGroups(plugin: PgPlugin) : boolean {
@@ -129,13 +119,11 @@ export default class PluginManager {
 	}
 
 	private static enablePlugin (plugin: PgPlugin) : Promise<boolean> {
-		// @ts-ignore
-		return app.plugins.enablePlugin(plugin.id);
+		return Manager.getInstance().obsidianPluginsObject.enablePlugin(plugin.id);
 	}
 
 	private static disablePlugin (plugin: PgPlugin) {
-		// @ts-ignore
-		return  app.plugins.disablePlugin(plugin.id);
+		return Manager.getInstance().obsidianPluginsObject.disablePlugin(plugin.id);
 	}
 
 }
