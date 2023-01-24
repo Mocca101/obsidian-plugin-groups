@@ -88,7 +88,10 @@ export default class PluginManager {
 	}
 
 	public static getInstalledPluginFromId (id: string) : PgPlugin | null {
-		if(!Manager.getInstance().pluginsManifests[id]) {
+		if(!Manager.getInstance().obsidianPluginsObject) {
+			return null;
+		}
+		if(!Manager.getInstance().pluginsManifests?.[id]) {
 			return null;
 		}
 
