@@ -7,15 +7,17 @@ import PluginListToggle from "../Components/PluginListToggle";
 import Manager from "../Managers/Manager";
 import FilteredGroupsList from "../Components/FilteredGroupsList";
 import ReorderablePluginList from "../Components/ReorderablePluginList";
+import TabbedContent from "../Components/TabbedContent";
 
-export default class GroupEditPluginsTab {
-	containerEl: HTMLElement;
+interface PluginTabOptions {
+	group: PluginGroup
+}
+
+export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>{
 
 	private readonly availablePlugins: PgPlugin[] = PluginManager.getAllAvailablePlugins();
 
 	private filteredPlugins: PgPlugin[];
-
-	private groupToEdit: PluginGroup;
 
 	private readonly sortModes = {
 		byName: "By Name",
@@ -30,20 +32,24 @@ export default class GroupEditPluginsTab {
 
 	private filteredGroups: Map<string, PluginGroup> = new Map<string, PluginGroup>();
 
-	constructor(group: PluginGroup, parentEl: HTMLElement) {
-		this.groupToEdit = group;
+	constructor(parentElement: HTMLElement, options: PluginTabOptions) {
+		super(parentElement, options);
 		this.filteredPlugins = this.availablePlugins;
 
-		this.containerEl = this.generatePluginSection(parentEl)
+		this.generateComponent();
 	}
 
-	private generatePluginSection(parentElement: HTMLElement) : HTMLElement {
+	protected generateComponent(active?: boolean) {
+		super.generateComponent(active);
 
-		const pluginSection = parentElement.createDiv({cls:"pg-tabbed-content"});
+		if(!this.mainEl) {
 
-		pluginSection.createEl('h5', {text: 'Plugins'});
+			console.log("-> this.mainEl", this.mainEl);
+			return; }
 
-		const searchAndList: HTMLElement = pluginSection.createEl('div');
+		this.mainEl.createEl('h5', {text: 'Plugins'});
+
+		const searchAndList: HTMLElement = this.mainEl?.createEl('div');
 
 		new Setting(searchAndList)
 			.setName('Search')
@@ -53,8 +59,6 @@ export default class GroupEditPluginsTab {
 					this.searchPlugins(search);
 				})
 			})
-
-
 
 		const filtersAndSelectionContainer = searchAndList.createDiv({cls: 'pg-plugin-filter-container'});
 		const filtersAndSelection = filtersAndSelectionContainer.createDiv({cls: 'pg-plugin-filter-section'});
@@ -147,16 +151,13 @@ export default class GroupEditPluginsTab {
 			]
 		});
 
-		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.groupToEdit, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
+		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.options.group, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
-		new ReorderablePluginList(pluginSection.createDiv(), {items: this.groupToEdit.plugins});
-
-		return pluginSection;
+		new ReorderablePluginList(this.mainEl.createDiv(), {items: this.options.group.plugins});
 	}
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
 	private filterAndSortPlugins() {
-
 		this.filteredPlugins = this.availablePlugins;
 		if(this.searchTerm && this.searchTerm !== '') {
 			this.filteredPlugins = this.filteredPlugins
@@ -174,6 +175,10 @@ export default class GroupEditPluginsTab {
 
 	private filterPluginsByGroups(pluginsToFilter: PgPlugin[], groupsToExclude: Map<string, PluginGroup>) : PgPlugin[] {
 		const pluginMembershipMap = Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
+		console.log("-> pluginMembershipMap", pluginMembershipMap);
+
+		console.log("-> groupsToExclude", groupsToExclude);
+		// TODO: Something in the following filtering doesn't work out, maybe because of the plugin membershipMap
 		return pluginsToFilter.filter(plugin => {
 			if (!pluginMembershipMap.has(plugin.id)) { return true; }
 
@@ -197,16 +202,19 @@ export default class GroupEditPluginsTab {
 	}
 
 	private deselectAllFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.removePlugin(plugin));
+		this.filteredPlugins.forEach(plugin => 	this.options.group.removePlugin(plugin));
 		this.showFilteredPlugins();
 	}
 
 	private selectAllFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => 	this.groupToEdit.addPlugin(plugin));
+		this.filteredPlugins.forEach(plugin => 	this.options.group.addPlugin(plugin));
 		this.showFilteredPlugins();
 	}
 
 	sortPlugins(plugins: PgPlugin[], sortMode: string) : PgPlugin[] {
+		if(!plugins || !(typeof plugins[Symbol.iterator] === 'function')) {
+			return [];
+		}
 		const sortedArray = [...plugins];
 
 		if(sortMode === this.sortModes.byName) {
@@ -228,16 +236,16 @@ export default class GroupEditPluginsTab {
 	}
 
 	isPluginInGroup(plugin: PgPlugin) :boolean {
-		return this.groupToEdit.plugins.map(p => p.id).contains(plugin.id);
+		return this.options.group.plugins.map(p => p.id).contains(plugin.id);
 	}
 
 
 
 	togglePluginForGroup(plugin: PgPlugin) {
-		if(this.groupToEdit.plugins.map(p => p.id).contains(plugin.id)) {
-			this.groupToEdit.removePlugin(plugin);
+		if(this.options.group.plugins.map(p => p.id).contains(plugin.id)) {
+			this.options.group.removePlugin(plugin);
 		} else {
-			this.groupToEdit.addPlugin(plugin);
+			this.options.group.addPlugin(plugin);
 		}
 	}
 }

@@ -34,7 +34,7 @@ export default class GroupEditModal extends Modal {
 		// eslint-disable-next-line prefer-const
 		let generalSettings: HTMLElement;
 		// eslint-disable-next-line prefer-const
-		let pluginsSection: HTMLElement;
+		let pluginsSection: HTMLElement | undefined;
 		// eslint-disable-next-line prefer-const
 		let groupsSection: HTMLElement;
 
@@ -86,7 +86,7 @@ export default class GroupEditModal extends Modal {
 
 		generalSettings = new GroupEditGeneralTab(this.groupToEdit, contentEl).containerEl;
 
-		pluginsSection = new GroupEditPluginsTab(this.groupToEdit, contentEl).containerEl;
+		pluginsSection = new GroupEditPluginsTab(contentEl, { group: this.groupToEdit}).mainEl;
 
 		groupsSection = new GroupEditGroupsTab(this.groupToEdit, contentEl).containerEl;
 

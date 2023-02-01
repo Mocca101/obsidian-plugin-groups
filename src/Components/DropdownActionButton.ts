@@ -20,27 +20,28 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 
 	protected generateComponent(): void {
 		this.mainEl = this.parentEl.createEl('button', {cls: 'pg-drp-btn pg-has-dropdown-single'});
-		if(this.options.minWidth) {
-			this.mainEl.style.minWidth = this.options.minWidth;
+		const {dropDownOptions, mainLabel, drpIcon, minWidth} = this.options;
+		if(minWidth) {
+			this.mainEl.style.minWidth = minWidth;
 		}
 
 		const activeOptionBtn = this.mainEl.createSpan({cls: 'pg-drp-btn-main-label'});
-		this.setElementTextOrIcon(activeOptionBtn, this.options.mainLabel.label, this.options.mainLabel.icon)
+		this.setElementTextOrIcon(activeOptionBtn, mainLabel.label, mainLabel.icon)
 
-		if(this.options.drpIcon) {
+		if(drpIcon) {
 			const iconSpan = this.mainEl.createSpan();
-			setIcon(iconSpan, this.options.drpIcon);
+			setIcon(iconSpan, drpIcon);
 			iconSpan.style.paddingTop = '12px'
 		} else {
 			this.mainEl.createSpan({text: '▼'})
 		}
 
 		this.drpList = this.mainEl.createEl('ul', {cls: 'pg-dropdown'});
-		this.options.dropDownOptions.forEach(option => {
+		dropDownOptions.forEach(option => {
 			const item = this.drpList.createEl('li', {cls: 'pg-dropdown-item'});
 			this.setElementTextOrIcon(item, option.label, option.icon);
 
-			item.onClickEvent(evt => {
+			item.onClickEvent(() => {
 				option.func();
 			});
 		});
