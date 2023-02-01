@@ -175,10 +175,7 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 
 	private filterPluginsByGroups(pluginsToFilter: PgPlugin[], groupsToExclude: Map<string, PluginGroup>) : PgPlugin[] {
 		const pluginMembershipMap = Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
-		console.log("-> pluginMembershipMap", pluginMembershipMap);
 
-		console.log("-> groupsToExclude", groupsToExclude);
-		// TODO: Something in the following filtering doesn't work out, maybe because of the plugin membershipMap
 		return pluginsToFilter.filter(plugin => {
 			if (!pluginMembershipMap.has(plugin.id)) { return true; }
 

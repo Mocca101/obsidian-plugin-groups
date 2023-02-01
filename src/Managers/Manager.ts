@@ -79,7 +79,7 @@ export default class Manager {
 
 		this.groupsMap.forEach(group => {
 			group.plugins.forEach(plugin => {
-				if(!pluginsMemMap.has(pluginId)) {
+				if(!pluginsMemMap.has(plugin.id)) {
 					pluginsMemMap.set(plugin.id, new Set<string>());
 				}
 				pluginsMemMap.get(plugin.id)?.add(group.id);
