@@ -42,10 +42,7 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 	protected generateComponent(active?: boolean) {
 		super.generateComponent(active);
 
-		if(!this.mainEl) {
-
-			console.log("-> this.mainEl", this.mainEl);
-			return; }
+		if(!this.mainEl) { return; }
 
 		this.mainEl.createEl('h5', {text: 'Plugins'});
 
@@ -64,28 +61,25 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 		const filtersAndSelection = filtersAndSelectionContainer.createDiv({cls: 'pg-plugin-filter-section'});
 		const filters = filtersAndSelection.createDiv();
 
-		// TODO: Look into the group filtering and why it doesn't work if one group has all the plugins
-		const filteredGroupsList = new FilteredGroupsList(filtersAndSelectionContainer, this.filteredGroups, ()=> this.filterAndSortPlugins());
+		const filteredGroupsChips = new FilteredGroupsList(filtersAndSelectionContainer, this.filteredGroups, ()=> this.filterAndSortPlugins());
 
 		const toggleGroupFilter = (group: PluginGroup) => {
 			this.filteredGroups.has(group.id) ? this.filteredGroups.delete(group.id) : this.filteredGroups.set(group.id, group);
-			filteredGroupsList.update(this.filteredGroups);
+		}
+		const updateGroupFilters = () => {
+			filteredGroupsChips.update(this.filteredGroups);
+			this.filterAndSortPlugins();
 		}
 
 		const groupOptionsForButton: DropdownOption[] = [{
 			label: 'All groups',
 			func: () => {
 				if(this.filteredGroups.size === Manager.getInstance().groupsMap.size) {
-					Manager.getInstance().groupsMap.forEach(group => {
-						this.filteredGroups.delete(group.id);
-					});
+					this.filteredGroups.clear();
 				} else {
-					Manager.getInstance().groupsMap.forEach(group => {
-						this.filteredGroups.set(group.id, group);
-					});
+					this.filteredGroups = new Map(Manager.getInstance().groupsMap);
 				}
-				filteredGroupsList.update(this.filteredGroups);
-				this.filterAndSortPlugins();
+				updateGroupFilters();
 			}
 		}];
 		Manager.getInstance().groupsMap.forEach(group => {
@@ -93,7 +87,7 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 				label: group.name,
 				func: () => {
 					toggleGroupFilter(group);
-					this.filterAndSortPlugins();
+					updateGroupFilters();
 				}
 			})
 		})
@@ -114,20 +108,13 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 				{
 					label: this.sortModes.byName,
 					func: () => {
-						this.selectedSortMode = this.sortModes.byName;
-						sortButton.options.mainLabel.label = this.sortModes.byName;
-						sortButton.update();
-						this.filterAndSortPlugins();
-
+						this.onSortModeChanged(this.sortModes.byName, sortButton);
 					}
 				},
 				{
 					label: this.sortModes.byNameAndSelected,
 					func: () => {
-						this.selectedSortMode = this.sortModes.byNameAndSelected;
-						sortButton.options.mainLabel.label = this.sortModes.byNameAndSelected;
-						sortButton.update();
-						this.filterAndSortPlugins();
+						this.onSortModeChanged(this.sortModes.byNameAndSelected, sortButton);
 					}
 				},
 			],
@@ -154,6 +141,14 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.options.group, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
 
 		new ReorderablePluginList(this.mainEl.createDiv(), {items: this.options.group.plugins});
+	}
+
+	private onSortModeChanged(sortMode: string, sortButton: DropdownActionButton) {
+		this.selectedSortMode = sortMode;
+		sortButton.options.mainLabel.label = sortMode;
+		sortButton.update();
+		this.filterAndSortPlugins();
+
 	}
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
@@ -236,13 +231,10 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 		return this.options.group.plugins.map(p => p.id).contains(plugin.id);
 	}
 
-
-
 	togglePluginForGroup(plugin: PgPlugin) {
-		if(this.options.group.plugins.map(p => p.id).contains(plugin.id)) {
-			this.options.group.removePlugin(plugin);
-		} else {
-			this.options.group.addPlugin(plugin);
-		}
+		const { group } = this.options;
+		group.plugins.filter(p => p.id === plugin.id).length > 0
+			? group.removePlugin(plugin)
+			: group.addPlugin(plugin);
 	}
 }
