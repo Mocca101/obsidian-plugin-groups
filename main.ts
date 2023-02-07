@@ -1,19 +1,18 @@
-import {Notice, Plugin} from 'obsidian';
-import GroupSettingsTab from "./src/GroupSettingsTab";
-import {disableStartupTimeout} from "./src/Utils/Constants";
-import Manager from "./src/Managers/Manager";
-import CommandManager from "./src/Managers/CommandManager";
-import PluginManager from "./src/Managers/PluginManager";
+import { Notice, Plugin } from 'obsidian';
+import GroupSettingsTab from './src/GroupSettingsTab';
+import { disableStartupTimeout } from './src/Utils/Constants';
+import Manager from './src/Managers/Manager';
+import CommandManager from './src/Managers/CommandManager';
+import PluginManager from './src/Managers/PluginManager';
 
 export default class PgMain extends Plugin {
-
 	async onload() {
 		const times: {
 			label: string;
-			time: number
+			time: number;
 		}[] = [];
 
-		times.push({label: 'Time on Load', time: this.getCurrentTime()});
+		times.push({ label: 'Time on Load', time: this.getCurrentTime() });
 
 		await Manager.getInstance().init(this);
 		this.logTime('Manager Setup', times);
@@ -31,15 +30,17 @@ export default class PgMain extends Plugin {
 		}
 
 		if (Manager.getInstance().generateCommands) {
-			Manager.getInstance().groupsMap.forEach(group => CommandManager.getInstance().AddGroupCommands(group.id));
+			Manager.getInstance().groupsMap.forEach((group) =>
+				CommandManager.getInstance().AddGroupCommands(group.id)
+			);
 			if (Manager.getInstance().logDetailedTime) {
 				this.logTime('Generated Commands for Groups in', times);
 			}
 		}
 
 		// TODO: Improve hacky solution if possible
-		if(window.performance.now() < disableStartupTimeout) {
-			Manager.getInstance().groupsMap.forEach(group => {
+		if (window.performance.now() < disableStartupTimeout) {
+			Manager.getInstance().groupsMap.forEach((group) => {
 				if (group.loadAtStartup) group.startup();
 			});
 
@@ -51,36 +52,45 @@ export default class PgMain extends Plugin {
 		this.displayTimeNotice(times);
 	}
 
-	private logTime(label: string, times: { label: string, time: number }[]) {
+	private logTime(label: string, times: { label: string; time: number }[]) {
 		if (Manager.getInstance().logDetailedTime) {
-			times.push({label, time: this.elapsedTime(times)});
+			times.push({ label, time: this.elapsedTime(times) });
 		}
 	}
 
-	private displayTimeNotice(times: { label: string, time: number }[]) {
+	private displayTimeNotice(times: { label: string; time: number }[]) {
 		if (!Manager.getInstance().logDetailedTime || times.length === 0) {
-			return
+			return;
 		}
 		const totalTime = Math.round(this.accTime(times.slice(1)));
 
-		new Notice(times.map(item => item.label + ': ' + item.time + ' ms').join('\n') + '\nTotal Time: ' + totalTime + ' ms', 10000);
+		new Notice(
+			times
+				.map((item) => item.label + ': ' + item.time + ' ms')
+				.join('\n') +
+				'\nTotal Time: ' +
+				totalTime +
+				' ms',
+			10000
+		);
 	}
 
-	private elapsedTime(times: { label: string, time: number }[]): number {
+	private elapsedTime(times: { label: string; time: number }[]): number {
 		if (times.length > 1) {
 			return this.getCurrentTime() - this.accTime(times);
 		}
 		return this.getCurrentTime() - times[0].time;
 	}
 
-	private accTime(times: { label: string, time: number }[]): number {
-		return times.map(item => item.time).reduce((prev, curr) => prev + curr);
+	private accTime(times: { label: string; time: number }[]): number {
+		return times
+			.map((item) => item.time)
+			.reduce((prev, curr) => prev + curr);
 	}
 
 	private getCurrentTime(): number {
 		return Date.now();
-		}
-
-	onunload() {
 	}
+
+	onunload() {}
 }

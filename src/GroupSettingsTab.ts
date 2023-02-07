@@ -1,15 +1,27 @@
-import {App, ButtonComponent, Notice, PluginSettingTab, Setting, TextComponent} from "obsidian";
-import PgMain from "../main";
-import GroupEditModal from "./GroupEditModal";
-import {generateGroupID, getCurrentlyActiveDevice, setCurrentlyActiveDevice} from "./Utils/Utilities";
-import {PluginGroup} from "./DataStructures/PluginGroup";
-import ConfirmationPopupModal from "./Components/ConfirmationPopupModal";
-import Manager from "./Managers/Manager";
-import PluginManager from "./Managers/PluginManager";
-import DescriptionsPluginList, {PluginAndDesc} from "./Components/DescriptionsPluginList";
+import {
+	App,
+	ButtonComponent,
+	Notice,
+	PluginSettingTab,
+	Setting,
+	TextComponent,
+} from 'obsidian';
+import PgMain from '../main';
+import GroupEditModal from './GroupEditModal';
+import {
+	generateGroupID,
+	getCurrentlyActiveDevice,
+	setCurrentlyActiveDevice,
+} from './Utils/Utilities';
+import { PluginGroup } from './DataStructures/PluginGroup';
+import ConfirmationPopupModal from './Components/ConfirmationPopupModal';
+import Manager from './Managers/Manager';
+import PluginManager from './Managers/PluginManager';
+import DescriptionsPluginList, {
+	PluginAndDesc,
+} from './Components/DescriptionsPluginList';
 
 export default class GroupSettingsTab extends PluginSettingTab {
-
 	newGroupName: string;
 
 	groupNameField: TextComponent;
@@ -19,10 +31,9 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	}
 
 	async display(): Promise<void> {
-
 		await PluginManager.loadNewPlugins();
 
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
@@ -37,119 +48,121 @@ export default class GroupSettingsTab extends PluginSettingTab {
 
 	private generateGroupSettings(containerEl: HTMLElement) {
 		const groupParent = containerEl.createEl('div');
-		groupParent.createEl('h5', {text: 'Groups'});
+		groupParent.createEl('h5', { text: 'Groups' });
 
 		let addBtnEl: HTMLButtonElement;
 
 		new Setting(groupParent)
 			.setName('Add Group')
-			.addText(text => {
-					this.groupNameField = text;
-					this.groupNameField.setPlaceholder('Enter group name...')
-						.setValue(this.newGroupName)
-						.onChange(val => {
-							this.newGroupName = val;
-							if (addBtnEl) {
-								val.replace(' ', '').length > 0 ?
-									addBtnEl.removeClass('btn-disabled')
-									: addBtnEl.addClass('btn-disabled');
-							}
-						})
-						.inputEl.onkeydown = async e => {
-						if (e.key === 'Enter') {
-							await this.addNewGroup()
+			.addText((text) => {
+				this.groupNameField = text;
+				this.groupNameField
+					.setPlaceholder('Enter group name...')
+					.setValue(this.newGroupName)
+					.onChange((val) => {
+						this.newGroupName = val;
+						if (addBtnEl) {
+							val.replace(' ', '').length > 0
+								? addBtnEl.removeClass('btn-disabled')
+								: addBtnEl.addClass('btn-disabled');
 						}
-					};
-				}
-			)
-			.addButton(btn => {
-					btn
-						.setIcon('plus')
-						.onClick(() => this.addNewGroup());
-					addBtnEl = btn.buttonEl;
-					addBtnEl.addClass('btn-disabled');
-				}
-			)
+					}).inputEl.onkeydown = async (e) => {
+					if (e.key === 'Enter') {
+						await this.addNewGroup();
+					}
+				};
+			})
+			.addButton((btn) => {
+				btn.setIcon('plus').onClick(() => this.addNewGroup());
+				addBtnEl = btn.buttonEl;
+				addBtnEl.addClass('btn-disabled');
+			});
 
 		this.GenerateGroupList(groupParent);
 	}
 
 	private generateGeneralSettings(containerEl: HTMLElement) {
-		const generalParent = containerEl.createEl('h4', {text: 'General'});
+		const generalParent = containerEl.createEl('h4', { text: 'General' });
 
 		new Setting(generalParent)
 			.setName('Generate Commands for Groups')
-			.addToggle(tgl => {
+			.addToggle((tgl) => {
 				tgl.setValue(Manager.getInstance().generateCommands ?? false);
-				tgl.onChange(async value => {
+				tgl.onChange(async (value) => {
 					Manager.getInstance().shouldGenerateCommands = value;
 					await Manager.getInstance().saveSettings();
 				});
-			})
+			});
 
 		new Setting(generalParent)
 			.setName('Notice upon un-/loading groups')
-			.addDropdown(drp => {
+			.addDropdown((drp) => {
 				drp.addOption('none', 'None')
 					.addOption('short', 'Short')
 					.addOption('normal', 'Normal');
-				drp.setValue(Manager.getInstance().showNoticeOnGroupLoad ?? 'none');
-				drp.onChange(async value => {
+				drp.setValue(
+					Manager.getInstance().showNoticeOnGroupLoad ?? 'none'
+				);
+				drp.onChange(async (value) => {
 					Manager.getInstance().showNoticeOnGroupLoad = value;
 					await Manager.getInstance().saveSettings();
-
 				});
 			});
 
 		new Setting(generalParent)
 			.setName('Log Startup time')
-			.addToggle(tgl => {
+			.addToggle((tgl) => {
 				tgl.setValue(Manager.getInstance().logDetailedTime);
-				tgl.onChange(async value => {
+				tgl.onChange(async (value) => {
 					Manager.getInstance().logDetailedTime = value;
 					await Manager.getInstance().saveSettings();
-				})
-			})
+				});
+			});
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {
-		Manager.getInstance().groupsMap.forEach(group => {
+		Manager.getInstance().groupsMap.forEach((group) => {
 			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
-				.addButton(btn => {
+				.addButton((btn) => {
 					btn.setButtonText('Enable');
 					btn.setIcon('power');
 					btn.onClick(async () => {
 						await group.enable();
 					});
-					group.groupActive() ? btn.buttonEl.removeClass('btn-disabled') : btn.buttonEl.addClass('btn-disabled');
+					group.groupActive()
+						? btn.buttonEl.removeClass('btn-disabled')
+						: btn.buttonEl.addClass('btn-disabled');
 				})
-				.addButton(btn => {
+				.addButton((btn) => {
 					btn.setButtonText('Disable');
 					btn.setIcon('power-off');
 					btn.onClick(() => group.disable());
-					group.groupActive() ? btn.buttonEl.removeClass('btn-disabled') : btn.buttonEl.addClass('btn-disabled');
+					group.groupActive()
+						? btn.buttonEl.removeClass('btn-disabled')
+						: btn.buttonEl.addClass('btn-disabled');
 				})
-				.addButton(btn => {
-					btn.setIcon('pencil')
-					btn.onClick(() => this.editGroup(group))
+				.addButton((btn) => {
+					btn.setIcon('pencil');
+					btn.onClick(() => this.editGroup(group));
 				});
-			if(group.loadAtStartup) {
+			if (group.loadAtStartup) {
 				const descFrag = new DocumentFragment();
-				const startupEl = descFrag
-					.createEl('span');
-				startupEl
-					.createEl('b', {
-						text: 'Startup: ',
-						})
-				startupEl
-					.createEl('span',{text: 'Delayed by ' + group.delay + ' seconds'});
+				const startupEl = descFrag.createEl('span');
+				startupEl.createEl('b', {
+					text: 'Startup: ',
+				});
+				startupEl.createEl('span', {
+					text: 'Delayed by ' + group.delay + ' seconds',
+				});
 
-				if(!group.groupActive()) {
-					const activeEl = descFrag.createEl('span')
+				if (!group.groupActive()) {
+					const activeEl = descFrag.createEl('span');
 					activeEl.createEl('br');
-					activeEl.createEl('b', {text: 'Inactive: '});
-					activeEl.createEl('span', {text: 'Not enabled for current Device'});
+					activeEl.createEl('b', { text: 'Inactive: ' });
+					activeEl.createEl('span', {
+						text: 'Not enabled for current Device',
+					});
 				}
 
 				groupSetting.setDesc(descFrag);
@@ -160,18 +173,20 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	async addNewGroup() {
 		const id = generateGroupID(this.newGroupName);
 
-		if(!id) {
-			console.error('Failed to create Group, please choose a different Name as there have been to many groups with the same name')
+		if (!id) {
+			console.error(
+				'Failed to create Group, please choose a different Name as there have been to many groups with the same name'
+			);
 			return;
 		}
 
 		const newGroup = new PluginGroup({
 			id: id,
-			name: this.newGroupName
+			name: this.newGroupName,
 		});
 		new GroupEditModal(this.app, this, newGroup).open();
 		this.newGroupName = '';
-		if(this.groupNameField) {
+		if (this.groupNameField) {
 			this.groupNameField.setValue('');
 		}
 	}
@@ -183,9 +198,11 @@ export default class GroupSettingsTab extends PluginSettingTab {
 	GenerateDeviceList(contentEl: HTMLElement) {
 		let newDeviceName = '';
 		const CreateNewDevice = async () => {
-			if(!newDeviceName || newDeviceName.replace(' ', '') === '') {return;}
+			if (!newDeviceName || newDeviceName.replace(' ', '') === '') {
+				return;
+			}
 
-			if(Manager.getInstance().devices.contains(newDeviceName)) {
+			if (Manager.getInstance().devices.contains(newDeviceName)) {
 				new Notice('Name already in use for other device');
 				return;
 			}
@@ -193,7 +210,9 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			Manager.getInstance().devices.push(newDeviceName);
 			await Manager.getInstance().saveSettings();
 
-			if(!getCurrentlyActiveDevice()) { setCurrentlyActiveDevice(newDeviceName); }
+			if (!getCurrentlyActiveDevice()) {
+				setCurrentlyActiveDevice(newDeviceName);
+			}
 
 			this.display();
 
@@ -201,9 +220,7 @@ export default class GroupSettingsTab extends PluginSettingTab {
 			newDevNameText.setValue(newDeviceName);
 		};
 
-
-		contentEl.createEl('h4', {text: 'Devices'});
-
+		contentEl.createEl('h4', { text: 'Devices' });
 
 		let deviceAddBtn: ButtonComponent;
 
@@ -212,99 +229,106 @@ export default class GroupSettingsTab extends PluginSettingTab {
 		const newDevNameText = new TextComponent(deviceNameSetting.controlEl);
 		newDevNameText
 			.setValue(newDeviceName)
-			.onChange(value => {
+			.onChange((value) => {
 				newDeviceName = value;
 				if (deviceAddBtn) {
-					value.replace(' ', '').length > 0 ?
-						deviceAddBtn.buttonEl.removeClass('btn-disabled')
+					value.replace(' ', '').length > 0
+						? deviceAddBtn.buttonEl.removeClass('btn-disabled')
 						: deviceAddBtn.buttonEl.addClass('btn-disabled');
 				}
 			})
-			.setPlaceholder('Device Name')
-			.inputEl.onkeydown = async e => {
-				if(e.key === 'Enter') {await CreateNewDevice(); }
-			};
+			.setPlaceholder('Device Name').inputEl.onkeydown = async (e) => {
+			if (e.key === 'Enter') {
+				await CreateNewDevice();
+			}
+		};
 
-
-		deviceNameSetting
-			.addButton(btn => {
-				deviceAddBtn = btn;
-				deviceAddBtn
-					.setIcon('plus')
-					.onClick(async () => {
+		deviceNameSetting.addButton((btn) => {
+			deviceAddBtn = btn;
+			deviceAddBtn
+				.setIcon('plus')
+				.onClick(async () => {
 					await CreateNewDevice();
-					})
-					.buttonEl.addClass('btn-disabled');
-			})
+				})
+				.buttonEl.addClass('btn-disabled');
+		});
 
-		Manager.getInstance().devices.forEach(device => {
-			const deviceSetting = new Setting(contentEl)
-				.setName(device);
-			if(getCurrentlyActiveDevice() === device) {
-				deviceSetting
-					.setDesc('Current Device')
-					.addButton(btn => {
-						btn.setIcon('trash');
-						btn.onClick(() => new ConfirmationPopupModal(this.app,
+		Manager.getInstance().devices.forEach((device) => {
+			const deviceSetting = new Setting(contentEl).setName(device);
+			if (getCurrentlyActiveDevice() === device) {
+				deviceSetting.setDesc('Current Device').addButton((btn) => {
+					btn.setIcon('trash');
+					btn.onClick(() =>
+						new ConfirmationPopupModal(
+							this.app,
 							'This is the currently active device, are you sure?',
 							void 0,
 							'Delete',
 							() => {
 								this.ResetCurrentDevice();
-							}).open());
-					})
+							}
+						).open()
+					);
+				});
 			} else {
 				deviceSetting
-					.addButton(btn => {
+					.addButton((btn) => {
 						btn.setButtonText('Set as Current');
 						btn.onClick(() => {
 							setCurrentlyActiveDevice(device);
 							this.display();
 						});
 					})
-					.addButton(btn => {
+					.addButton((btn) => {
 						btn.setIcon('trash');
-						btn.onClick(() => new ConfirmationPopupModal(this.app,
-							'You are about to delete: ' + device,
-							void 0,
-							'Delete',
-							async () => {
-								Manager.getInstance().devices.remove(device);
-								await Manager.getInstance().saveSettings();
-								this.display();
-							}).open());
-					})
+						btn.onClick(() =>
+							new ConfirmationPopupModal(
+								this.app,
+								'You are about to delete: ' + device,
+								void 0,
+								'Delete',
+								async () => {
+									Manager.getInstance().devices.remove(
+										device
+									);
+									await Manager.getInstance().saveSettings();
+									this.display();
+								}
+							).open()
+						);
+					});
 			}
-
 		});
 	}
 
 	ResetCurrentDevice() {
 		const device: string | null = getCurrentlyActiveDevice();
 
-		if(!device) { return ;}
+		if (!device) {
+			return;
+		}
 		Manager.getInstance().devices.remove(device);
 		setCurrentlyActiveDevice(null);
 		this.display();
-
 	}
 
 	GeneratePluginsList(contentEl: HTMLElement) {
-		contentEl.createEl('h4', {text: 'Plugins'});
+		contentEl.createEl('h4', { text: 'Plugins' });
 
-		const pluginsAndParentGroups : PluginAndDesc[] = PluginManager.getAllAvailablePlugins()
-			.map(plugin => {
-				const groups = Manager.getInstance().getGroupsOfPlugin(plugin.id);
+		const pluginsAndParentGroups: PluginAndDesc[] =
+			PluginManager.getAllAvailablePlugins().map((plugin) => {
+				const groups = Manager.getInstance().getGroupsOfPlugin(
+					plugin.id
+				);
 
 				return {
 					plugin: plugin,
-					description: groups.map(group => group.name).join(', ')
-				}
-			})
+					description: groups.map((group) => group.name).join(', '),
+				};
+			});
 
-		new DescriptionsPluginList(contentEl, {items: pluginsAndParentGroups})
-
+		new DescriptionsPluginList(contentEl, {
+			items: pluginsAndParentGroups,
+		});
 	}
-
-
 }

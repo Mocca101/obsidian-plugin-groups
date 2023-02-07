@@ -1,14 +1,11 @@
-import {PgComponent} from "../Utils/Types";
-import {PgPlugin} from "./PgPlugin";
-import {Notice} from "obsidian";
-import {
-	getCurrentlyActiveDevice, groupFromId
-} from "../Utils/Utilities";
-import Manager from "../Managers/Manager";
-import PluginManager from "../Managers/PluginManager";
+import { PgComponent } from '../Utils/Types';
+import { PgPlugin } from './PgPlugin';
+import { Notice } from 'obsidian';
+import { getCurrentlyActiveDevice, groupFromId } from '../Utils/Utilities';
+import Manager from '../Managers/Manager';
+import PluginManager from '../Managers/PluginManager';
 
 export class PluginGroup implements PluginGroupData {
-
 	id: string;
 	name: string;
 
@@ -58,11 +55,11 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	startup() {
-		if(!this.loadAtStartup) {
+		if (!this.loadAtStartup) {
 			return;
 		}
 
-		if(this.disableOnStartup) {
+		if (this.disableOnStartup) {
 			setTimeout(async () => {
 				await this.disable();
 			}, this.delay * 1000);
@@ -70,7 +67,7 @@ export class PluginGroup implements PluginGroupData {
 		}
 
 		setTimeout(async () => {
-				await this.enable();
+			await this.enable();
 		}, this.delay * 1000);
 		return;
 	}
@@ -88,14 +85,16 @@ export class PluginGroup implements PluginGroupData {
 
 		await Promise.allSettled(pluginPromises);
 		for (const groupId of this.groupIds) {
-			await groupFromId(groupId)?.enable()
+			await groupFromId(groupId)?.enable();
 		}
 		if (Manager.getInstance().showNoticeOnGroupLoad) {
 			const messageString: string = 'Loaded ' + this.name;
 
-			if(Manager.getInstance().showNoticeOnGroupLoad === 'short') {
+			if (Manager.getInstance().showNoticeOnGroupLoad === 'short') {
 				new Notice(messageString);
-			} else if(Manager.getInstance().showNoticeOnGroupLoad === 'normal') {
+			} else if (
+				Manager.getInstance().showNoticeOnGroupLoad === 'normal'
+			) {
 				new Notice(messageString + '\n' + this.getGroupListString());
 			}
 		}
@@ -106,47 +105,59 @@ export class PluginGroup implements PluginGroupData {
 			return;
 		}
 
-		this.plugins.forEach(plugin => {
+		this.plugins.forEach((plugin) => {
 			PluginManager.queueDisablePlugin(plugin);
-		})
+		});
 
-		this.groupIds.forEach(groupId => {
+		this.groupIds.forEach((groupId) => {
 			groupFromId(groupId)?.disable();
-		})
+		});
 
 		if (Manager.getInstance().showNoticeOnGroupLoad !== 'none') {
-
 			const messageString: string = 'Disabled ' + this.name;
 
-			if(Manager.getInstance().showNoticeOnGroupLoad === 'short') {
+			if (Manager.getInstance().showNoticeOnGroupLoad === 'short') {
 				new Notice(messageString);
-			} else if(Manager.getInstance().showNoticeOnGroupLoad === 'normal') {
+			} else if (
+				Manager.getInstance().showNoticeOnGroupLoad === 'normal'
+			) {
 				new Notice(messageString + '\n' + this.getGroupListString());
 			}
 		}
 	}
 
-	getGroupListString() : string {
-		const existingPluginsInGroup = PluginManager.getAllAvailablePlugins().filter(p => this.plugins.map(p => p.id).contains(p.id));
+	getGroupListString(): string {
+		const existingPluginsInGroup =
+			PluginManager.getAllAvailablePlugins().filter((p) =>
+				this.plugins.map((p) => p.id).contains(p.id)
+			);
 		let messageString = '';
 		this.plugins && this.plugins.length > 0
-			? messageString += '- Plugins:\n' + existingPluginsInGroup.map(p => ' - ' + p.name + '\n').join('')
-			: messageString += '';
+			? (messageString +=
+					'- Plugins:\n' +
+					existingPluginsInGroup
+						.map((p) => ' - ' + p.name + '\n')
+						.join(''))
+			: (messageString += '');
 
 		this.groupIds && this.groupIds.length > 0
-			? messageString += '- Groups:\n' + this.groupIds.map(g => {
-				const group = groupFromId(g);
-				if (group && group.groupActive()) {
-					return ' - ' + group.name + '\n';
-				}
-			}).join('')
-			: messageString += '';
+			? (messageString +=
+					'- Groups:\n' +
+					this.groupIds
+						.map((g) => {
+							const group = groupFromId(g);
+							if (group && group.groupActive()) {
+								return ' - ' + group.name + '\n';
+							}
+						})
+						.join(''))
+			: (messageString += '');
 
 		return messageString;
 	}
 
 	addPlugin(plugin: PgPlugin): boolean {
-		if (this.plugins.map(p => p.id).contains(plugin.id)) return false;
+		if (this.plugins.map((p) => p.id).contains(plugin.id)) return false;
 
 		this.plugins.push(plugin);
 		return true;
@@ -156,16 +167,21 @@ export class PluginGroup implements PluginGroupData {
 		if (!group.wouldHaveCyclicGroups(this.id)) {
 			if (this.groupIds.contains(group.id)) return false;
 
-			this.groupIds.push(group.id)
+			this.groupIds.push(group.id);
 			return true;
 		} else {
-			new Notice('Couldn\'t add this group, it would create a loop of group activations:\n Group A → Group B → Group A', 4000);
+			new Notice(
+				"Couldn't add this group, it would create a loop of group activations:\n Group A → Group B → Group A",
+				4000
+			);
 		}
 		return false;
 	}
 
 	removePlugin(plugin: PgPlugin): boolean {
-		const indexOfPlugin: number = this.plugins.map(p => p.id).indexOf(plugin.id);
+		const indexOfPlugin: number = this.plugins
+			.map((p) => p.id)
+			.indexOf(plugin.id);
 
 		if (indexOfPlugin === -1) return true;
 
@@ -194,16 +210,19 @@ export class PluginGroup implements PluginGroupData {
 		return false;
 	}
 
-	getAllPluginIdsControlledByGroup() : Set<string> {
-		let pluginsArr = this.plugins.map(plugin => plugin.id)
+	getAllPluginIdsControlledByGroup(): Set<string> {
+		let pluginsArr = this.plugins.map((plugin) => plugin.id);
 
-		this.groupIds.forEach(gid => {
+		this.groupIds.forEach((gid) => {
 			const group = groupFromId(gid);
-			if(group) {
-				pluginsArr = [ ...pluginsArr, ...group.getAllPluginIdsControlledByGroup()];
+			if (group) {
+				pluginsArr = [
+					...pluginsArr,
+					...group.getAllPluginIdsControlledByGroup(),
+				];
 			}
 		});
-		return new Set<string>( pluginsArr);
+		return new Set<string>(pluginsArr);
 	}
 }
 

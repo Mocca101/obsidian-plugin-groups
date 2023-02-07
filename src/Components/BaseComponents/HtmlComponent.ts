@@ -1,4 +1,3 @@
-
 export default abstract class HtmlComponent<OptionsType> {
 	mainEl?: HTMLElement;
 
@@ -7,13 +6,13 @@ export default abstract class HtmlComponent<OptionsType> {
 	protected parentEl: HTMLElement;
 	protected constructor(parentElement: HTMLElement, options?: OptionsType) {
 		this.parentEl = parentElement;
-		if(options) {
+		if (options) {
 			this.options = options;
 		}
 	}
 
-	update(options?: OptionsType) : void {
-		if(options) {
+	update(options?: OptionsType): void {
+		if (options) {
 			this.options = options;
 		}
 		this.render();
@@ -24,8 +23,5 @@ export default abstract class HtmlComponent<OptionsType> {
 		this.generateComponent();
 	}
 
-	protected abstract generateComponent() : void;
-
+	protected abstract generateComponent(): void;
 }
-
-

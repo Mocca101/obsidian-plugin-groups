@@ -1,28 +1,30 @@
-import {Setting} from "obsidian";
-import {PgPlugin} from "../DataStructures/PgPlugin";
-import {PluginGroup} from "../DataStructures/PluginGroup";
-import DropdownActionButton, {DropdownOption} from "../Components/DropdownActionButton";
-import PluginManager from "../Managers/PluginManager";
-import PluginListToggle from "../Components/PluginListToggle";
-import Manager from "../Managers/Manager";
-import FilteredGroupsList from "../Components/FilteredGroupsList";
-import ReorderablePluginList from "../Components/ReorderablePluginList";
-import TabbedContent from "../Components/TabbedContent";
+import { Setting } from 'obsidian';
+import { PgPlugin } from '../DataStructures/PgPlugin';
+import { PluginGroup } from '../DataStructures/PluginGroup';
+import DropdownActionButton, {
+	DropdownOption,
+} from '../Components/DropdownActionButton';
+import PluginManager from '../Managers/PluginManager';
+import PluginListToggle from '../Components/PluginListToggle';
+import Manager from '../Managers/Manager';
+import FilteredGroupsList from '../Components/FilteredGroupsList';
+import ReorderablePluginList from '../Components/ReorderablePluginList';
+import TabbedContent from '../Components/TabbedContent';
 
 interface PluginTabOptions {
-	group: PluginGroup
+	group: PluginGroup;
 }
 
-export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>{
-
-	private readonly availablePlugins: PgPlugin[] = PluginManager.getAllAvailablePlugins();
+export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions> {
+	private readonly availablePlugins: PgPlugin[] =
+		PluginManager.getAllAvailablePlugins();
 
 	private filteredPlugins: PgPlugin[];
 
 	private readonly sortModes = {
-		byName: "By Name",
-		byNameAndSelected: "By Name & Selected"
-	}
+		byName: 'By Name',
+		byNameAndSelected: 'By Name & Selected',
+	};
 
 	private selectedSortMode = this.sortModes.byNameAndSelected;
 
@@ -30,7 +32,10 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 
 	private pluginsList: PluginListToggle;
 
-	private filteredGroups: Map<string, PluginGroup> = new Map<string, PluginGroup>();
+	private filteredGroups: Map<string, PluginGroup> = new Map<
+		string,
+		PluginGroup
+	>();
 
 	constructor(parentElement: HTMLElement, options: PluginTabOptions) {
 		super(parentElement, options);
@@ -42,84 +47,107 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 	protected generateComponent(active?: boolean) {
 		super.generateComponent(active);
 
-		if(!this.mainEl) { return; }
+		if (!this.mainEl) {
+			return;
+		}
 
-		this.mainEl.createEl('h5', {text: 'Plugins'});
+		this.mainEl.createEl('h5', { text: 'Plugins' });
 
 		const searchAndList: HTMLElement = this.mainEl?.createEl('div');
 
-		new Setting(searchAndList)
-			.setName('Search')
-			.addText(txt => {
-				txt.setPlaceholder('Search for Plugin...')
-				txt.onChange(search => {
-					this.searchPlugins(search);
-				})
-			})
+		new Setting(searchAndList).setName('Search').addText((txt) => {
+			txt.setPlaceholder('Search for Plugin...');
+			txt.onChange((search) => {
+				this.searchPlugins(search);
+			});
+		});
 
-		const filtersAndSelectionContainer = searchAndList.createDiv({cls: 'pg-plugin-filter-container'});
-		const filtersAndSelection = filtersAndSelectionContainer.createDiv({cls: 'pg-plugin-filter-section'});
+		const filtersAndSelectionContainer = searchAndList.createDiv({
+			cls: 'pg-plugin-filter-container',
+		});
+		const filtersAndSelection = filtersAndSelectionContainer.createDiv({
+			cls: 'pg-plugin-filter-section',
+		});
 		const filters = filtersAndSelection.createDiv();
 
-		const filteredGroupsChips = new FilteredGroupsList(filtersAndSelectionContainer, this.filteredGroups, ()=> this.filterAndSortPlugins());
+		const filteredGroupsChips = new FilteredGroupsList(
+			filtersAndSelectionContainer,
+			this.filteredGroups,
+			() => this.filterAndSortPlugins()
+		);
 
 		const toggleGroupFilter = (group: PluginGroup) => {
-			this.filteredGroups.has(group.id) ? this.filteredGroups.delete(group.id) : this.filteredGroups.set(group.id, group);
-		}
+			this.filteredGroups.has(group.id)
+				? this.filteredGroups.delete(group.id)
+				: this.filteredGroups.set(group.id, group);
+		};
 		const updateGroupFilters = () => {
 			filteredGroupsChips.update(this.filteredGroups);
 			this.filterAndSortPlugins();
-		}
+		};
 
-		const groupOptionsForButton: DropdownOption[] = [{
-			label: 'All groups',
-			func: () => {
-				if(this.filteredGroups.size === Manager.getInstance().groupsMap.size) {
-					this.filteredGroups.clear();
-				} else {
-					this.filteredGroups = new Map(Manager.getInstance().groupsMap);
-				}
-				updateGroupFilters();
-			}
-		}];
-		Manager.getInstance().groupsMap.forEach(group => {
+		const groupOptionsForButton: DropdownOption[] = [
+			{
+				label: 'All groups',
+				func: () => {
+					if (
+						this.filteredGroups.size ===
+						Manager.getInstance().groupsMap.size
+					) {
+						this.filteredGroups.clear();
+					} else {
+						this.filteredGroups = new Map(
+							Manager.getInstance().groupsMap
+						);
+					}
+					updateGroupFilters();
+				},
+			},
+		];
+		Manager.getInstance().groupsMap.forEach((group) => {
 			groupOptionsForButton.push({
 				label: group.name,
 				func: () => {
 					toggleGroupFilter(group);
 					updateGroupFilters();
-				}
-			})
-		})
+				},
+			});
+		});
 
 		new DropdownActionButton(filters, {
 			mainLabel: {
-				label: 'Filter Groups'
+				label: 'Filter Groups',
 			},
 			dropDownOptions: groupOptionsForButton,
-			drpIcon: 'filter'
+			drpIcon: 'filter',
 		});
 
 		const sortButton = new DropdownActionButton(filters, {
 			mainLabel: {
-				label: 'Sort'
+				label: 'Sort',
 			},
 			dropDownOptions: [
 				{
 					label: this.sortModes.byName,
 					func: () => {
-						this.onSortModeChanged(this.sortModes.byName, sortButton);
-					}
+						this.onSortModeChanged(
+							this.sortModes.byName,
+							sortButton
+						);
+					},
 				},
 				{
 					label: this.sortModes.byNameAndSelected,
 					func: () => {
-						this.onSortModeChanged(this.sortModes.byNameAndSelected, sortButton);
-					}
+						this.onSortModeChanged(
+							this.sortModes.byNameAndSelected,
+							sortButton
+						);
+					},
 				},
 			],
-			minWidth:'80px',
-			drpIcon: 'sort-desc'
+			minWidth: '80px',
+			drpIcon: 'sort-desc',
 		});
 
 		new DropdownActionButton(filtersAndSelection, {
@@ -129,58 +157,83 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 			dropDownOptions: [
 				{
 					label: 'Select all',
-					func: () => this.selectAllFilteredPlugins()
+					func: () => this.selectAllFilteredPlugins(),
 				},
 				{
 					label: 'Deselect all',
-					func: () =>	this.deselectAllFilteredPlugins()
+					func: () => this.deselectAllFilteredPlugins(),
 				},
-			]
+			],
 		});
 
-		this.pluginsList = new PluginListToggle(searchAndList, this.sortPlugins(this.filteredPlugins, this.selectedSortMode), {group: this.options.group, onClickAction: (plugin: PgPlugin) => this.togglePluginForGroup(plugin)});
+		this.pluginsList = new PluginListToggle(
+			searchAndList,
+			this.sortPlugins(this.filteredPlugins, this.selectedSortMode),
+			{
+				group: this.options.group,
+				onClickAction: (plugin: PgPlugin) =>
+					this.togglePluginForGroup(plugin),
+			}
+		);
 
-		new ReorderablePluginList(this.mainEl.createDiv(), {items: this.options.group.plugins});
+		new ReorderablePluginList(this.mainEl.createDiv(), {
+			items: this.options.group.plugins,
+		});
 	}
 
-	private onSortModeChanged(sortMode: string, sortButton: DropdownActionButton) {
+	private onSortModeChanged(
+		sortMode: string,
+		sortButton: DropdownActionButton
+	) {
 		this.selectedSortMode = sortMode;
 		sortButton.options.mainLabel.label = sortMode;
 		sortButton.update();
 		this.filterAndSortPlugins();
-
 	}
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
 	private filterAndSortPlugins() {
 		this.filteredPlugins = this.availablePlugins;
-		if(this.searchTerm && this.searchTerm !== '') {
-			this.filteredPlugins = this.filteredPlugins
-				.filter(p => p.name.toLowerCase().contains(this.searchTerm.toLowerCase()));
+		if (this.searchTerm && this.searchTerm !== '') {
+			this.filteredPlugins = this.filteredPlugins.filter((p) =>
+				p.name.toLowerCase().contains(this.searchTerm.toLowerCase())
+			);
 		}
 
-		if(this.filteredGroups.size > 0) {
-			this.filteredPlugins = this.filterPluginsByGroups(this.filteredPlugins, this.filteredGroups);
+		if (this.filteredGroups.size > 0) {
+			this.filteredPlugins = this.filterPluginsByGroups(
+				this.filteredPlugins,
+				this.filteredGroups
+			);
 		}
 
-		this.filteredPlugins = this.sortPlugins(this.filteredPlugins, this.selectedSortMode);
+		this.filteredPlugins = this.sortPlugins(
+			this.filteredPlugins,
+			this.selectedSortMode
+		);
 
 		this.showFilteredPlugins();
 	}
 
-	private filterPluginsByGroups(pluginsToFilter: PgPlugin[], groupsToExclude: Map<string, PluginGroup>) : PgPlugin[] {
-		const pluginMembershipMap = Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
+	private filterPluginsByGroups(
+		pluginsToFilter: PgPlugin[],
+		groupsToExclude: Map<string, PluginGroup>
+	): PgPlugin[] {
+		const pluginMembershipMap =
+			Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
 
-		return pluginsToFilter.filter(plugin => {
-			if (!pluginMembershipMap.has(plugin.id)) { return true; }
+		return pluginsToFilter.filter((plugin) => {
+			if (!pluginMembershipMap.has(plugin.id)) {
+				return true;
+			}
 
 			for (const groupId of pluginMembershipMap.get(plugin.id) ?? []) {
-				if(groupsToExclude.has(groupId)) {
+				if (groupsToExclude.has(groupId)) {
 					return false;
 				}
 			}
 			return true;
-		})
+		});
 	}
 
 	private searchPlugins(search: string) {
@@ -194,26 +247,30 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 	}
 
 	private deselectAllFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => 	this.options.group.removePlugin(plugin));
+		this.filteredPlugins.forEach((plugin) =>
+			this.options.group.removePlugin(plugin)
+		);
 		this.showFilteredPlugins();
 	}
 
 	private selectAllFilteredPlugins() {
-		this.filteredPlugins.forEach(plugin => 	this.options.group.addPlugin(plugin));
+		this.filteredPlugins.forEach((plugin) =>
+			this.options.group.addPlugin(plugin)
+		);
 		this.showFilteredPlugins();
 	}
 
-	sortPlugins(plugins: PgPlugin[], sortMode: string) : PgPlugin[] {
-		if(!plugins || !(typeof plugins[Symbol.iterator] === 'function')) {
+	sortPlugins(plugins: PgPlugin[], sortMode: string): PgPlugin[] {
+		if (!plugins || !(typeof plugins[Symbol.iterator] === 'function')) {
 			return [];
 		}
 		const sortedArray = [...plugins];
 
-		if(sortMode === this.sortModes.byName) {
+		if (sortMode === this.sortModes.byName) {
 			return sortedArray.sort((a, b) => a.name.localeCompare(b.name));
 		}
 
-		if(sortMode === this.sortModes.byNameAndSelected) {
+		if (sortMode === this.sortModes.byNameAndSelected) {
 			sortedArray.sort((a, b) => a.name.localeCompare(b.name));
 			sortedArray.sort((a, b) => {
 				const aInGroup = this.isPluginInGroup(a);
@@ -227,13 +284,13 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 		return sortedArray;
 	}
 
-	isPluginInGroup(plugin: PgPlugin) :boolean {
-		return this.options.group.plugins.map(p => p.id).contains(plugin.id);
+	isPluginInGroup(plugin: PgPlugin): boolean {
+		return this.options.group.plugins.map((p) => p.id).contains(plugin.id);
 	}
 
 	togglePluginForGroup(plugin: PgPlugin) {
 		const { group } = this.options;
-		group.plugins.filter(p => p.id === plugin.id).length > 0
+		group.plugins.filter((p) => p.id === plugin.id).length > 0
 			? group.removePlugin(plugin)
 			: group.addPlugin(plugin);
 	}

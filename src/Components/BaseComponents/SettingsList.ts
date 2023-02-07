@@ -1,8 +1,10 @@
-import {Setting} from "obsidian";
-import HtmlComponent from "./HtmlComponent";
+import { Setting } from 'obsidian';
+import HtmlComponent from './HtmlComponent';
 
-export default abstract class SettingsList<ItemType, OptionsType extends { items: ItemType[]}> extends HtmlComponent<OptionsType>{
-
+export default abstract class SettingsList<
+	ItemType,
+	OptionsType extends { items: ItemType[] }
+> extends HtmlComponent<OptionsType> {
 	constructor(parentEL: HTMLElement, options: OptionsType) {
 		super(parentEL, options);
 		this.generateComponent();
@@ -12,15 +14,14 @@ export default abstract class SettingsList<ItemType, OptionsType extends { items
 		this.mainEl = this.parentEl.createEl('div');
 		this.mainEl.addClass('group-edit-modal-plugin-list');
 
-		this.options.items.forEach(item => {
-			if(!this.mainEl) { return; }
+		this.options.items.forEach((item) => {
+			if (!this.mainEl) {
+				return;
+			}
 
 			this.generateListItem(this.mainEl, item);
 		});
-
 	}
 
-	abstract generateListItem(listEl: HTMLElement, item: ItemType) : Setting;
-
-
+	abstract generateListItem(listEl: HTMLElement, item: ItemType): Setting;
 }
