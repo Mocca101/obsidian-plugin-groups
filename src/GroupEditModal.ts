@@ -8,6 +8,7 @@ import GroupEditGroupsTab from './GroupEditModal/GroupEditGroupsTab';
 import GroupEditGeneralTab from './GroupEditModal/GroupEditGeneralTab';
 import Manager from './Managers/Manager';
 import CommandManager from './Managers/CommandManager';
+import TabGroupComponent from './Components/BaseComponents/TabGroupComponent';
 
 export default class GroupEditModal extends Modal {
 	groupToEdit: PluginGroup;
@@ -32,12 +33,6 @@ export default class GroupEditModal extends Modal {
 		const contentEl = modalEl.createEl('div', {
 			cls: 'group-edit-modal-content ',
 		});
-		// eslint-disable-next-line prefer-const
-		let generalSettings: HTMLElement;
-		// eslint-disable-next-line prefer-const
-		let pluginsSection: HTMLElement | undefined;
-		// eslint-disable-next-line prefer-const
-		let groupsSection: HTMLElement;
 
 		const nameSettingNameEl = new Setting(contentEl)
 			.addText((txt) => {
@@ -53,52 +48,32 @@ export default class GroupEditModal extends Modal {
 				text: 'Editing "' + this.groupToEdit.name + '"',
 			});
 
-		const tabContainer = contentEl.createDiv({ cls: 'pg-tabs' });
-
-		const generalTab = tabContainer.createDiv({ cls: 'pg-tab is-active' });
-		generalTab.createSpan({ text: 'General' });
-		const pluginsTab = tabContainer.createDiv({ cls: 'pg-tab' });
-		pluginsTab.createSpan({ text: 'Plugins' });
-		const groupsTab = tabContainer.createDiv({ cls: 'pg-tab' });
-		groupsTab.createSpan({ text: 'Groups' });
-
-		const switchActive = (clicked: string) => {
-			generalTab.removeClass('is-active');
-			pluginsTab.removeClass('is-active');
-			groupsTab.removeClass('is-active');
-
-			generalSettings?.removeClass('is-active');
-			pluginsSection?.removeClass('is-active');
-			groupsSection?.removeClass('is-active');
-			switch (clicked) {
-				case 'Plugins':
-					pluginsSection?.addClass('is-active');
-					pluginsTab?.addClass('is-active');
-					break;
-				case 'Groups':
-					groupsSection?.addClass('is-active');
-					groupsTab.addClass('is-active');
-					break;
-				default:
-					generalSettings?.addClass('is-active');
-					generalTab.addClass('is-active');
-					break;
-			}
-		};
-
-		generalTab.onClickEvent(() => switchActive('General'));
-		pluginsTab.onClickEvent(() => switchActive('Plugins'));
-		groupsTab.onClickEvent(() => switchActive('Groups'));
-
-		generalSettings = new GroupEditGeneralTab(this.groupToEdit, contentEl)
-			.containerEl;
-
-		pluginsSection = new GroupEditPluginsTab(contentEl, {
-			group: this.groupToEdit,
-		}).mainEl;
-
-		groupsSection = new GroupEditGroupsTab(this.groupToEdit, contentEl)
-			.containerEl;
+		const tabGroup: TabGroupComponent = new TabGroupComponent(modalEl, {
+			tabs: [
+				{
+					title: 'General',
+					content: new GroupEditGeneralTab(
+						this.groupToEdit,
+						contentEl
+					).containerEl,
+				},
+				{
+					title: 'Plugins',
+					content:
+						new GroupEditPluginsTab(contentEl, {
+							group: this.groupToEdit,
+						}).mainEl ??
+						modalEl.createSpan(
+							'Plugins Not Loaded, please contact Dev.'
+						),
+				},
+				{
+					title: 'Groups',
+					content: new GroupEditGroupsTab(this.groupToEdit, contentEl)
+						.containerEl,
+				},
+			],
+		});
 
 		this.generateFooter(modalEl);
 	}
