@@ -22,6 +22,7 @@ export default class TabGroupComponent extends HtmlComponent<TabGroupOptions> {
 			tabEl.createSpan({ text: tab.title });
 
 			const contentEl = contentContainer.appendChild(tab.content);
+			contentEl.addClass('pg-tabbed-content');
 			tabEl.onClickEvent(() => this.switchActiveTab(tabEl, contentEl));
 
 			if (index === 0) {

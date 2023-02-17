@@ -18,9 +18,7 @@ export default class GroupEditGeneralTab {
 	private generateGeneralSettingsSection(
 		contentEl: HTMLElement
 	): HTMLElement {
-		const generalSettingsSection = contentEl.createDiv({
-			cls: 'pg-tabbed-content is-active',
-		});
+		const generalSettingsSection = contentEl.createDiv();
 
 		generalSettingsSection.createEl('h5', { text: 'General' });
 

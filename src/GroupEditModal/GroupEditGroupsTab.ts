@@ -25,9 +25,7 @@ export default class GroupEditGroupsTab {
 	}
 
 	private generateGroupsSection(parentElement: HTMLElement): HTMLElement {
-		const groupSection: HTMLElement = parentElement.createDiv({
-			cls: 'pg-tabbed-content',
-		});
+		const groupSection: HTMLElement = parentElement.createDiv();
 
 		groupSection.createEl('h5', { text: 'Groups' });
 

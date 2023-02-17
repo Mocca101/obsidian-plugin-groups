@@ -9,13 +9,13 @@ import PluginListToggle from '../Components/PluginListToggle';
 import Manager from '../Managers/Manager';
 import FilteredGroupsList from '../Components/FilteredGroupsList';
 import ReorderablePluginList from '../Components/ReorderablePluginList';
-import TabbedContent from '../Components/TabbedContent';
+import HtmlComponent from '../Components/BaseComponents/HtmlComponent';
 
 interface PluginTabOptions {
 	group: PluginGroup;
 }
 
-export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions> {
+export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions> {
 	private readonly availablePlugins: PgPlugin[] =
 		PluginManager.getAllAvailablePlugins();
 
@@ -44,12 +44,8 @@ export default class GroupEditPluginsTab extends TabbedContent<PluginTabOptions>
 		this.generateComponent();
 	}
 
-	protected generateComponent(active?: boolean) {
-		super.generateComponent(active);
-
-		if (!this.mainEl) {
-			return;
-		}
+	protected generateComponent() {
+		this.mainEl = this.parentEl.createDiv();
 
 		this.mainEl.createEl('h5', { text: 'Plugins' });
 

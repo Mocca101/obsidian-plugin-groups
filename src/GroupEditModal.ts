@@ -30,9 +30,7 @@ export default class GroupEditModal extends Modal {
 
 		modalEl.empty();
 
-		const contentEl = modalEl.createEl('div', {
-			cls: 'group-edit-modal-content ',
-		});
+		const contentEl = modalEl.createDiv();
 
 		const nameSettingNameEl = new Setting(contentEl)
 			.addText((txt) => {
