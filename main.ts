@@ -20,7 +20,7 @@ export default class PgMain extends Plugin {
 		await PluginManager.loadNewPlugins();
 		this.logTime('Loading new plugins', times);
 
-		this.addSettingTab(new GroupSettingsTab(this.app, this));
+		this.addSettingTab(new PluginGroupSettings(this.app, this));
 		this.logTime('Creating the Settings Tab', times);
 
 		if (!Manager.getInstance().groupsMap) {

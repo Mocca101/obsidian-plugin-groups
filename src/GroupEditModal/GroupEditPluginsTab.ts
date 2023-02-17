@@ -5,7 +5,7 @@ import DropdownActionButton, {
 	DropdownOption,
 } from '../Components/DropdownActionButton';
 import PluginManager from '../Managers/PluginManager';
-import PluginListTogglable from '../Components/PluginListToggle';
+import PluginListTogglable from '../Components/PluginListTogglable';
 import Manager from '../Managers/Manager';
 import FilteredGroupsList from '../Components/FilteredGroupsList';
 import ReorderablePluginList from '../Components/ReorderablePluginList';

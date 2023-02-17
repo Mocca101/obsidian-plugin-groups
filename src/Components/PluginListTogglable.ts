@@ -2,7 +2,7 @@ import { PgPlugin } from '../DataStructures/PgPlugin';
 import { ButtonComponent, Setting } from 'obsidian';
 import { PluginGroup } from '../DataStructures/PluginGroup';
 
-export default class PluginListToggle {
+export default class PluginListTogglable {
 	pluginListEl: HTMLElement;
 
 	private pluginListTarget: EventTarget = new EventTarget();

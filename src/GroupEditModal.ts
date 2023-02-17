@@ -1,5 +1,5 @@
 import { App, Modal, Setting } from 'obsidian';
-import GroupSettingsTab from './GroupSettingsTab';
+import PluginGroupSettings from './PluginGroupSettings';
 import { generateGroupID } from './Utils/Utilities';
 import ConfirmationPopupModal from './Components/ConfirmationPopupModal';
 import { PluginGroup } from './DataStructures/PluginGroup';
@@ -16,9 +16,13 @@ export default class GroupEditModal extends Modal {
 	groupToEditCache: string;
 	discardChanges = true;
 
-	settingsTab: GroupSettingsTab;
+	settingsTab: PluginGroupSettings;
 
-	constructor(app: App, settingsTab: GroupSettingsTab, group: PluginGroup) {
+	constructor(
+		app: App,
+		settingsTab: PluginGroupSettings,
+		group: PluginGroup
+	) {
 		super(app);
 		this.settingsTab = settingsTab;
 		this.groupToEdit = group;

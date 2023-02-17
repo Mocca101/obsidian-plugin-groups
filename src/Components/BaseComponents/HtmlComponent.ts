@@ -28,11 +28,8 @@ export default abstract class HtmlComponent<OptionsType> {
 	}
 
 	protected generateComponent(): void {
-		console.log('-> creating', this.options);
 		this.generateMain();
 		this.generateDynamicContent();
-
-		console.log('-> this.mainEl', this.mainEl);
 	}
 
 	protected abstract generateMain(): void;
