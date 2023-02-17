@@ -39,7 +39,7 @@ export default class GroupEditGroupsTab {
 		});
 
 		const groupList = searchAndList.createEl('div');
-		groupList.addClass('group-edit-modal-plugin-list');
+		groupList.addClass('pg-settings-list');
 
 		this.groupListElements = new Map<string, Setting>();
 

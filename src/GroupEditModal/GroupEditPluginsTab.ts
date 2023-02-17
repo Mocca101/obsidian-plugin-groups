@@ -5,11 +5,12 @@ import DropdownActionButton, {
 	DropdownOption,
 } from '../Components/DropdownActionButton';
 import PluginManager from '../Managers/PluginManager';
-import PluginListToggle from '../Components/PluginListToggle';
+import PluginListTogglable from '../Components/PluginListToggle';
 import Manager from '../Managers/Manager';
 import FilteredGroupsList from '../Components/FilteredGroupsList';
 import ReorderablePluginList from '../Components/ReorderablePluginList';
 import HtmlComponent from '../Components/BaseComponents/HtmlComponent';
+import TabGroupComponent from '../Components/BaseComponents/TabGroupComponent';
 
 interface PluginTabOptions {
 	group: PluginGroup;
@@ -30,7 +31,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 
 	searchTerm: string;
 
-	private pluginsList: PluginListToggle;
+	private pluginsList: PluginListTogglable;
 
 	private filteredGroups: Map<string, PluginGroup> = new Map<
 		string,
@@ -44,21 +45,65 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 		this.generateComponent();
 	}
 
-	protected generateComponent() {
+	protected generateMain(): void {
 		this.mainEl = this.parentEl.createDiv();
 
 		this.mainEl.createEl('h5', { text: 'Plugins' });
+	}
 
-		const searchAndList: HTMLElement = this.mainEl?.createEl('div');
+	protected generateDynamicContent(): void {
+		if (!this.mainEl) {
+			return;
+		}
 
-		new Setting(searchAndList).setName('Search').addText((txt) => {
+		const mainPluginSection: HTMLElement = this.mainEl.createEl('div');
+
+		const filterSection: HTMLElement =
+			this.createFilterSection(mainPluginSection);
+
+		this.pluginsList = new PluginListTogglable(
+			mainPluginSection,
+			this.sortPlugins(this.filteredPlugins, this.selectedSortMode),
+			{
+				group: this.options.group,
+				onClickAction: (plugin: PgPlugin) =>
+					this.togglePluginForGroup(plugin),
+			}
+		);
+
+		const reorderPluginSection = new ReorderablePluginList(
+			this.mainEl.createDiv(),
+			{
+				items: this.options.group.plugins,
+			}
+		).mainEl;
+
+		new TabGroupComponent(this.mainEl, {
+			tabs: [
+				{
+					title: 'Main',
+					content: mainPluginSection,
+				},
+				{
+					title: 'Order',
+					content:
+						reorderPluginSection ??
+						createSpan('No Plugins loaded, please contact Dev'),
+				},
+			],
+		});
+	}
+
+	private createFilterSection(parentEl: HTMLElement): HTMLElement {
+		const filterSection = parentEl.createDiv();
+		new Setting(filterSection).setName('Search').addText((txt) => {
 			txt.setPlaceholder('Search for Plugin...');
 			txt.onChange((search) => {
 				this.searchPlugins(search);
 			});
 		});
 
-		const filtersAndSelectionContainer = searchAndList.createDiv({
+		const filtersAndSelectionContainer = filterSection.createDiv({
 			cls: 'pg-plugin-filter-container',
 		});
 		const filtersAndSelection = filtersAndSelectionContainer.createDiv({
@@ -82,7 +127,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 			this.filterAndSortPlugins();
 		};
 
-		const groupOptionsForButton: DropdownOption[] = [
+		const groupFilterOptions: DropdownOption[] = [
 			{
 				label: 'All groups',
 				func: () => {
@@ -101,7 +146,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 			},
 		];
 		Manager.getInstance().groupsMap.forEach((group) => {
-			groupOptionsForButton.push({
+			groupFilterOptions.push({
 				label: group.name,
 				func: () => {
 					toggleGroupFilter(group);
@@ -114,7 +159,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 			mainLabel: {
 				label: 'Filter Groups',
 			},
-			dropDownOptions: groupOptionsForButton,
+			dropDownOptions: groupFilterOptions,
 			drpIcon: 'filter',
 		});
 
@@ -162,19 +207,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 			],
 		});
 
-		this.pluginsList = new PluginListToggle(
-			searchAndList,
-			this.sortPlugins(this.filteredPlugins, this.selectedSortMode),
-			{
-				group: this.options.group,
-				onClickAction: (plugin: PgPlugin) =>
-					this.togglePluginForGroup(plugin),
-			}
-		);
-
-		new ReorderablePluginList(this.mainEl.createDiv(), {
-			items: this.options.group.plugins,
-		});
+		return filterSection;
 	}
 
 	private onSortModeChanged(

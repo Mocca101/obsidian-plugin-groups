@@ -20,10 +20,17 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 		this.generateComponent();
 	}
 
-	protected generateComponent(): void {
+	protected generateMain() {
 		this.mainEl = this.parentEl.createEl('button', {
 			cls: 'pg-drp-btn pg-has-dropdown-single',
 		});
+	}
+
+	protected generateDynamicContent() {
+		if (!this.mainEl) {
+			return;
+		}
+
 		const { dropDownOptions, mainLabel, drpIcon, minWidth } = this.options;
 		if (minWidth) {
 			this.mainEl.style.minWidth = minWidth;

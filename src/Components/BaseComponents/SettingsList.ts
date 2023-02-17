@@ -11,9 +11,18 @@ export default abstract class SettingsList<
 	}
 
 	protected generateComponent() {
-		this.mainEl = this.parentEl.createEl('div');
-		this.mainEl.addClass('group-edit-modal-plugin-list');
+		this.generateMain();
+		this.generateDynamicContent();
+	}
 
+	abstract generateListItem(listEl: HTMLElement, item: ItemType): Setting;
+
+	protected generateMain(): void {
+		this.mainEl = this.parentEl.createEl('div');
+		this.mainEl.addClass('pg-settings-list');
+	}
+
+	protected generateDynamicContent() {
 		this.options.items.forEach((item) => {
 			if (!this.mainEl) {
 				return;
@@ -23,5 +32,9 @@ export default abstract class SettingsList<
 		});
 	}
 
-	abstract generateListItem(listEl: HTMLElement, item: ItemType): Setting;
+	protected clear() {
+		if (this.mainEl && this.mainEl.hasClass('pg-settings-list')) {
+			this.mainEl.textContent = '';
+		}
+	}
 }

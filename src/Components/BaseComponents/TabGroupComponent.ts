@@ -10,8 +10,24 @@ export default class TabGroupComponent extends HtmlComponent<TabGroupOptions> {
 		this.generateComponent();
 	}
 
-	protected generateComponent(): void {
-		this.mainEl = this.parentEl.createDiv();
+	private switchActiveTab(
+		newActiveTab: HTMLElement,
+		newActiveContent: HTMLElement
+	) {
+		this.activeTab?.removeClass('is-active');
+		this.activeContent?.removeClass('is-active');
+
+		this.activeTab = newActiveTab;
+		this.activeContent = newActiveContent;
+
+		this.activeTab?.addClass('is-active');
+		this.activeContent?.addClass('is-active');
+	}
+
+	protected generateDynamicContent(): void {
+		if (!this.mainEl) {
+			return;
+		}
 
 		const tabContainer = this.mainEl.createDiv({ cls: 'pg-tabs' });
 
@@ -31,18 +47,8 @@ export default class TabGroupComponent extends HtmlComponent<TabGroupOptions> {
 		});
 	}
 
-	private switchActiveTab(
-		newActiveTab: HTMLElement,
-		newActiveContent: HTMLElement
-	) {
-		this.activeTab?.removeClass('is-active');
-		this.activeContent?.removeClass('is-active');
-
-		this.activeTab = newActiveTab;
-		this.activeContent = newActiveContent;
-
-		this.activeTab?.addClass('is-active');
-		this.activeContent?.addClass('is-active');
+	protected generateMain(): void {
+		this.mainEl = this.parentEl.createDiv();
 	}
 }
 

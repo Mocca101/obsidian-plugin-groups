@@ -46,7 +46,7 @@ export default class PluginListToggle {
 
 	private generateList() {
 		this.pluginListEl = this.parentEL.createEl('div');
-		this.pluginListEl.addClass('group-edit-modal-plugin-list');
+		this.pluginListEl.addClass('pg-settings-list');
 
 		this.plugins.forEach((plugin) => {
 			const setting = new Setting(this.pluginListEl).setName(plugin.name);

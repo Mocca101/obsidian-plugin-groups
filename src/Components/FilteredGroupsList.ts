@@ -22,6 +22,7 @@ export default class FilteredGroupsList {
 	}
 
 	public update(groups: Map<string, PluginGroup>) {
+		console.log('-> Updating list');
 		this.listEL.remove();
 		this.groups = groups;
 		this.render();
