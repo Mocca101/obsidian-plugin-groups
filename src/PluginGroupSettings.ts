@@ -36,7 +36,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		this.generateGeneralSettings(containerEl);
 
-		new GroupSettings(containerEl);
+		new GroupSettings(containerEl, {});
 
 		this.GenerateDeviceList(containerEl);
 

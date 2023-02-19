@@ -144,7 +144,7 @@ export default class GroupEditGeneralTab {
 			.setName('Delay')
 			.addSlider((slider) => {
 				slider.setValue(this.groupToEdit.delay);
-				slider.setLimits(0, disableStartupTimeout, 1);
+				slider.setLimits(0, disableStartupTimeout / 1000, 1);
 				slider.onChange((value) => {
 					this.groupToEdit.delay = value;
 					delaySetting.setDesc(value.toString());

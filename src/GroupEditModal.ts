@@ -9,6 +9,7 @@ import GroupEditGeneralTab from './GroupEditModal/GroupEditGeneralTab';
 import Manager from './Managers/Manager';
 import CommandManager from './Managers/CommandManager';
 import TabGroupComponent from './Components/BaseComponents/TabGroupComponent';
+import GroupSettings from './Components/Settings/GroupSettings';
 
 export default class GroupEditModal extends Modal {
 	groupToEdit: PluginGroup;
@@ -16,15 +17,11 @@ export default class GroupEditModal extends Modal {
 	groupToEditCache: string;
 	discardChanges = true;
 
-	settingsTab: PluginGroupSettings;
+	groupSettings: GroupSettings;
 
-	constructor(
-		app: App,
-		settingsTab: PluginGroupSettings,
-		group: PluginGroup
-	) {
+	constructor(app: App, settingsTab: GroupSettings, group: PluginGroup) {
 		super(app);
-		this.settingsTab = settingsTab;
+		this.groupSettings = settingsTab;
 		this.groupToEdit = group;
 		this.groupToEditCache = JSON.stringify(group);
 	}
@@ -169,14 +166,14 @@ export default class GroupEditModal extends Modal {
 
 	async persistChangesAndClose() {
 		await Manager.getInstance().saveSettings();
-		this.settingsTab.display();
+		this.groupSettings.render();
 		this.close();
 	}
 
 	async deleteGroup() {
 		Manager.getInstance().groupsMap.delete(this.groupToEdit.id);
 		await Manager.getInstance().saveSettings();
-		this.settingsTab.display();
+		this.groupSettings.render();
 		this.close();
 	}
 }

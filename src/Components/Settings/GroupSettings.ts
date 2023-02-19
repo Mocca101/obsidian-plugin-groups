@@ -5,13 +5,15 @@ import { generateGroupID } from '../../Utils/Utilities';
 import { PluginGroup } from '../../DataStructures/PluginGroup';
 import GroupEditModal from '../../GroupEditModal';
 
-export default class GroupSettings extends HtmlComponent<never> {
+export interface GroupSettingOptions {}
+
+export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 	newGroupName: string;
 
 	groupNameField: TextComponent;
 
-	constructor(parentEL: HTMLElement) {
-		super(parentEL);
+	constructor(parentEL: HTMLElement, options: GroupSettingOptions) {
+		super(parentEL, options);
 		this.generateComponent();
 	}
 
@@ -120,7 +122,11 @@ export default class GroupSettings extends HtmlComponent<never> {
 			id: id,
 			name: this.newGroupName,
 		});
-		new GroupEditModal(this.app, this, newGroup).open();
+		new GroupEditModal(
+			Manager.getInstance().pluginInstance.app,
+			this,
+			newGroup
+		).open();
 		this.newGroupName = '';
 		if (this.groupNameField) {
 			this.groupNameField.setValue('');
@@ -128,6 +134,10 @@ export default class GroupSettings extends HtmlComponent<never> {
 	}
 
 	editGroup(group: PluginGroup) {
-		new GroupEditModal(this.app, this, group).open();
+		new GroupEditModal(
+			Manager.getInstance().pluginInstance.app,
+			this,
+			group
+		).open();
 	}
 }
