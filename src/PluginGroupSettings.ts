@@ -21,6 +21,7 @@ import DescriptionsPluginList, {
 	PluginAndDesc,
 } from './Components/DescriptionsPluginList';
 import GroupSettings from './Components/Settings/GroupSettings';
+import AdvancedSettings from './Components/Settings/AdvancedSettings';
 
 export default class PluginGroupSettings extends PluginSettingTab {
 	constructor(app: App, plugin: PgMain) {
@@ -41,6 +42,8 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		this.GenerateDeviceList(containerEl);
 
 		this.GeneratePluginsList(containerEl);
+
+		new AdvancedSettings(containerEl, {});
 	}
 
 	private generateGeneralSettings(containerEl: HTMLElement) {
@@ -67,16 +70,6 @@ export default class PluginGroupSettings extends PluginSettingTab {
 				);
 				drp.onChange(async (value) => {
 					Manager.getInstance().showNoticeOnGroupLoad = value;
-					await Manager.getInstance().saveSettings();
-				});
-			});
-
-		new Setting(generalParent)
-			.setName('Log Startup time')
-			.addToggle((tgl) => {
-				tgl.setValue(Manager.getInstance().logDetailedTime);
-				tgl.onChange(async (value) => {
-					Manager.getInstance().logDetailedTime = value;
 					await Manager.getInstance().saveSettings();
 				});
 			});

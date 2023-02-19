@@ -17,10 +17,12 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 		this.generateComponent();
 	}
 
-	protected generateDynamicContent(): void {
+	protected generateContent(): void {
 		if (!this.mainEl) {
 			return;
 		}
+
+		this.mainEl.createEl('h5', { text: 'Groups' });
 
 		let addBtnEl: HTMLButtonElement;
 
@@ -53,9 +55,8 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 		this.GenerateGroupList(this.mainEl);
 	}
 
-	protected generateMain(): void {
+	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createDiv();
-		this.mainEl.createEl('h5', { text: 'Groups' });
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {

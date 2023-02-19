@@ -1,7 +1,11 @@
 import { PgComponent } from '../Utils/Types';
 import { PgPlugin } from './PgPlugin';
 import { Notice } from 'obsidian';
-import { getCurrentlyActiveDevice, groupFromId } from '../Utils/Utilities';
+import {
+	devLog,
+	getCurrentlyActiveDevice,
+	groupFromId,
+} from '../Utils/Utilities';
 import Manager from '../Managers/Manager';
 import PluginManager from '../Managers/PluginManager';
 
@@ -80,10 +84,15 @@ export class PluginGroup implements PluginGroupData {
 		const pluginPromises: Promise<boolean>[] = [];
 
 		for (const plugin of this.plugins) {
-			pluginPromises.push(PluginManager.queuePluginForEnable(plugin));
+			if (Manager.getInstance().doLoadSynchronously) {
+				pluginPromises.push(PluginManager.queuePluginForEnable(plugin));
+			} else {
+				await PluginManager.queuePluginForEnable(plugin);
+			}
 		}
 
 		await Promise.allSettled(pluginPromises);
+
 		for (const groupId of this.groupIds) {
 			await groupFromId(groupId)?.enable();
 		}

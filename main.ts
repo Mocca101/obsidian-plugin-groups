@@ -1,5 +1,5 @@
-import { Notice, Plugin } from 'obsidian';
-import GroupSettingsTab from './src/GroupSettingsTab';
+import { Notice, Plugin, setIcon } from 'obsidian';
+import PluginGroupSettings from './src/PluginGroupSettings';
 import { disableStartupTimeout } from './src/Utils/Constants';
 import Manager from './src/Managers/Manager';
 import CommandManager from './src/Managers/CommandManager';
@@ -23,6 +23,8 @@ export default class PgMain extends Plugin {
 		this.addSettingTab(new PluginGroupSettings(this.app, this));
 		this.logTime('Creating the Settings Tab', times);
 
+		this.addStatusBar();
+
 		if (!Manager.getInstance().groupsMap) {
 			this.displayTimeNotice(times);
 
@@ -33,7 +35,7 @@ export default class PgMain extends Plugin {
 			Manager.getInstance().groupsMap.forEach((group) =>
 				CommandManager.getInstance().AddGroupCommands(group.id)
 			);
-			if (Manager.getInstance().logDetailedTime) {
+			if (Manager.getInstance().devLog) {
 				this.logTime('Generated Commands for Groups in', times);
 			}
 		}
@@ -44,7 +46,7 @@ export default class PgMain extends Plugin {
 				if (group.loadAtStartup) group.startup();
 			});
 
-			if (Manager.getInstance().logDetailedTime) {
+			if (Manager.getInstance().devLog) {
 				this.logTime('Dispatching Groups for delayed start in', times);
 			}
 		}
@@ -52,14 +54,20 @@ export default class PgMain extends Plugin {
 		this.displayTimeNotice(times);
 	}
 
+	private addStatusBar() {
+		const sbItem = this.addStatusBarItem();
+
+		setIcon(sbItem, 'boxes');
+		sbItem.onClickEvent(() => {});
+	}
 	private logTime(label: string, times: { label: string; time: number }[]) {
-		if (Manager.getInstance().logDetailedTime) {
+		if (Manager.getInstance().devLog) {
 			times.push({ label, time: this.elapsedTime(times) });
 		}
 	}
 
 	private displayTimeNotice(times: { label: string; time: number }[]) {
-		if (!Manager.getInstance().logDetailedTime || times.length === 0) {
+		if (!Manager.getInstance().devLog || times.length === 0) {
 			return;
 		}
 		const totalTime = Math.round(this.accTime(times.slice(1)));

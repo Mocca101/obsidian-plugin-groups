@@ -24,7 +24,7 @@ export default class TabGroupComponent extends HtmlComponent<TabGroupOptions> {
 		this.activeContent?.addClass('is-active');
 	}
 
-	protected generateDynamicContent(): void {
+	protected generateContent(): void {
 		if (!this.mainEl) {
 			return;
 		}
@@ -47,7 +47,7 @@ export default class TabGroupComponent extends HtmlComponent<TabGroupOptions> {
 		});
 	}
 
-	protected generateMain(): void {
+	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createDiv();
 	}
 }

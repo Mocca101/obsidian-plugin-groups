@@ -14,7 +14,7 @@ export default class RemovableChip extends HtmlComponent<RemovableChipOptions> {
 		this.render();
 	}
 
-	protected generateDynamicContent(): void {
+	protected generateContent(): void {
 		if (!this.mainEl) {
 			return;
 		}
@@ -28,7 +28,7 @@ export default class RemovableChip extends HtmlComponent<RemovableChipOptions> {
 		});
 	}
 
-	protected generateMain(): void {
+	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createDiv({ cls: 'pg-chip' });
 	}
 }

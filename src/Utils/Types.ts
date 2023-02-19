@@ -9,8 +9,10 @@ export interface PluginGroupsSettings {
 	groupsMap: Map<string, PluginGroup>;
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: string;
-	logDetailedTime: boolean;
 	devices: string[];
+
+	devLogs: boolean;
+	doLoadSynchronously: boolean;
 }
 
 export interface PersistentSettings {
@@ -18,5 +20,6 @@ export interface PersistentSettings {
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: string;
 	devices: string[];
-	logDetailedTime: boolean;
+	devLogs: boolean;
+	doLoadSynchronously: boolean;
 }

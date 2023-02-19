@@ -23,18 +23,18 @@ export default abstract class HtmlComponent<OptionsType> {
 			this.generateComponent();
 		} else {
 			this.clear();
-			this.generateDynamicContent();
+			this.generateContent();
 		}
 	}
 
 	protected generateComponent(): void {
-		this.generateMain();
-		this.generateDynamicContent();
+		this.generateContainer();
+		this.generateContent();
 	}
 
-	protected abstract generateMain(): void;
+	protected abstract generateContainer(): void;
 
-	protected abstract generateDynamicContent(): void;
+	protected abstract generateContent(): void;
 
 	protected clear(): void {
 		if (this.mainEl) {

@@ -28,6 +28,12 @@ export function generateGroupID(
 	return undefined;
 }
 
+export function devLog(message?: any, ...data: any[]) {
+	if (Manager.getInstance().devLog) {
+		console.log(message, data);
+	}
+}
+
 export function nameToId(name: string): string {
 	return name.replace(/[\W_]/g, '').toLowerCase();
 }

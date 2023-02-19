@@ -20,13 +20,13 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 		this.generateComponent();
 	}
 
-	protected generateMain() {
+	protected generateContainer() {
 		this.mainEl = this.parentEl.createEl('button', {
 			cls: 'pg-drp-btn pg-has-dropdown-single',
 		});
 	}
 
-	protected generateDynamicContent() {
+	protected generateContent() {
 		if (!this.mainEl) {
 			return;
 		}

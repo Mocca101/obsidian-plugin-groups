@@ -11,18 +11,18 @@ export default abstract class SettingsList<
 	}
 
 	protected generateComponent() {
-		this.generateMain();
-		this.generateDynamicContent();
+		this.generateContainer();
+		this.generateContent();
 	}
 
 	abstract generateListItem(listEl: HTMLElement, item: ItemType): Setting;
 
-	protected generateMain(): void {
+	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createEl('div');
 		this.mainEl.addClass('pg-settings-list');
 	}
 
-	protected generateDynamicContent() {
+	protected generateContent() {
 		this.options.items.forEach((item) => {
 			if (!this.mainEl) {
 				return;

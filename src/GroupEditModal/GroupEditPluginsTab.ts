@@ -45,13 +45,13 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 		this.generateComponent();
 	}
 
-	protected generateMain(): void {
+	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createDiv();
 
 		this.mainEl.createEl('h5', { text: 'Plugins' });
 	}
 
-	protected generateDynamicContent(): void {
+	protected generateContent(): void {
 		if (!this.mainEl) {
 			return;
 		}

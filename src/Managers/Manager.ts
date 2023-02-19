@@ -7,8 +7,9 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
 	generateCommands: true,
 	showNoticeOnGroupLoad: 'none',
-	logDetailedTime: false,
+	devLogs: false,
 	devices: [],
+	doLoadSynchronously: true,
 };
 
 export default class Manager {
@@ -111,21 +112,30 @@ export default class Manager {
 			showNoticeOnGroupLoad:
 				this.settings.showNoticeOnGroupLoad ??
 				DEFAULT_SETTINGS.showNoticeOnGroupLoad,
-			logDetailedTime:
-				this.settings.logDetailedTime ??
-				DEFAULT_SETTINGS.logDetailedTime,
+			devLogs: this.settings.devLogs ?? DEFAULT_SETTINGS.devLogs,
 			devices: this.settings.devices ?? DEFAULT_SETTINGS.devices,
+			doLoadSynchronously:
+				this.settings.doLoadSynchronously ??
+				DEFAULT_SETTINGS.doLoadSynchronously,
 		};
 		await this.main.saveData(persistentSettings);
 	}
 
 	// Getters & Setters
 
-	get logDetailedTime(): boolean {
-		return this.settings.logDetailedTime;
+	get doLoadSynchronously(): boolean {
+		return this.settings.doLoadSynchronously;
 	}
-	set logDetailedTime(value: boolean) {
-		this.settings.logDetailedTime = value;
+
+	set doLoadSynchronously(value: boolean) {
+		this.settings.doLoadSynchronously = value;
+	}
+
+	get devLog(): boolean {
+		return this.settings.devLogs;
+	}
+	set devLog(value: boolean) {
+		this.settings.devLogs = value;
 	}
 
 	get pluginInstance(): PgMain {
