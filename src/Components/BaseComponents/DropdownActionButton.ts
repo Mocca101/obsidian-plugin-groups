@@ -1,5 +1,5 @@
 import { setIcon } from 'obsidian';
-import HtmlComponent from './BaseComponents/HtmlComponent';
+import HtmlComponent from './HtmlComponent';
 
 interface DropdownActionButtonOptions {
 	mainLabel: MainLabelOptions;

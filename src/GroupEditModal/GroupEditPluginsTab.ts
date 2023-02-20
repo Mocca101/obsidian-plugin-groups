@@ -3,7 +3,7 @@ import { PgPlugin } from '../DataStructures/PgPlugin';
 import { PluginGroup } from '../DataStructures/PluginGroup';
 import DropdownActionButton, {
 	DropdownOption,
-} from '../Components/DropdownActionButton';
+} from '../Components/BaseComponents/DropdownActionButton';
 import PluginManager from '../Managers/PluginManager';
 import PluginListTogglable from '../Components/PluginListTogglable';
 import Manager from '../Managers/Manager';

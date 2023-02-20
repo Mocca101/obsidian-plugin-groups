@@ -199,6 +199,29 @@
 	padding-bottom: 0.6rem;
 }
 
+.pg-settings-window {
+	display: none;
+	position: absolute;
+	background-color: var(--modal-background);
+	border-radius: var(--modal-radius);
+	border: var(--modal-border-width) solid var(--modal-border-color);
+	padding: var(--size-4-4);
+}
+
+.pg-statusbar-icon:focus > .pg-settings-window {
+	display:block;
+}
+
+.pg-statusbar-icon:focus-within > .pg-settings-window {
+	display:block;
+}
+
+.pg-statusbar-icon:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+
 :root {
 	--pg-group-edit-modal-footer-height: 60px;
 }

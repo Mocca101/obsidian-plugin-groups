@@ -1,7 +1,7 @@
 import { App, Modal, Setting } from 'obsidian';
 import PluginGroupSettings from './PluginGroupSettings';
 import { generateGroupID } from './Utils/Utilities';
-import ConfirmationPopupModal from './Components/ConfirmationPopupModal';
+import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
 import { PluginGroup } from './DataStructures/PluginGroup';
 import GroupEditPluginsTab from './GroupEditModal/GroupEditPluginsTab';
 import GroupEditGroupsTab from './GroupEditModal/GroupEditGroupsTab';

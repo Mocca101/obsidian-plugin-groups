@@ -14,7 +14,7 @@ import {
 	setCurrentlyActiveDevice,
 } from './Utils/Utilities';
 import { PluginGroup } from './DataStructures/PluginGroup';
-import ConfirmationPopupModal from './Components/ConfirmationPopupModal';
+import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
 import Manager from './Managers/Manager';
 import PluginManager from './Managers/PluginManager';
 import DescriptionsPluginList, {

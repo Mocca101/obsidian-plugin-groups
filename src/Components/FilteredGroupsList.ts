@@ -1,5 +1,5 @@
 import { PluginGroup } from '../DataStructures/PluginGroup';
-import RemovableChip from './RemovableChip';
+import RemovableChip from './BaseComponents/RemovableChip';
 
 export default class FilteredGroupsList {
 	private parentEl: HTMLElement;

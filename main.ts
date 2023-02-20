@@ -4,6 +4,7 @@ import { disableStartupTimeout } from './src/Utils/Constants';
 import Manager from './src/Managers/Manager';
 import CommandManager from './src/Managers/CommandManager';
 import PluginManager from './src/Managers/PluginManager';
+import GroupSettingsMenu from './src/Components/Modals/GroupSettingsMenu';
 
 export default class PgMain extends Plugin {
 	async onload() {
@@ -56,9 +57,10 @@ export default class PgMain extends Plugin {
 
 	private addStatusBar() {
 		const sbItem = this.addStatusBarItem();
-
+		sbItem.addClass('pg-statusbar-icon');
+		sbItem.tabIndex = 0;
 		setIcon(sbItem, 'boxes');
-		sbItem.onClickEvent(() => {});
+		const settingsModal = new GroupSettingsMenu(sbItem, {});
 	}
 	private logTime(label: string, times: { label: string; time: number }[]) {
 		if (Manager.getInstance().devLog) {
