@@ -1,4 +1,4 @@
-import { Notice, Plugin, setIcon } from 'obsidian';
+import { ExtraButtonComponent, Notice, Plugin } from 'obsidian';
 import PluginGroupSettings from './src/PluginGroupSettings';
 import { disableStartupTimeout } from './src/Utils/Constants';
 import Manager from './src/Managers/Manager';
@@ -59,8 +59,17 @@ export default class PgMain extends Plugin {
 		const sbItem = this.addStatusBarItem();
 		sbItem.addClass('pg-statusbar-icon');
 		sbItem.tabIndex = 0;
-		setIcon(sbItem, 'boxes');
-		const settingsModal = new GroupSettingsMenu(sbItem, {});
+
+		const menu = new GroupSettingsMenu(sbItem, {});
+
+		const btn = new ExtraButtonComponent(sbItem);
+		btn.setIcon('boxes');
+		// @ts-ignore
+		btn.setTooltip('Plugin Groups Menu', { placement: 'top' });
+
+		sbItem.onfocus = () => {
+			menu.updatePosition();
+		};
 	}
 	private logTime(label: string, times: { label: string; time: number }[]) {
 		if (Manager.getInstance().devLog) {

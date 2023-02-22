@@ -11,11 +11,6 @@ export default class GroupSettingsMenu extends HtmlComponent<GroupSettingMenuOpt
 
 	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createDiv({ cls: 'pg-settings-window' });
-		const parentRect = this.parentEl.getBoundingClientRect();
-		this.mainEl.style.bottom =
-			window.innerHeight - parentRect.top + 10 + 'px';
-		this.mainEl.style.right =
-			window.innerWidth - parentRect.right + 10 + 'px';
 	}
 
 	protected generateContent(): void {
@@ -24,5 +19,28 @@ export default class GroupSettingsMenu extends HtmlComponent<GroupSettingMenuOpt
 		}
 
 		new GroupSettings(this.mainEl, {});
+
+		this.updatePosition();
+	}
+
+	public updatePosition() {
+		if (!this.mainEl) {
+			return;
+		}
+
+		this.mainEl.style.transform = 'translate(0px, 0px)';
+
+		let xOffset = -this.mainEl.getBoundingClientRect().width / 2;
+		const yOffset = -this.mainEl.innerHeight / 2 - 48;
+
+		const diff =
+			window.innerWidth - this.mainEl.getBoundingClientRect().right - 16;
+
+		if (diff < 0) {
+			xOffset = diff;
+		}
+
+		this.mainEl.style.transform =
+			'translate(' + xOffset + 'px, ' + yOffset + 'px)';
 	}
 }

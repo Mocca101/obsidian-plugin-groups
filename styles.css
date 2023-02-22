@@ -200,7 +200,8 @@
 }
 
 .pg-settings-window {
-	display: none;
+	height: 0;
+	opacity: 0;
 	position: absolute;
 	background-color: var(--modal-background);
 	border-radius: var(--modal-radius);
@@ -210,17 +211,17 @@
 
 .pg-statusbar-icon:focus > .pg-settings-window {
 	display:block;
+	opacity: 1;
+	transition: opacity 1s;
+	height: auto;
 }
 
 .pg-statusbar-icon:focus-within > .pg-settings-window {
 	display:block;
+	opacity: 1;
+	transition: opacity 1s;
+	height: auto;
 }
-
-.pg-statusbar-icon:hover {
-	background-color: var(--background-modifier-hover);
-	color: var(--text-normal);
-}
-
 
 :root {
 	--pg-group-edit-modal-footer-height: 60px;
