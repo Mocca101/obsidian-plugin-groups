@@ -2,6 +2,8 @@ import { PersistentSettings, PluginGroupsSettings } from '../Utils/Types';
 import PgMain from '../../main';
 import { PluginGroup } from '../DataStructures/PluginGroup';
 import { pluginId } from '../Utils/Constants';
+import { setIcon } from 'obsidian';
+import GroupSettingsMenu from '../Components/Modals/GroupSettingsMenu';
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
@@ -10,6 +12,7 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	devLogs: false,
 	devices: [],
 	doLoadSynchronously: true,
+	showStatusbarIcon: 'None',
 };
 
 export default class Manager {
@@ -117,6 +120,9 @@ export default class Manager {
 			doLoadSynchronously:
 				this.settings.doLoadSynchronously ??
 				DEFAULT_SETTINGS.doLoadSynchronously,
+			showStatusbarIcon:
+				this.settings.showStatusbarIcon ??
+				DEFAULT_SETTINGS.showStatusbarIcon,
 		};
 		await this.main.saveData(persistentSettings);
 	}
@@ -129,6 +135,14 @@ export default class Manager {
 
 	set doLoadSynchronously(value: boolean) {
 		this.settings.doLoadSynchronously = value;
+	}
+
+	get showStatusbarIcon() {
+		return this.settings.showStatusbarIcon;
+	}
+
+	set showStatusbarIcon(value) {
+		this.settings.showStatusbarIcon = value;
 	}
 
 	get devLog(): boolean {
@@ -173,5 +187,32 @@ export default class Manager {
 
 	get devices(): string[] {
 		return this.settings.devices;
+	}
+
+	private statusbarItem: HTMLElement;
+
+	public updateStatusbarItem() {
+		if (this.statusbarItem) {
+			this.statusbarItem.remove();
+		}
+		if (this.showStatusbarIcon === 'None') {
+			return;
+		}
+
+		this.statusbarItem = this.pluginInstance.addStatusBarItem();
+		this.statusbarItem.addClasses(['pg-statusbar-icon', 'mod-clickable']);
+		this.statusbarItem.tabIndex = 0;
+
+		if (this.showStatusbarIcon === 'Text') {
+			this.statusbarItem.textContent = 'Plugins';
+		} else if (this.showStatusbarIcon === 'Icon') {
+			setIcon(this.statusbarItem, 'boxes');
+		}
+
+		const menu = new GroupSettingsMenu(this.statusbarItem, {});
+
+		this.statusbarItem.onfocus = () => {
+			menu.updatePosition();
+		};
 	}
 }

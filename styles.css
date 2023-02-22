@@ -202,25 +202,30 @@
 .pg-settings-window {
 	height: 0;
 	opacity: 0;
+
+	transition: height 1s, opacity 250ms;
+
+	overflow: hidden;
 	position: absolute;
 	background-color: var(--modal-background);
+}
+
+.pg-statusbar-icon:focus-within > .pg-settings-window {
+	height: auto;
+	opacity: 1;
+
+	transition: height 1s, opacity 250ms;
+
 	border-radius: var(--modal-radius);
 	border: var(--modal-border-width) solid var(--modal-border-color);
 	padding: var(--size-4-4);
 }
 
-.pg-statusbar-icon:focus > .pg-settings-window {
-	display:block;
-	opacity: 1;
-	transition: opacity 1s;
-	height: auto;
-}
+.pg-statusbar-icon:hover > .tooltip {
+	position: absolute;
+	bottom: -100%;
 
-.pg-statusbar-icon:focus-within > .pg-settings-window {
-	display:block;
-	opacity: 1;
-	transition: opacity 1s;
-	height: auto;
+
 }
 
 :root {

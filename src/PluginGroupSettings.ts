@@ -73,6 +73,30 @@ export default class PluginGroupSettings extends PluginSettingTab {
 					await Manager.getInstance().saveSettings();
 				});
 			});
+
+		new Setting(generalParent)
+			.setName('Statusbar Menu')
+			.addDropdown((drp) => {
+				drp.addOption('None', 'None')
+					.addOption('Icon', 'Icon')
+					.addOption('Text', 'Text');
+				drp.setValue(Manager.getInstance().showStatusbarIcon ?? 'None');
+				drp.onChange(async (value) => {
+					switch (value) {
+						case 'Icon':
+							Manager.getInstance().showStatusbarIcon = 'Icon';
+							break;
+						case 'Text':
+							Manager.getInstance().showStatusbarIcon = 'Text';
+							break;
+						default:
+							Manager.getInstance().showStatusbarIcon = 'None';
+							break;
+					}
+					await Manager.getInstance().saveSettings();
+					Manager.getInstance().updateStatusbarItem();
+				});
+			});
 	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {

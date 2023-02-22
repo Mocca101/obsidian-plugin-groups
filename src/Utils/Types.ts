@@ -10,9 +10,9 @@ export interface PluginGroupsSettings {
 	generateCommands: boolean;
 	showNoticeOnGroupLoad: string;
 	devices: string[];
-
 	devLogs: boolean;
 	doLoadSynchronously: boolean;
+	showStatusbarIcon: 'None' | 'Icon' | 'Text';
 }
 
 export interface PersistentSettings {
@@ -22,4 +22,5 @@ export interface PersistentSettings {
 	devices: string[];
 	devLogs: boolean;
 	doLoadSynchronously: boolean;
+	showStatusbarIcon: 'None' | 'Icon' | 'Text';
 }
