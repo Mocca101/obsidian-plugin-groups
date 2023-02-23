@@ -221,11 +221,28 @@
 	padding: var(--size-4-4);
 }
 
-.pg-statusbar-icon:hover > .tooltip {
-	position: absolute;
-	bottom: -100%;
+.pg-collapsible-content.is-active {
+	display: block;
+}
 
+.pg-collapsible-content {
+	display: none;
+}
 
+.pg-collapsible-header:hover {
+	background-color: var(--interactive-hover, #363636);
+	border-radius: var(--button-radius, 5px);
+}
+
+.pg-collapsible-header {
+	padding-bottom: 8px;
+	padding-top: 4px;
+}
+
+.pg-collapsible-icon {
+	position: relative;
+	top: 4px;
+	left: 16px;
 }
 
 :root {

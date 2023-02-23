@@ -1,11 +1,14 @@
 import HtmlComponent from '../BaseComponents/HtmlComponent';
 import { Setting, TextComponent } from 'obsidian';
 import Manager from '../../Managers/Manager';
-import { generateGroupID } from '../../Utils/Utilities';
+import { generateGroupID, makeCollapsible } from '../../Utils/Utilities';
 import { PluginGroup } from '../../DataStructures/PluginGroup';
 import GroupEditModal from '../../GroupEditModal';
 
-export interface GroupSettingOptions {}
+export interface GroupSettingOptions {
+	collapsible?: boolean;
+	startOpened?: boolean;
+}
 
 export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 	newGroupName: string;
@@ -22,11 +25,17 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 			return;
 		}
 
-		this.mainEl.createEl('h5', { text: 'Groups' });
+		const header = this.mainEl.createEl('h5', { text: 'Groups' });
+
+		const content = this.mainEl.createDiv();
+
+		if (this.options.collapsible) {
+			makeCollapsible(header, content, this.options.startOpened);
+		}
 
 		let addBtnEl: HTMLButtonElement;
 
-		new Setting(this.mainEl)
+		new Setting(content)
 			.setName('Add Group')
 			.addText((text) => {
 				this.groupNameField = text;
@@ -52,7 +61,7 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 				addBtnEl.addClass('btn-disabled');
 			});
 
-		this.GenerateGroupList(this.mainEl);
+		this.GenerateGroupList(content);
 	}
 
 	protected generateContainer(): void {

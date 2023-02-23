@@ -7,13 +7,11 @@ import {
 	TextComponent,
 } from 'obsidian';
 import PgMain from '../main';
-import GroupEditModal from './GroupEditModal';
 import {
-	generateGroupID,
 	getCurrentlyActiveDevice,
+	makeCollapsible,
 	setCurrentlyActiveDevice,
 } from './Utils/Utilities';
-import { PluginGroup } from './DataStructures/PluginGroup';
 import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
 import Manager from './Managers/Manager';
 import PluginManager from './Managers/PluginManager';
@@ -37,19 +35,31 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		this.generateGeneralSettings(containerEl);
 
-		new GroupSettings(containerEl, {});
+		new GroupSettings(containerEl, {
+			collapsible: true,
+			startOpened: true,
+		});
 
 		this.GenerateDeviceList(containerEl);
 
 		this.GeneratePluginsList(containerEl);
 
-		new AdvancedSettings(containerEl, {});
+		new AdvancedSettings(containerEl, { collapsible: true });
 	}
 
 	private generateGeneralSettings(containerEl: HTMLElement) {
-		const generalParent = containerEl.createEl('h4', { text: 'General' });
+		const generalParent = containerEl.createDiv();
 
-		new Setting(generalParent)
+		const header = generalParent.createEl('h4', {
+			text: 'General',
+			cls: 'mod-clickable',
+		});
+
+		const content = generalParent.createDiv();
+
+		makeCollapsible(header, content, true);
+
+		new Setting(content)
 			.setName('Generate Commands for Groups')
 			.addToggle((tgl) => {
 				tgl.setValue(Manager.getInstance().generateCommands ?? false);
@@ -59,7 +69,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 				});
 			});
 
-		new Setting(generalParent)
+		new Setting(content)
 			.setName('Notice upon un-/loading groups')
 			.addDropdown((drp) => {
 				drp.addOption('none', 'None')
@@ -74,29 +84,27 @@ export default class PluginGroupSettings extends PluginSettingTab {
 				});
 			});
 
-		new Setting(generalParent)
-			.setName('Statusbar Menu')
-			.addDropdown((drp) => {
-				drp.addOption('None', 'None')
-					.addOption('Icon', 'Icon')
-					.addOption('Text', 'Text');
-				drp.setValue(Manager.getInstance().showStatusbarIcon ?? 'None');
-				drp.onChange(async (value) => {
-					switch (value) {
-						case 'Icon':
-							Manager.getInstance().showStatusbarIcon = 'Icon';
-							break;
-						case 'Text':
-							Manager.getInstance().showStatusbarIcon = 'Text';
-							break;
-						default:
-							Manager.getInstance().showStatusbarIcon = 'None';
-							break;
-					}
-					await Manager.getInstance().saveSettings();
-					Manager.getInstance().updateStatusbarItem();
-				});
+		new Setting(content).setName('Statusbar Menu').addDropdown((drp) => {
+			drp.addOption('None', 'None')
+				.addOption('Icon', 'Icon')
+				.addOption('Text', 'Text');
+			drp.setValue(Manager.getInstance().showStatusbarIcon ?? 'None');
+			drp.onChange(async (value) => {
+				switch (value) {
+					case 'Icon':
+						Manager.getInstance().showStatusbarIcon = 'Icon';
+						break;
+					case 'Text':
+						Manager.getInstance().showStatusbarIcon = 'Text';
+						break;
+					default:
+						Manager.getInstance().showStatusbarIcon = 'None';
+						break;
+				}
+				await Manager.getInstance().saveSettings();
+				Manager.getInstance().updateStatusbarItem();
 			});
+		});
 	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {
@@ -124,11 +132,15 @@ export default class PluginGroupSettings extends PluginSettingTab {
 			newDevNameText.setValue(newDeviceName);
 		};
 
-		contentEl.createEl('h4', { text: 'Devices' });
+		const header = contentEl.createEl('h4', { text: 'Devices' });
+
+		const content = contentEl.createDiv();
+
+		makeCollapsible(header, content);
 
 		let deviceAddBtn: ButtonComponent;
 
-		const deviceNameSetting = new Setting(contentEl).setName('New Device');
+		const deviceNameSetting = new Setting(content).setName('New Device');
 
 		const newDevNameText = new TextComponent(deviceNameSetting.controlEl);
 		newDevNameText
@@ -158,7 +170,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		});
 
 		Manager.getInstance().devices.forEach((device) => {
-			const deviceSetting = new Setting(contentEl).setName(device);
+			const deviceSetting = new Setting(content).setName(device);
 			if (getCurrentlyActiveDevice() === device) {
 				deviceSetting.setDesc('Current Device').addButton((btn) => {
 					btn.setIcon('trash');
@@ -216,8 +228,12 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		this.display();
 	}
 
-	GeneratePluginsList(contentEl: HTMLElement) {
-		contentEl.createEl('h4', { text: 'Plugins' });
+	GeneratePluginsList(parentEl: HTMLElement) {
+		const header = parentEl.createEl('h4', { text: 'Plugins' });
+
+		const content = parentEl.createDiv();
+
+		makeCollapsible(header, content);
 
 		const pluginsAndParentGroups: PluginAndDesc[] =
 			PluginManager.getAllAvailablePlugins().map((plugin) => {
@@ -231,7 +247,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 				};
 			});
 
-		new DescriptionsPluginList(contentEl, {
+		new DescriptionsPluginList(content, {
 			items: pluginsAndParentGroups,
 		});
 	}

@@ -1,6 +1,7 @@
 import { deviceNameKey } from './Constants';
 import { PluginGroup } from '../DataStructures/PluginGroup';
 import Manager from '../Managers/Manager';
+import { setIcon } from 'obsidian';
 
 export function generateGroupID(
 	name: string,
@@ -62,4 +63,49 @@ export function setCurrentlyActiveDevice(device: string | null) {
 
 export function groupFromId(id: string): PluginGroup | undefined {
 	return Manager.getInstance().groupsMap.get(id);
+}
+
+export function makeCollapsible(
+	foldClickElement: HTMLElement,
+	content: HTMLElement,
+	startOpened?: boolean
+) {
+	if (!content.hasClass('pg-collapsible-content')) {
+		content.addClass('pg-collapsible-content');
+	}
+
+	if (!foldClickElement.hasClass('pg-collapsible-header')) {
+		foldClickElement.addClass('pg-collapsible-header');
+	}
+
+	toggleCollapsibleIcon(foldClickElement);
+
+	if (startOpened) {
+		content.addClass('is-active');
+		toggleCollapsibleIcon(foldClickElement);
+	}
+
+	foldClickElement.onclick = () => {
+		content.hasClass('is-active')
+			? content.removeClass('is-active')
+			: content.addClass('is-active');
+
+		toggleCollapsibleIcon(foldClickElement);
+	};
+}
+
+function toggleCollapsibleIcon(parentEl: HTMLElement) {
+	let foldable: HTMLElement | null = parentEl.querySelector(
+		':scope > .pg-collapsible-icon'
+	);
+	if (!foldable) {
+		foldable = parentEl.createSpan({ cls: 'pg-collapsible-icon' });
+	}
+	if (foldable.dataset.togglestate === 'up') {
+		setIcon(foldable, 'chevron-down');
+		foldable.dataset.togglestate = 'down';
+	} else {
+		setIcon(foldable, 'chevron-up');
+		foldable.dataset.togglestate = 'up';
+	}
 }
