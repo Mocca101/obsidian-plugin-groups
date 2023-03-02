@@ -1,15 +1,14 @@
 import { App, Modal, Setting } from 'obsidian';
-import PluginGroupSettings from './PluginGroupSettings';
-import { generateGroupID } from './Utils/Utilities';
-import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
-import { PluginGroup } from './DataStructures/PluginGroup';
-import GroupEditPluginsTab from './GroupEditModal/GroupEditPluginsTab';
-import GroupEditGroupsTab from './GroupEditModal/GroupEditGroupsTab';
-import GroupEditGeneralTab from './GroupEditModal/GroupEditGeneralTab';
-import Manager from './Managers/Manager';
-import CommandManager from './Managers/CommandManager';
-import TabGroupComponent from './Components/BaseComponents/TabGroupComponent';
-import GroupSettings from './Components/Settings/GroupSettings';
+import { generateGroupID } from '../../Utils/Utilities';
+import ConfirmationPopupModal from '../BaseComponents/ConfirmationPopupModal';
+import { PluginGroup } from '../../DataStructures/PluginGroup';
+import GroupEditPluginsTab from '../../GroupEditModal/GroupEditPluginsTab';
+import GroupEditGroupsTab from '../../GroupEditModal/GroupEditGroupsTab';
+import GroupEditGeneralTab from '../../GroupEditModal/GroupEditGeneralTab';
+import Manager from '../../Managers/Manager';
+import CommandManager from '../../Managers/CommandManager';
+import TabGroupComponent from '../BaseComponents/TabGroupComponent';
+import GroupSettings from '../Settings/GroupSettings';
 
 export default class GroupEditModal extends Modal {
 	groupToEdit: PluginGroup;
@@ -80,7 +79,7 @@ export default class GroupEditModal extends Modal {
 	private generateFooter(parentElement: HTMLElement) {
 		const footer = parentElement.createEl('div');
 
-		footer.addClass('group-edit-modal-footer');
+		footer.addClass('pg-edit-modal-footer');
 
 		new Setting(footer)
 			.addButton((btn) => {

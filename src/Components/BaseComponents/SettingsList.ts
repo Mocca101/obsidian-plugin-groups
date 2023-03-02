@@ -23,12 +23,14 @@ export default abstract class SettingsList<
 	}
 
 	protected generateContent() {
-		this.options.items.forEach((item) => {
-			if (!this.mainEl) {
-				return;
-			}
+		if (!this.mainEl) {
+			return;
+		}
 
-			this.generateListItem(this.mainEl, item);
+		const container = this.mainEl;
+
+		this.options.items.forEach((item) => {
+			this.generateListItem(container, item);
 		});
 	}
 

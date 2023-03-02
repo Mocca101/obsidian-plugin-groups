@@ -1,8 +1,11 @@
 import { PluginGroup } from '../DataStructures/PluginGroup';
 
-export interface PgComponent {
-	id: string;
+export interface Named {
 	name: string;
+}
+
+export interface PgComponent extends Named {
+	id: string;
 }
 
 export interface PluginGroupsSettings {

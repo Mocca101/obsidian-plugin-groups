@@ -1,6 +1,7 @@
 import {
 	App,
 	ButtonComponent,
+	ExtraButtonComponent,
 	Notice,
 	PluginSettingTab,
 	Setting,
@@ -15,11 +16,11 @@ import {
 import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
 import Manager from './Managers/Manager';
 import PluginManager from './Managers/PluginManager';
-import DescriptionsPluginList, {
-	PluginAndDesc,
-} from './Components/DescriptionsPluginList';
+import { ItemAndDescription } from './Components/DescriptionsList';
 import GroupSettings from './Components/Settings/GroupSettings';
 import AdvancedSettings from './Components/Settings/AdvancedSettings';
+import EditPluginList from './Components/EditPluginList';
+import { PgPlugin } from './DataStructures/PgPlugin';
 
 export default class PluginGroupSettings extends PluginSettingTab {
 	constructor(app: App, plugin: PgMain) {
@@ -235,20 +236,39 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		makeCollapsible(header, content);
 
-		const pluginsAndParentGroups: PluginAndDesc[] =
-			PluginManager.getAllAvailablePlugins().map((plugin) => {
-				const groups = Manager.getInstance().getGroupsOfPlugin(
-					plugin.id
-				);
+		const refresh = new ExtraButtonComponent(content);
+		refresh.setIcon('refresh-cw');
+		refresh.setTooltip(
+			'Refresh list for changes to the plugins and assigned groups.'
+		);
 
-				return {
-					plugin: plugin,
-					description: groups.map((group) => group.name).join(', '),
-				};
+		const pluginList = new EditPluginList(
+			content,
+			{
+				items: this.getPluginsWithGroupsAsDescription(),
+			},
+			() => {
+				pluginList.update({
+					items: this.getPluginsWithGroupsAsDescription(),
+				});
+			}
+		);
+
+		refresh.onClick(() => {
+			pluginList.update({
+				items: this.getPluginsWithGroupsAsDescription(),
 			});
+		});
+	}
 
-		new DescriptionsPluginList(content, {
-			items: pluginsAndParentGroups,
+	private getPluginsWithGroupsAsDescription(): ItemAndDescription<PgPlugin>[] {
+		return PluginManager.getAllAvailablePlugins().map((plugin) => {
+			const groups = Manager.getInstance().getGroupsOfPlugin(plugin.id);
+
+			return {
+				item: plugin,
+				description: groups.map((group) => group.name).join(', '),
+			};
 		});
 	}
 }

@@ -14,7 +14,7 @@
 	opacity: 0.3;
 }
 
-.group-edit-modal-footer {
+.pg-edit-modal-footer {
 	position: sticky;
 	width: 100%;
 	left: 0;
@@ -246,5 +246,5 @@
 }
 
 :root {
-	--pg-group-edit-modal-footer-height: 60px;
+	--pg-edit-modal-footer-height: 60px;
 }

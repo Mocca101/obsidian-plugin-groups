@@ -3,7 +3,7 @@ import { Setting, TextComponent } from 'obsidian';
 import Manager from '../../Managers/Manager';
 import { generateGroupID, makeCollapsible } from '../../Utils/Utilities';
 import { PluginGroup } from '../../DataStructures/PluginGroup';
-import GroupEditModal from '../../GroupEditModal';
+import GroupEditModal from '../Modals/GroupEditModal';
 
 export interface GroupSettingOptions {
 	collapsible?: boolean;
