@@ -61,6 +61,7 @@ To create a new group head to the plugin settings, Enter a name for the group an
 ### Editing a Group
 
 To edit an existing group, click on the pen icon next to the group name in the plugin settings. From here, you can edit the group the same way you created it.
+Alternatively you can choose which groups a plugin should belong to from the plugins list within the Settings.
 
 ### Enabling/Disabling Groups
 
