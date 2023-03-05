@@ -8,6 +8,7 @@ import GroupEditModal from '../Modals/GroupEditModal';
 export interface GroupSettingOptions {
 	collapsible?: boolean;
 	startOpened?: boolean;
+	maxListHeight?: number;
 }
 
 export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
@@ -61,7 +62,14 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 				addBtnEl.addClass('btn-disabled');
 			});
 
-		this.GenerateGroupList(content);
+		const listContainer = content.createDiv();
+		listContainer.style.overflow = 'scroll';
+		listContainer.style.maxHeight =
+			(this.options.maxListHeight?.toString() ?? '') + 'px';
+
+		console.log(this.options.maxListHeight);
+
+		this.GenerateGroupList(listContainer);
 	}
 
 	protected generateContainer(): void {
