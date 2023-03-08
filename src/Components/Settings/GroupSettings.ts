@@ -67,8 +67,6 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 		listContainer.style.maxHeight =
 			(this.options.maxListHeight?.toString() ?? '') + 'px';
 
-		console.log(this.options.maxListHeight);
-
 		this.GenerateGroupList(listContainer);
 	}
 
