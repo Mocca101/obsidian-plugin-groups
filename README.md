@@ -96,8 +96,10 @@ If you have any questions, feedback, issues or bugs, please don't hesitate to co
 
 Thank you for using Plugin Groups I hope it makes your life easier!
 
-## Help me with the Readme:
+## Help me with the documentation:
 
-Even though I try my best to keep the Readme and documentation up to date, there may be things that I miss, such as spelling mistakes or features that could be explained more clearly. If you notice any of these issues, please let me know. Or, even better, if you are able to fix the mistakes or write clearer explanations, you can create a pull request with your changes. This helps me focus more on development and allows other users to benefit from improved usage documentation!
+Even though I try my best to keep the documentation up to date in the Readme, there may be things that I miss, such as spelling mistakes or features that could be explained more clearly. If you notice any of these issues, please let me know. Or, even better, if you are able to fix the mistakes or write clearer explanations, you can create a pull request with your changes. This helps me focus more on development and allows other users to benefit from improved usage documentation!
 
-If you do end up helping me like that, thank you so much! If you make use of Plugins, put them into the images folder. The theme used is the light version of the obsidian standard theme.
+If you do end up helping me like that, thank you so much! If you make use of Images, put them into the images folder. The theme used is the light version of the obsidian standard theme.
+
+Also if you've got any usages or tips you think might benefit other don't hesitate to create a pullrequest for those as well.
