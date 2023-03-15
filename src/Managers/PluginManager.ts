@@ -141,6 +141,8 @@ export default class PluginManager {
 
 	public static checkPluginEnabled(plugin: PgPlugin): boolean {
 		return (
+			// obsidianPluginsObject.getPlugin(id) would be the preferred method, however it does not work since,
+			// for some reason it won't recognize the admonition plugin as active if it was loaded through obsidian
 			Manager.getInstance().obsidianPluginsObject.enabledPlugins.has(
 				plugin.id
 			) || this.checkPluginEnabledFromPluginGroups(plugin)
