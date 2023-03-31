@@ -1,7 +1,6 @@
 import {
 	App,
 	ButtonComponent,
-	ExtraButtonComponent,
 	Notice,
 	PluginSettingTab,
 	Setting,
@@ -16,11 +15,9 @@ import {
 import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
 import Manager from './Managers/Manager';
 import PluginManager from './Managers/PluginManager';
-import { ItemAndDescription } from './Components/DescriptionsList';
 import GroupSettings from './Components/Settings/GroupSettings';
 import AdvancedSettings from './Components/Settings/AdvancedSettings';
-import EditPluginList from './Components/EditPluginList';
-import { PgPlugin } from './DataStructures/PgPlugin';
+import PluginSettings from './Components/Settings/PluginsSettings';
 
 export default class PluginGroupSettings extends PluginSettingTab {
 	constructor(app: App, plugin: PgMain) {
@@ -43,7 +40,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		this.GenerateDeviceList(containerEl);
 
-		this.GeneratePluginsList(containerEl);
+		new PluginSettings(containerEl, {collapsible: true});
 
 		new AdvancedSettings(containerEl, { collapsible: true });
 	}
@@ -229,46 +226,6 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		this.display();
 	}
 
-	GeneratePluginsList(parentEl: HTMLElement) {
-		const header = parentEl.createEl('h4', { text: 'Plugins' });
 
-		const content = parentEl.createDiv();
 
-		makeCollapsible(header, content);
-
-		const refresh = new ExtraButtonComponent(content);
-		refresh.setIcon('refresh-cw');
-		refresh.setTooltip(
-			'Refresh list for changes to the plugins and assigned groups.'
-		);
-
-		const pluginList = new EditPluginList(
-			content,
-			{
-				items: this.getPluginsWithGroupsAsDescription(),
-			},
-			() => {
-				pluginList.update({
-					items: this.getPluginsWithGroupsAsDescription(),
-				});
-			}
-		);
-
-		refresh.onClick(() => {
-			pluginList.update({
-				items: this.getPluginsWithGroupsAsDescription(),
-			});
-		});
-	}
-
-	private getPluginsWithGroupsAsDescription(): ItemAndDescription<PgPlugin>[] {
-		return PluginManager.getAllAvailablePlugins().map((plugin) => {
-			const groups = Manager.getInstance().getGroupsOfPlugin(plugin.id);
-
-			return {
-				item: plugin,
-				description: groups.map((group) => group.name).join(', '),
-			};
-		});
-	}
 }

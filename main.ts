@@ -1,10 +1,9 @@
-import { ExtraButtonComponent, Notice, Plugin, setIcon } from 'obsidian';
+import { Notice, Plugin } from 'obsidian';
 import PluginGroupSettings from './src/PluginGroupSettings';
 import { disableStartupTimeout } from './src/Utils/Constants';
 import Manager from './src/Managers/Manager';
 import CommandManager from './src/Managers/CommandManager';
 import PluginManager from './src/Managers/PluginManager';
-import GroupSettingsMenu from './src/Components/Modals/GroupSettingsMenu';
 
 export default class PgMain extends Plugin {
 	async onload() {
