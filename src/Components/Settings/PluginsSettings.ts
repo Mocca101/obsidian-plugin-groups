@@ -18,6 +18,13 @@ export interface PluginSettingOptions {
 
 export default class PluginSettings extends HtmlComponent<PluginSettingOptions> {
 
+	private readonly FilterModes = {
+		notInGroup: 'Not in the Group(s)',
+		inGroup: 'In the Groups',
+	};
+
+	activeFilterMode = this.FilterModes.inGroup;
+
   content: HTMLElement;
 
   private filteredPlugins: ItemAndDescription<PgPlugin>[];
@@ -56,14 +63,15 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 			makeCollapsible(header, this.content, this.options.startOpened);
 		}
 
+		this.FilterAndSort();
+
+		this.GenerateFilterSection(this.content);
+
 		const listContainer = this.content.createDiv();
 		listContainer.style.overflow = 'scroll';
 		listContainer.style.maxHeight =
 			(this.options.maxListHeight?.toString() ?? '') + 'px';
 
-		this.FilterAndSort();
-
-		this.createFilterSection(listContainer);
 
 		this.GeneratePluginsList(listContainer);
 	}
@@ -108,7 +116,7 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
   // ------------------------------------------------------------------------
 
-  private createFilterSection(parentEl: HTMLElement): HTMLElement {
+  private GenerateFilterSection(parentEl: HTMLElement): HTMLElement {
 		const filterSection = parentEl.createDiv();
 		new Setting(filterSection).setName('Search').addText((txt) => {
 			txt.setPlaceholder('Search for Plugin...');
@@ -177,7 +185,46 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 			drpIcon: 'filter',
 		});
 
+		// TODO: Add Filter Mode Functionality: "Not In Selected Groups, In selected Groups"
+
+		const sortButton = new DropdownActionButton(filters, {
+			mainLabel: {
+				label: this.activeFilterMode,
+			},
+			dropDownOptions: [
+				{
+					label: this.FilterModes.notInGroup,
+					func: () => {
+						this.onFilterModeChanged(
+							this.FilterModes.notInGroup,
+							sortButton
+						);
+					},
+				},
+				{
+					label: this.FilterModes.inGroup,
+					func: () => {
+						this.onFilterModeChanged(
+							this.FilterModes.inGroup,
+							sortButton
+						);
+					},
+				},
+			],
+			minWidth: '80px',
+			drpIcon: 'sort-desc',
+		});
+
 		return filterSection;
+	}
+
+	private onFilterModeChanged(
+		filterMode: string,
+		sortButton: DropdownActionButton) {
+			this.activeFilterMode = filterMode;
+			sortButton.options.mainLabel.label = filterMode;
+			sortButton.update();
+			this.OnFilterOrSortUpdated();
 	}
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
@@ -208,23 +255,59 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
 	private filterPluginsByGroups(
 		pluginsToFilter: ItemAndDescription<PgPlugin>[],
-		groupsToExclude: Map<string, PluginGroup>
+		filterGroups: Map<string, PluginGroup>
 	): ItemAndDescription<PgPlugin>[] {
-		const pluginMembershipMap =
+		const groupsOfPlugins =
 			Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
 
-		return pluginsToFilter.filter((itemAndDesc) => {
-			if (!pluginMembershipMap.has(itemAndDesc.item.id)) {
-				return true;
-			}
+		if(this.activeFilterMode === this.FilterModes.notInGroup){
+			return this.filterByNotInGroup(pluginsToFilter, groupsOfPlugins, filterGroups);
+		}
 
-			for (const groupId of pluginMembershipMap.get(itemAndDesc.item.id) ?? []) {
-				if (groupsToExclude.has(groupId)) {
+		if(this.activeFilterMode === this.FilterModes.inGroup){
+			return this.filterByInGroup(pluginsToFilter, groupsOfPlugins, filterGroups);
+		}
+
+		return pluginsToFilter;
+	}
+
+
+	private filterByInGroup(
+			pluginsToFilter: ItemAndDescription<PgPlugin>[],
+			groupsOfPlugins: Map<string, Set<string>>,
+			groupsToFilter: Map<string, PluginGroup>) {
+
+		let filteredPlugins: ItemAndDescription<PgPlugin>[] = pluginsToFilter;
+		filteredPlugins = filteredPlugins.filter(element => {
+			return groupsOfPlugins.has(element.item.id);
+		}
+		).filter(element => {
+			const groupsOfPlugin = groupsOfPlugins.get(element.item.id);
+			for(const groupToFilter of groupsToFilter.keys()){
+				if(!groupsOfPlugin?.has(groupToFilter)){
 					return false;
 				}
 			}
 			return true;
 		});
+		return filteredPlugins;
+	}
+
+	private filterByNotInGroup(pluginsToFilter: ItemAndDescription<PgPlugin>[], groupsOfPlugins: Map<string, Set<string>>, groupsToFilter: Map<string, PluginGroup>) {
+		const filteredPlugins: ItemAndDescription<PgPlugin>[] = pluginsToFilter.filter(element => {
+			if(!groupsOfPlugins.has(element.item.id)) {
+				return true;
+			}
+
+			for (const groupOfPlugin of groupsOfPlugins.get(element.item.id) ?? []) {
+				if(groupsToFilter.has(groupOfPlugin)){
+					return false;
+				}
+			}
+
+			return true;
+		});
+		return filteredPlugins;
 	}
 
 	private searchPlugins(search: string) {
