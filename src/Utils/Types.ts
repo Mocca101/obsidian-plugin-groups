@@ -11,7 +11,7 @@ export interface PgComponent extends Named {
 export interface PluginGroupsSettings {
 	groupsMap: Map<string, PluginGroup>;
 	generateCommands: boolean;
-	showNoticeOnGroupLoad: string;
+	showNoticeOnGroupLoad: 'none' | 'short' | 'normal';
 	devices: string[];
 	devLogs: boolean;
 	doLoadSynchronously: boolean;
@@ -21,7 +21,7 @@ export interface PluginGroupsSettings {
 export interface PersistentSettings {
 	groups: PluginGroup[];
 	generateCommands: boolean;
-	showNoticeOnGroupLoad: string;
+	showNoticeOnGroupLoad: 'none' | 'short' | 'normal';
 	devices: string[];
 	devLogs: boolean;
 	doLoadSynchronously: boolean;

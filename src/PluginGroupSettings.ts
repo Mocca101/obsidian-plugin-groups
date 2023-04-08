@@ -40,7 +40,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		this.GenerateDeviceList(containerEl);
 
-		new PluginSettings(containerEl, {collapsible: true});
+		new PluginSettings(containerEl, { collapsible: true });
 
 		new AdvancedSettings(containerEl, { collapsible: true });
 	}
@@ -77,7 +77,20 @@ export default class PluginGroupSettings extends PluginSettingTab {
 					Manager.getInstance().showNoticeOnGroupLoad ?? 'none'
 				);
 				drp.onChange(async (value) => {
-					Manager.getInstance().showNoticeOnGroupLoad = value;
+					switch (value) {
+						case 'normal':
+							Manager.getInstance().showNoticeOnGroupLoad =
+								'normal';
+							break;
+						case 'short':
+							Manager.getInstance().showNoticeOnGroupLoad =
+								'short';
+							break;
+						default:
+							Manager.getInstance().showNoticeOnGroupLoad =
+								'none';
+							break;
+					}
 					await Manager.getInstance().saveSettings();
 				});
 			});
@@ -225,7 +238,4 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		setCurrentlyActiveDevice(null);
 		this.display();
 	}
-
-
-
 }

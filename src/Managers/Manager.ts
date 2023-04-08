@@ -177,11 +177,11 @@ export default class Manager {
 		this.settings.generateCommands = val;
 	}
 
-	get showNoticeOnGroupLoad(): string {
+	get showNoticeOnGroupLoad(): 'none' | 'short' | 'normal' {
 		return this.settings.showNoticeOnGroupLoad;
 	}
 
-	set showNoticeOnGroupLoad(val: string) {
+	set showNoticeOnGroupLoad(val: 'none' | 'short' | 'normal') {
 		this.settings.showNoticeOnGroupLoad = val;
 	}
 
