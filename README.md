@@ -24,6 +24,7 @@ E.g.:
 Sometimes the pane will automatically reload, however this will only happen after the plugin has loaded that is the case for e.g.:
 
 -   [Kanban](https://github.com/mgmeyers/obsidian-kanban)
+-   [Outliner](https://github.com/vslinko/obsidian-outliner)
 
 _If you notice a plugin that has issues with delayed loading, please let me know or open a PR with the Plugin added to the list in this README.md_
 
