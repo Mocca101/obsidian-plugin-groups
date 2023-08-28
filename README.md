@@ -1,3 +1,5 @@
+⚠️ I'm currently unable to actively continue development. In the mean time check out **1C0D**'s amazing [Quick Plugin Switcher](https://github.com/1C0D/obsidian-quick-plugin-switcher) plugin that offers similar as well as some additional functionalities! ⚠️
+
 # Plugin Groups for Obsidian
 
 A plugin that allows you to easily group and manage your other plugins in Obsidian.
