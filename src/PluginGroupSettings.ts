@@ -1,23 +1,23 @@
 import {
-	App,
-	ButtonComponent,
+	type App,
+	type ButtonComponent,
 	Notice,
 	PluginSettingTab,
 	Setting,
 	TextComponent,
 } from 'obsidian';
-import PgMain from '../main';
+import type PgMain from '@/main';
 import {
 	getCurrentlyActiveDevice,
 	makeCollapsible,
 	setCurrentlyActiveDevice,
-} from './Utils/Utilities';
-import ConfirmationPopupModal from './Components/BaseComponents/ConfirmationPopupModal';
-import Manager from './Managers/Manager';
-import PluginManager from './Managers/PluginManager';
-import GroupSettings from './Components/Settings/GroupSettings';
-import AdvancedSettings from './Components/Settings/AdvancedSettings';
-import PluginSettings from './Components/Settings/PluginsSettings';
+} from '@/Utils/Utilities';
+import ConfirmationPopupModal from '@/Components/BaseComponents/ConfirmationPopupModal';
+import Manager from '@/Managers/Manager';
+import PluginManager from '@/Managers/PluginManager';
+import GroupSettings from '@/Components/Settings/GroupSettings';
+import AdvancedSettings from '@/Components/Settings/AdvancedSettings';
+import PluginSettings from '@/Components/Settings/PluginsSettings';
 
 export default class PluginGroupSettings extends PluginSettingTab {
 	constructor(app: App, plugin: PgMain) {

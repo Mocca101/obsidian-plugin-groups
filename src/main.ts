@@ -1,9 +1,9 @@
 import { Notice, Plugin } from 'obsidian';
-import PluginGroupSettings from './src/PluginGroupSettings';
-import { disableStartupTimeout } from './src/Utils/Constants';
-import Manager from './src/Managers/Manager';
-import CommandManager from './src/Managers/CommandManager';
-import PluginManager from './src/Managers/PluginManager';
+import PluginGroupSettings from './PluginGroupSettings';
+import { disableStartupTimeout } from './Utils/Constants';
+import Manager from './Managers/Manager';
+import CommandManager from './Managers/CommandManager';
+import PluginManager from './Managers/PluginManager';
 
 export default class PgMain extends Plugin {
 	async onload() {

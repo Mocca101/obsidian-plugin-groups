@@ -1,9 +1,9 @@
-import { PersistentSettings, PluginGroupsSettings } from '../Utils/Types';
-import PgMain from '../../main';
-import { PluginGroup } from '../DataStructures/PluginGroup';
-import { pluginId } from '../Utils/Constants';
+import type { PersistentSettings, PluginGroupsSettings } from '@/Utils/Types';
+import type PgMain from '@/main';
+import { PluginGroup } from '@/DataStructures/PluginGroup';
+import { pluginId } from '@/Utils/Constants';
 import { setIcon } from 'obsidian';
-import GroupSettingsMenu from '../Components/Modals/GroupSettingsMenu';
+import GroupSettingsMenu from '@/Components/Modals/GroupSettingsMenu';
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),

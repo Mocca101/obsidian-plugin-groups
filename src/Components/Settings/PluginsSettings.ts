@@ -1,14 +1,14 @@
-import { makeCollapsible } from "src/Utils/Utilities";
-import HtmlComponent from "../BaseComponents/HtmlComponent";
+import { makeCollapsible } from "@/Utils/Utilities";
+import HtmlComponent from "@/Components/BaseComponents/HtmlComponent";
 import { ExtraButtonComponent, Setting } from "obsidian";
-import EditPluginList from "../EditPluginList";
-import { PgPlugin } from "src/DataStructures/PgPlugin";
-import Manager from "src/Managers/Manager";
-import PluginManager from "src/Managers/PluginManager";
-import { ItemAndDescription } from "../DescriptionsList";
-import { PluginGroup } from "src/DataStructures/PluginGroup";
-import DropdownActionButton, { DropdownOption } from "../BaseComponents/DropdownActionButton";
-import FilteredGroupsList from "../FilteredGroupsList";
+import EditPluginList from "@/Components/EditPluginList";
+import type { PgPlugin } from "@/DataStructures/PgPlugin";
+import Manager from "@/Managers/Manager";
+import PluginManager from "@/Managers/PluginManager";
+import type { ItemAndDescription } from "@/Components/DescriptionsList";
+import type { PluginGroup } from "@/DataStructures/PluginGroup";
+import DropdownActionButton, { type DropdownOption } from "@/Components//BaseComponents/DropdownActionButton";
+import FilteredGroupsList from "@/Components/FilteredGroupsList";
 
 export interface PluginSettingOptions {
 	collapsible?: boolean;
