@@ -15,8 +15,8 @@ A plugin that allows you to easily group and manage your other plugins in Obsidi
 
 Some plugins don't work with delayed loading, as they need to load before the workspace is loaded. In the future, I hope it will be possible to load those delayed as well. Until then here's a list of plugins that don't work with delayed loading:
 
--	[Pane Relief](https://github.com/pjeby/pane-relief)
--	[Hidden Folder](https://github.com/ptrsvltns/hidden-folder-obsidian)
+-   [Pane Relief](https://github.com/pjeby/pane-relief)
+-   [Hidden Folder](https://github.com/ptrsvltns/hidden-folder-obsidian)
 
 Some plugins will also have minor issues (proper view not loading). This can be resolved by closing and reopening the affected pane.
 E.g.:
