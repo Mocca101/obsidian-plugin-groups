@@ -1,14 +1,14 @@
-import { App, Modal, Setting } from 'obsidian';
-import { generateGroupID } from '../../Utils/Utilities';
-import ConfirmationPopupModal from '../BaseComponents/ConfirmationPopupModal';
-import { PluginGroup } from '../../DataStructures/PluginGroup';
-import GroupEditPluginsTab from '../../GroupEditModal/GroupEditPluginsTab';
-import GroupEditGroupsTab from '../../GroupEditModal/GroupEditGroupsTab';
-import GroupEditGeneralTab from '../../GroupEditModal/GroupEditGeneralTab';
-import Manager from '../../Managers/Manager';
-import CommandManager from '../../Managers/CommandManager';
-import TabGroupComponent from '../BaseComponents/TabGroupComponent';
-import GroupSettings from '../Settings/GroupSettings';
+import { type App, Modal, Setting } from "obsidian";
+import { PluginGroup } from "../../DataStructures/PluginGroup";
+import GroupEditGeneralTab from "../../GroupEditModal/GroupEditGeneralTab";
+import GroupEditGroupsTab from "../../GroupEditModal/GroupEditGroupsTab";
+import GroupEditPluginsTab from "../../GroupEditModal/GroupEditPluginsTab";
+import CommandManager from "../../Managers/CommandManager";
+import Manager from "../../Managers/Manager";
+import { generateGroupID } from "../../Utils/Utilities";
+import ConfirmationPopupModal from "../BaseComponents/ConfirmationPopupModal";
+import TabGroupComponent from "../BaseComponents/TabGroupComponent";
+import type GroupSettings from "../Settings/GroupSettings";
 
 export default class GroupEditModal extends Modal {
 	groupToEdit: PluginGroup;
@@ -37,36 +37,30 @@ export default class GroupEditModal extends Modal {
 				txt.setValue(this.groupToEdit.name);
 				txt.onChange((val) => {
 					this.groupToEdit.name = val;
-					nameSettingNameEl.setText(
-						'Editing "' + this.groupToEdit.name + '"'
-					);
+					nameSettingNameEl.setText(`Editing "${this.groupToEdit.name}"`);
 				});
 			})
-			.nameEl.createEl('h2', {
-				text: 'Editing "' + this.groupToEdit.name + '"',
+			.nameEl.createEl("h2", {
+				text: `Editing "${this.groupToEdit.name}"`,
 			});
 
 		const tabGroup: TabGroupComponent = new TabGroupComponent(modalEl, {
 			tabs: [
 				{
-					title: 'General',
-					content: new GroupEditGeneralTab(
-						this.groupToEdit,
-						contentEl
-					).containerEl,
+					title: "General",
+					content: new GroupEditGeneralTab(this.groupToEdit, contentEl)
+						.containerEl,
 				},
 				{
-					title: 'Plugins',
+					title: "Plugins",
 					content:
 						new GroupEditPluginsTab(contentEl, {
 							group: this.groupToEdit,
 						}).mainEl ??
-						modalEl.createSpan(
-							'Plugins Not Loaded, please contact Dev.'
-						),
+						modalEl.createSpan("Plugins Not Loaded, please contact Dev."),
 				},
 				{
-					title: 'Groups',
+					title: "Groups",
 					content: new GroupEditGroupsTab(this.groupToEdit, contentEl)
 						.containerEl,
 				},
@@ -77,37 +71,38 @@ export default class GroupEditModal extends Modal {
 	}
 
 	private generateFooter(parentElement: HTMLElement) {
-		const footer = parentElement.createEl('div');
+		const footer = parentElement.createEl("div");
 
-		footer.addClass('pg-edit-modal-footer');
+		footer.addClass("pg-edit-modal-footer");
 
 		new Setting(footer)
 			.addButton((btn) => {
-				btn.setButtonText('Delete');
+				btn.setButtonText("Delete");
 				btn.onClick(() =>
 					new ConfirmationPopupModal(
 						this.app,
-						'You are about to delete: ' + this.groupToEdit.name,
+						`You are about to delete: ${this.groupToEdit.name}`,
 						void 0,
-						'Delete',
+						"Delete",
 						() => this.deleteGroup()
 					).open()
 				);
 			})
 			.addButton((btn) => {
-				btn.setButtonText('Cancel');
+				btn.setButtonText("Cancel");
 				btn.onClick(() => this.close());
 			})
 			.addButton((btn) => {
-				btn.setButtonText('Save');
+				btn.setButtonText("Save");
 				btn.onClick(() => this.saveChanges());
 			})
 			.addExtraButton((btn) => {
-				btn.setIcon('copy')
-					.setTooltip('Duplicate this group')
+				btn
+					.setIcon("copy")
+					.setTooltip("Duplicate this group")
 					.onClick(() => this.duplicate());
 			})
-			.settingEl.addClass('modal-footer');
+			.settingEl.addClass("modal-footer");
 	}
 
 	onClose() {
@@ -138,7 +133,7 @@ export default class GroupEditModal extends Modal {
 		if (!groupMap) {
 			return;
 		}
-		duplicateGroup.name += '-Duplicate';
+		duplicateGroup.name += "-Duplicate";
 		const genId = generateGroupID(duplicateGroup.name);
 
 		if (!genId) {

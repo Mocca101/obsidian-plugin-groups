@@ -1,8 +1,8 @@
-import { PluginGroup } from '../DataStructures/PluginGroup';
-import { Setting } from 'obsidian';
-import DeviceSelectionModal from '../Components/DeviceSelectionModal';
-import { disableStartupTimeout } from '../Utils/Constants';
-import Manager from '../Managers/Manager';
+import { Setting } from "obsidian";
+import DeviceSelectionModal from "../Components/DeviceSelectionModal";
+import type { PluginGroup } from "../DataStructures/PluginGroup";
+import Manager from "../Managers/Manager";
+import { disableStartupTimeout } from "../Utils/Constants";
 
 export default class GroupEditGeneralTab {
 	containerEl: HTMLElement;
@@ -15,44 +15,37 @@ export default class GroupEditGeneralTab {
 		this.containerEl = this.generateGeneralSettingsSection(parentEl);
 	}
 
-	private generateGeneralSettingsSection(
-		contentEl: HTMLElement
-	): HTMLElement {
+	private generateGeneralSettingsSection(contentEl: HTMLElement): HTMLElement {
 		const generalSettingsSection = contentEl.createDiv();
 
-		generalSettingsSection.createEl('h5', { text: 'General' });
+		generalSettingsSection.createEl("h5", { text: "General" });
 
 		new Setting(generalSettingsSection)
-			.setName('Commands')
-			.setDesc('Add Commands to enable/disable this group')
+			.setName("Commands")
+			.setDesc("Add Commands to enable/disable this group")
 			.addToggle((tgl) => {
 				tgl.setValue(this.groupToEdit.generateCommands);
-				tgl.onChange(
-					(value) => (this.groupToEdit.generateCommands = value)
-				);
+				tgl.onChange((value) => (this.groupToEdit.generateCommands = value));
 			});
 
 		new Setting(generalSettingsSection)
-			.setName('Auto Add')
-			.setDesc('Automatically add new Plugins to this group')
+			.setName("Auto Add")
+			.setDesc("Automatically add new Plugins to this group")
 			.addToggle((tgl) => {
 				tgl.setValue(this.groupToEdit.autoAdd ?? false);
 				tgl.onChange((value) => (this.groupToEdit.autoAdd = value));
 			});
 
 		const devicesSetting = new Setting(generalSettingsSection)
-			.setName('Devices')
+			.setName("Devices")
 			.setDesc(this.getDevicesDescription())
 			.addButton((btn) => {
-				btn.setIcon('pencil').onClick(() => {
+				btn.setIcon("pencil").onClick(() => {
 					new DeviceSelectionModal(
 						app,
 						(evt: CustomEvent) => {
-							this.groupToEdit.assignedDevices =
-								evt.detail.devices;
-							devicesSetting.setDesc(
-								this.getDevicesDescription()
-							);
+							this.groupToEdit.assignedDevices = evt.detail.devices;
+							devicesSetting.setDesc(this.getDevicesDescription());
 						},
 						this.groupToEdit.assignedDevices
 					).open();
@@ -65,38 +58,31 @@ export default class GroupEditGeneralTab {
 	}
 
 	getDevicesDescription() {
-		let description = 'Active on All devices';
+		let description = "Active on All devices";
 
 		if (!this.groupToEdit.assignedDevices) {
 			return description;
 		}
-		const arr: string[] = this.groupToEdit.assignedDevices.filter(
-			(device) => Manager.getInstance().devices.contains(device)
+		const arr: string[] = this.groupToEdit.assignedDevices.filter((device) =>
+			Manager.getInstance().devices.contains(device)
 		);
 		if (arr?.length > 0) {
-			description =
-				'Active on: ' +
-				arr.reduce((acc, curr, i, arr) => {
-					if (i < 3) {
-						return acc + ', ' + curr;
-					} else if (i === arr.length - 1) {
-						return (
-							acc +
-							', ... and ' +
-							(i - 2) +
-							' other' +
-							(i - 2 > 1 ? 's' : '')
-						);
-					}
-					return acc;
-				});
+			description = `Active on: ${arr.reduce((acc, curr, i, arr) => {
+				if (i < 3) {
+					return `${acc}, ${curr}`;
+				}
+				if (i === arr.length - 1) {
+					return `${acc}, ... and ${i - 2} other${i - 2 > 1 ? "s" : ""}`;
+				}
+				return acc;
+			})}`;
 		}
 		return description;
 	}
 
 	private GenerateStartupSettings(contentEl: HTMLElement) {
-		const startupParent = contentEl.createEl('div');
-		startupParent.createEl('h6', { text: 'Startup' });
+		const startupParent = contentEl.createEl("div");
+		startupParent.createEl("h6", { text: "Startup" });
 
 		// eslint-disable-next-line prefer-const
 		let delaySetting: Setting;
@@ -118,16 +104,14 @@ export default class GroupEditGeneralTab {
 		};
 
 		new Setting(startupParent)
-			.setName('Load on Startup')
+			.setName("Load on Startup")
 			.addDropdown((drp) => {
 				behaviourElement = drp.selectEl;
-				drp.addOption('enable', 'Enable');
-				drp.addOption('disable', 'Disable');
-				drp.setValue(
-					this.groupToEdit.disableOnStartup ? 'disable' : 'enable'
-				);
+				drp.addOption("enable", "Enable");
+				drp.addOption("disable", "Disable");
+				drp.setValue(this.groupToEdit.disableOnStartup ? "disable" : "enable");
 				drp.onChange((value) => {
-					value === 'disable'
+					value === "disable"
 						? (this.groupToEdit.disableOnStartup = true)
 						: (this.groupToEdit.disableOnStartup = false);
 				});
@@ -141,7 +125,7 @@ export default class GroupEditGeneralTab {
 			});
 
 		delaySetting = new Setting(startupParent)
-			.setName('Delay')
+			.setName("Delay")
 			.addSlider((slider) => {
 				slider.setValue(this.groupToEdit.delay);
 				slider.setLimits(0, disableStartupTimeout / 1000, 1);

@@ -1,14 +1,16 @@
-import { makeCollapsible } from "@/Utils/Utilities";
+import DropdownActionButton, {
+	type DropdownOption,
+} from "@/Components//BaseComponents/DropdownActionButton";
 import HtmlComponent from "@/Components/BaseComponents/HtmlComponent";
-import { ExtraButtonComponent, Setting } from "obsidian";
+import type { ItemAndDescription } from "@/Components/DescriptionsList";
 import EditPluginList from "@/Components/EditPluginList";
+import FilteredGroupsList from "@/Components/FilteredGroupsList";
 import type { PgPlugin } from "@/DataStructures/PgPlugin";
+import type { PluginGroup } from "@/DataStructures/PluginGroup";
 import Manager from "@/Managers/Manager";
 import PluginManager from "@/Managers/PluginManager";
-import type { ItemAndDescription } from "@/Components/DescriptionsList";
-import type { PluginGroup } from "@/DataStructures/PluginGroup";
-import DropdownActionButton, { type DropdownOption } from "@/Components//BaseComponents/DropdownActionButton";
-import FilteredGroupsList from "@/Components/FilteredGroupsList";
+import { makeCollapsible } from "@/Utils/Utilities";
+import { ExtraButtonComponent, Setting } from "obsidian";
 
 export interface PluginSettingOptions {
 	collapsible?: boolean;
@@ -17,43 +19,41 @@ export interface PluginSettingOptions {
 }
 
 export default class PluginSettings extends HtmlComponent<PluginSettingOptions> {
-
 	private readonly FilterModes = {
-		notInGroup: 'Not in the Group(s)',
-		inGroup: 'In the Groups',
+		notInGroup: "Not in the Group(s)",
+		inGroup: "In the Groups",
 	};
 
 	activeFilterMode = this.FilterModes.inGroup;
 
-  content: HTMLElement;
+	content: HTMLElement;
 
-  private filteredPlugins: ItemAndDescription<PgPlugin>[];
+	private filteredPlugins: ItemAndDescription<PgPlugin>[];
 
 	searchTerm: string;
 
-  private pluginsList: EditPluginList;
+	private pluginsList: EditPluginList;
 
 	private filteredGroups: Map<string, PluginGroup> = new Map<
 		string,
 		PluginGroup
 	>();
 
-
 	constructor(parentEL: HTMLElement, options: PluginSettingOptions) {
 		super(parentEL, options);
 		this.generateComponent();
 	}
 
-  protected generateContainer(): void {
+	protected generateContainer(): void {
 		this.mainEl = this.parentEl.createDiv();
 	}
 
-  protected generateContent(): void {
+	protected generateContent(): void {
 		if (!this.mainEl) {
 			return;
 		}
 
-    const header = this.mainEl.createEl('h5', { text: 'Plugins' });
+		const header = this.mainEl.createEl("h5", { text: "Plugins" });
 
 		this.content = this.mainEl.createDiv();
 
@@ -68,20 +68,19 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 		this.GenerateFilterSection(this.content);
 
 		const listContainer = this.content.createDiv();
-		listContainer.style.overflow = 'scroll';
-		listContainer.style.maxHeight =
-			(this.options.maxListHeight?.toString() ?? '') + 'px';
-
+		listContainer.style.overflow = "scroll";
+		listContainer.style.maxHeight = `${
+			this.options.maxListHeight?.toString() ?? ""
+		}px`;
 
 		this.GeneratePluginsList(listContainer);
 	}
 
-  GeneratePluginsList(parentEl: HTMLElement) {
-
+	GeneratePluginsList(parentEl: HTMLElement) {
 		const refresh = new ExtraButtonComponent(this.content);
-		refresh.setIcon('refresh-cw');
+		refresh.setIcon("refresh-cw");
 		refresh.setTooltip(
-			'Refresh list for changes to the plugins and assigned groups.'
+			"Refresh list for changes to the plugins and assigned groups."
 		);
 
 		this.pluginsList = new EditPluginList(
@@ -109,27 +108,27 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
 			return {
 				item: plugin,
-				description: groups.map((group) => group.name).join(', '),
+				description: groups.map((group) => group.name).join(", "),
 			};
 		});
 	}
 
-  // ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 
-  private GenerateFilterSection(parentEl: HTMLElement): HTMLElement {
+	private GenerateFilterSection(parentEl: HTMLElement): HTMLElement {
 		const filterSection = parentEl.createDiv();
-		new Setting(filterSection).setName('Search').addText((txt) => {
-			txt.setPlaceholder('Search for Plugin...');
+		new Setting(filterSection).setName("Search").addText((txt) => {
+			txt.setPlaceholder("Search for Plugin...");
 			txt.onChange((search) => {
 				this.searchPlugins(search);
 			});
 		});
 
 		const filtersAndSelectionContainer = filterSection.createDiv({
-			cls: 'pg-plugin-filter-container',
+			cls: "pg-plugin-filter-container",
 		});
 		const filtersAndSelection = filtersAndSelectionContainer.createDiv({
-			cls: 'pg-plugin-filter-section',
+			cls: "pg-plugin-filter-section",
 		});
 		const filters = filtersAndSelection.createDiv();
 
@@ -151,17 +150,14 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
 		const groupFilterOptions: DropdownOption[] = [
 			{
-				label: 'All groups',
+				label: "All groups",
 				func: () => {
 					if (
-						this.filteredGroups.size ===
-						Manager.getInstance().groupsMap.size
+						this.filteredGroups.size === Manager.getInstance().groupsMap.size
 					) {
 						this.filteredGroups.clear();
 					} else {
-						this.filteredGroups = new Map(
-							Manager.getInstance().groupsMap
-						);
+						this.filteredGroups = new Map(Manager.getInstance().groupsMap);
 					}
 					updateGroupFilters();
 				},
@@ -179,10 +175,10 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
 		new DropdownActionButton(filters, {
 			mainLabel: {
-				label: 'Filter Groups',
+				label: "Filter Groups",
 			},
 			dropDownOptions: groupFilterOptions,
-			drpIcon: 'filter',
+			drpIcon: "filter",
 		});
 
 		// TODO: Add Filter Mode Functionality: "Not In Selected Groups, In selected Groups"
@@ -195,24 +191,18 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 				{
 					label: this.FilterModes.notInGroup,
 					func: () => {
-						this.onFilterModeChanged(
-							this.FilterModes.notInGroup,
-							sortButton
-						);
+						this.onFilterModeChanged(this.FilterModes.notInGroup, sortButton);
 					},
 				},
 				{
 					label: this.FilterModes.inGroup,
 					func: () => {
-						this.onFilterModeChanged(
-							this.FilterModes.inGroup,
-							sortButton
-						);
+						this.onFilterModeChanged(this.FilterModes.inGroup, sortButton);
 					},
 				},
 			],
-			minWidth: '80px',
-			drpIcon: 'sort-desc',
+			minWidth: "80px",
+			drpIcon: "sort-desc",
 		});
 
 		return filterSection;
@@ -220,11 +210,12 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
 	private onFilterModeChanged(
 		filterMode: string,
-		sortButton: DropdownActionButton) {
-			this.activeFilterMode = filterMode;
-			sortButton.options.mainLabel.label = filterMode;
-			sortButton.update();
-			this.OnFilterOrSortUpdated();
+		sortButton: DropdownActionButton
+	) {
+		this.activeFilterMode = filterMode;
+		sortButton.options.mainLabel.label = filterMode;
+		sortButton.update();
+		this.OnFilterOrSortUpdated();
 	}
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
@@ -236,8 +227,9 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 
 	private FilterAndSort() {
 		this.filteredPlugins = this.getPluginsWithGroupsAsDescription();
-		if (this.searchTerm && this.searchTerm !== '') {
-			this.filteredPlugins = this.filteredPlugins.filter((p) => p.item.name.toLowerCase().contains(this.searchTerm.toLowerCase())
+		if (this.searchTerm && this.searchTerm !== "") {
+			this.filteredPlugins = this.filteredPlugins.filter((p) =>
+				p.item.name.toLowerCase().contains(this.searchTerm.toLowerCase())
 			);
 		}
 
@@ -248,9 +240,7 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 			);
 		}
 
-		this.filteredPlugins = this.sortPlugins(
-			this.filteredPlugins
-		);
+		this.filteredPlugins = this.sortPlugins(this.filteredPlugins);
 	}
 
 	private filterPluginsByGroups(
@@ -260,53 +250,67 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 		const groupsOfPlugins =
 			Manager.getInstance().mapOfPluginsDirectlyConnectedGroups;
 
-		if(this.activeFilterMode === this.FilterModes.notInGroup){
-			return this.filterByNotInGroup(pluginsToFilter, groupsOfPlugins, filterGroups);
+		if (this.activeFilterMode === this.FilterModes.notInGroup) {
+			return this.filterByNotInGroup(
+				pluginsToFilter,
+				groupsOfPlugins,
+				filterGroups
+			);
 		}
 
-		if(this.activeFilterMode === this.FilterModes.inGroup){
-			return this.filterByInGroup(pluginsToFilter, groupsOfPlugins, filterGroups);
+		if (this.activeFilterMode === this.FilterModes.inGroup) {
+			return this.filterByInGroup(
+				pluginsToFilter,
+				groupsOfPlugins,
+				filterGroups
+			);
 		}
 
 		return pluginsToFilter;
 	}
 
-
 	private filterByInGroup(
-			pluginsToFilter: ItemAndDescription<PgPlugin>[],
-			groupsOfPlugins: Map<string, Set<string>>,
-			groupsToFilter: Map<string, PluginGroup>) {
-
+		pluginsToFilter: ItemAndDescription<PgPlugin>[],
+		groupsOfPlugins: Map<string, Set<string>>,
+		groupsToFilter: Map<string, PluginGroup>
+	) {
 		let filteredPlugins: ItemAndDescription<PgPlugin>[] = pluginsToFilter;
-		filteredPlugins = filteredPlugins.filter(element => {
-			return groupsOfPlugins.has(element.item.id);
-		}
-		).filter(element => {
-			const groupsOfPlugin = groupsOfPlugins.get(element.item.id);
-			for(const groupToFilter of groupsToFilter.keys()){
-				if(!groupsOfPlugin?.has(groupToFilter)){
-					return false;
+		filteredPlugins = filteredPlugins
+			.filter((element) => {
+				return groupsOfPlugins.has(element.item.id);
+			})
+			.filter((element) => {
+				const groupsOfPlugin = groupsOfPlugins.get(element.item.id);
+				for (const groupToFilter of groupsToFilter.keys()) {
+					if (!groupsOfPlugin?.has(groupToFilter)) {
+						return false;
+					}
 				}
-			}
-			return true;
-		});
+				return true;
+			});
 		return filteredPlugins;
 	}
 
-	private filterByNotInGroup(pluginsToFilter: ItemAndDescription<PgPlugin>[], groupsOfPlugins: Map<string, Set<string>>, groupsToFilter: Map<string, PluginGroup>) {
-		const filteredPlugins: ItemAndDescription<PgPlugin>[] = pluginsToFilter.filter(element => {
-			if(!groupsOfPlugins.has(element.item.id)) {
-				return true;
-			}
-
-			for (const groupOfPlugin of groupsOfPlugins.get(element.item.id) ?? []) {
-				if(groupsToFilter.has(groupOfPlugin)){
-					return false;
+	private filterByNotInGroup(
+		pluginsToFilter: ItemAndDescription<PgPlugin>[],
+		groupsOfPlugins: Map<string, Set<string>>,
+		groupsToFilter: Map<string, PluginGroup>
+	) {
+		const filteredPlugins: ItemAndDescription<PgPlugin>[] =
+			pluginsToFilter.filter((element) => {
+				if (!groupsOfPlugins.has(element.item.id)) {
+					return true;
 				}
-			}
 
-			return true;
-		});
+				for (const groupOfPlugin of groupsOfPlugins.get(element.item.id) ??
+					[]) {
+					if (groupsToFilter.has(groupOfPlugin)) {
+						return false;
+					}
+				}
+
+				return true;
+			});
 		return filteredPlugins;
 	}
 
@@ -317,11 +321,13 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 	}
 
 	private showFilteredPlugins() {
-		this.pluginsList.update({ items: this.filteredPlugins});
+		this.pluginsList.update({ items: this.filteredPlugins });
 	}
 
-  sortPlugins(plugins: ItemAndDescription<PgPlugin>[]): ItemAndDescription<PgPlugin>[] {
-		if (!plugins || !(typeof plugins[Symbol.iterator] === 'function')) {
+	sortPlugins(
+		plugins: ItemAndDescription<PgPlugin>[]
+	): ItemAndDescription<PgPlugin>[] {
+		if (!plugins || !(typeof plugins[Symbol.iterator] === "function")) {
 			return [];
 		}
 		const sortedArray = [...plugins];

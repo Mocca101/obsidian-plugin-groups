@@ -1,13 +1,13 @@
-import { PgComponent } from '../Utils/Types';
-import { PgPlugin } from './PgPlugin';
-import { Notice } from 'obsidian';
+import { Notice } from "obsidian";
+import Manager from "../Managers/Manager";
+import PluginManager from "../Managers/PluginManager";
+import type { PgComponent } from "../Utils/Types";
 import {
 	devLog,
 	getCurrentlyActiveDevice,
 	groupFromId,
-} from '../Utils/Utilities';
-import Manager from '../Managers/Manager';
-import PluginManager from '../Managers/PluginManager';
+} from "../Utils/Utilities";
+import type { PgPlugin } from "./PgPlugin";
 
 export class PluginGroup implements PluginGroupData {
 	id: string;
@@ -97,14 +97,12 @@ export class PluginGroup implements PluginGroupData {
 			await groupFromId(groupId)?.enable();
 		}
 		if (Manager.getInstance().showNoticeOnGroupLoad) {
-			const messageString: string = 'Loaded ' + this.name;
+			const messageString: string = `Loaded ${this.name}`;
 
-			if (Manager.getInstance().showNoticeOnGroupLoad === 'short') {
+			if (Manager.getInstance().showNoticeOnGroupLoad === "short") {
 				new Notice(messageString);
-			} else if (
-				Manager.getInstance().showNoticeOnGroupLoad === 'normal'
-			) {
-				new Notice(messageString + '\n' + this.getGroupListString());
+			} else if (Manager.getInstance().showNoticeOnGroupLoad === "normal") {
+				new Notice(`${messageString}\n${this.getGroupListString()}`);
 			}
 		}
 	}
@@ -122,15 +120,13 @@ export class PluginGroup implements PluginGroupData {
 			groupFromId(groupId)?.disable();
 		});
 
-		if (Manager.getInstance().showNoticeOnGroupLoad !== 'none') {
-			const messageString: string = 'Disabled ' + this.name;
+		if (Manager.getInstance().showNoticeOnGroupLoad !== "none") {
+			const messageString: string = `Disabled ${this.name}`;
 
-			if (Manager.getInstance().showNoticeOnGroupLoad === 'short') {
+			if (Manager.getInstance().showNoticeOnGroupLoad === "short") {
 				new Notice(messageString);
-			} else if (
-				Manager.getInstance().showNoticeOnGroupLoad === 'normal'
-			) {
-				new Notice(messageString + '\n' + this.getGroupListString());
+			} else if (Manager.getInstance().showNoticeOnGroupLoad === "normal") {
+				new Notice(`${messageString}\n${this.getGroupListString()}`);
 			}
 		}
 	}
@@ -140,27 +136,23 @@ export class PluginGroup implements PluginGroupData {
 			PluginManager.getAllAvailablePlugins().filter((p) =>
 				this.plugins.map((p) => p.id).contains(p.id)
 			);
-		let messageString = '';
+		let messageString = "";
 		this.plugins && this.plugins.length > 0
-			? (messageString +=
-					'- Plugins:\n' +
-					existingPluginsInGroup
-						.map((p) => ' - ' + p.name + '\n')
-						.join(''))
-			: (messageString += '');
+			? (messageString += `- Plugins:\n${existingPluginsInGroup
+					.map((p) => ` - ${p.name}\n`)
+					.join("")}`)
+			: (messageString += "");
 
 		this.groupIds && this.groupIds.length > 0
-			? (messageString +=
-					'- Groups:\n' +
-					this.groupIds
-						.map((g) => {
-							const group = groupFromId(g);
-							if (group && group.groupActive()) {
-								return ' - ' + group.name + '\n';
-							}
-						})
-						.join(''))
-			: (messageString += '');
+			? (messageString += `- Groups:\n${this.groupIds
+					.map((g) => {
+						const group = groupFromId(g);
+						if (group?.groupActive()) {
+							return ` - ${group.name}\n`;
+						}
+					})
+					.join("")}`)
+			: (messageString += "");
 
 		return messageString;
 	}
@@ -178,12 +170,11 @@ export class PluginGroup implements PluginGroupData {
 
 			this.groupIds.push(group.id);
 			return true;
-		} else {
-			new Notice(
-				"Couldn't add this group, it would create a loop of group activations:\n Group A → Group B → Group A",
-				4000
-			);
 		}
+		new Notice(
+			"Couldn't add this group, it would create a loop of group activations:\n Group A → Group B → Group A",
+			4000
+		);
 		return false;
 	}
 

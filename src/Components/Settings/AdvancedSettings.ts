@@ -1,7 +1,7 @@
-import HtmlComponent from '../BaseComponents/HtmlComponent';
-import { Setting, TextComponent } from 'obsidian';
-import Manager from '../../Managers/Manager';
-import { makeCollapsible } from '../../Utils/Utilities';
+import { Setting, type TextComponent } from "obsidian";
+import Manager from "../../Managers/Manager";
+import { makeCollapsible } from "../../Utils/Utilities";
+import HtmlComponent from "../BaseComponents/HtmlComponent";
 
 export interface AdvancedSettingOptions {
 	collapsible?: boolean;
@@ -22,8 +22,8 @@ export default class AdvancedSettings extends HtmlComponent<AdvancedSettingOptio
 			return;
 		}
 
-		const header = this.mainEl.createEl('h5', {
-			text: 'Advanced Settings',
+		const header = this.mainEl.createEl("h5", {
+			text: "Advanced Settings",
 		});
 
 		const content = this.mainEl.createDiv();
@@ -32,7 +32,7 @@ export default class AdvancedSettings extends HtmlComponent<AdvancedSettingOptio
 			makeCollapsible(header, content);
 		}
 
-		new Setting(content).setName('Development Logs').addToggle((tgl) => {
+		new Setting(content).setName("Development Logs").addToggle((tgl) => {
 			tgl.setValue(Manager.getInstance().devLog);
 			tgl.onChange(async (value) => {
 				Manager.getInstance().devLog = value;
@@ -40,7 +40,7 @@ export default class AdvancedSettings extends HtmlComponent<AdvancedSettingOptio
 			});
 		});
 
-		new Setting(content).setName('Load Synchronously').addToggle((tgl) => {
+		new Setting(content).setName("Load Synchronously").addToggle((tgl) => {
 			tgl.setValue(Manager.getInstance().doLoadSynchronously);
 			tgl.onChange(async (value) => {
 				Manager.getInstance().doLoadSynchronously = value;

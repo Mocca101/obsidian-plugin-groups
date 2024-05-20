@@ -1,16 +1,15 @@
-import SettingsList from './SettingsList';
-import { setIcon, Setting } from 'obsidian';
+import { Setting, setIcon } from "obsidian";
+import SettingsList from "./SettingsList";
 
 export default abstract class ReorderableList<
 	ItemType,
-	OptionsType extends { items: ItemType[] }
+	OptionsType extends { items: ItemType[] },
 > extends SettingsList<ItemType, OptionsType> {
 	moveItemUp(item: ItemType): void {
 		const currentIndex = this.findIndexInItems(item);
 
 		if (currentIndex < this.options.items.length - 1 && currentIndex > -1) {
-			this.options.items[currentIndex] =
-				this.options.items[currentIndex + 1];
+			this.options.items[currentIndex] = this.options.items[currentIndex + 1];
 			this.options.items[currentIndex + 1] = item;
 		}
 		this.render();
@@ -20,8 +19,7 @@ export default abstract class ReorderableList<
 		const currentIndex = this.findIndexInItems(item);
 
 		if (currentIndex > 0) {
-			this.options.items[currentIndex] =
-				this.options.items[currentIndex - 1];
+			this.options.items[currentIndex] = this.options.items[currentIndex - 1];
 			this.options.items[currentIndex - 1] = item;
 		}
 		this.render();
@@ -34,13 +32,13 @@ export default abstract class ReorderableList<
 	generateListItem(listEl: HTMLElement, item: ItemType): Setting {
 		const itemEl = new Setting(listEl)
 			.addButton((btn) => {
-				setIcon(btn.buttonEl, 'arrow-down');
+				setIcon(btn.buttonEl, "arrow-down");
 				btn.onClick(() => {
 					this.moveItemUp(item);
 				});
 			})
 			.addButton((btn) => {
-				setIcon(btn.buttonEl, 'arrow-up');
+				setIcon(btn.buttonEl, "arrow-up");
 				btn.onClick(() => {
 					this.moveItemDown(item);
 				});

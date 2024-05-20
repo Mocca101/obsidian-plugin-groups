@@ -1,20 +1,13 @@
-import SettingsList from './BaseComponents/SettingsList';
-import { Setting } from 'obsidian';
-import { Named } from '../Utils/Types';
+import { Setting } from "obsidian";
+import type { Named } from "../Utils/Types";
+import SettingsList from "./BaseComponents/SettingsList";
 
 export default class DescriptionsList<
-	ItemType extends Named
+	ItemType extends Named,
 > extends SettingsList<
 	ItemAndDescription<ItemType>,
 	{ items: ItemAndDescription<ItemType>[] }
 > {
-	constructor(
-		parentEL: HTMLElement,
-		options: { items: ItemAndDescription<ItemType>[] }
-	) {
-		super(parentEL, options);
-	}
-
 	generateListItem(
 		listEl: HTMLElement,
 		plugin: ItemAndDescription<ItemType>

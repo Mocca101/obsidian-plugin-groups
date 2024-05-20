@@ -1,7 +1,7 @@
+import { URL, fileURLToPath } from "node:url";
 // import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import builtins from "builtin-modules";
 import { defineConfig } from "vite";
-import { fileURLToPath, URL } from "node:url";
 
 const setOutDir = (mode: string) => {
 	switch (mode) {
@@ -55,6 +55,6 @@ export default defineConfig(({ mode }) => {
 				"@": fileURLToPath(new URL("./src", import.meta.url)),
 				"~": fileURLToPath(new URL(".", import.meta.url)),
 			},
-		}
+		},
 	};
 });

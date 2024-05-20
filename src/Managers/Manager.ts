@@ -1,18 +1,18 @@
-import type { PersistentSettings, PluginGroupsSettings } from '@/Utils/Types';
-import type PgMain from '@/main';
-import { PluginGroup } from '@/DataStructures/PluginGroup';
-import { pluginId } from '@/Utils/Constants';
-import { setIcon } from 'obsidian';
-import GroupSettingsMenu from '@/Components/Modals/GroupSettingsMenu';
+import GroupSettingsMenu from "@/Components/Modals/GroupSettingsMenu";
+import { PluginGroup } from "@/DataStructures/PluginGroup";
+import { pluginId } from "@/Utils/Constants";
+import type { PersistentSettings, PluginGroupsSettings } from "@/Utils/Types";
+import type PgMain from "@/main";
+import { setIcon } from "obsidian";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
 	generateCommands: true,
-	showNoticeOnGroupLoad: 'none',
+	showNoticeOnGroupLoad: "none",
 	devLogs: false,
 	devices: [],
 	doLoadSynchronously: true,
-	showStatusbarIcon: 'None',
+	showStatusbarIcon: "None",
 };
 
 export default class Manager {
@@ -46,7 +46,7 @@ export default class Manager {
 			return;
 		}
 
-		Object.keys(this.settings).forEach(function (key) {
+		Object.keys(this.settings).forEach((key) => {
 			if (key in savedSettings) {
 				// @ts-ignore
 				Manager.getInstance().settings[key] = savedSettings[key];
@@ -110,8 +110,7 @@ export default class Manager {
 		const persistentSettings: PersistentSettings = {
 			groups: Array.from(this.groupsMap.values() ?? []),
 			generateCommands:
-				this.settings.generateCommands ??
-				DEFAULT_SETTINGS.generateCommands,
+				this.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
 			showNoticeOnGroupLoad:
 				this.settings.showNoticeOnGroupLoad ??
 				DEFAULT_SETTINGS.showNoticeOnGroupLoad,
@@ -121,8 +120,7 @@ export default class Manager {
 				this.settings.doLoadSynchronously ??
 				DEFAULT_SETTINGS.doLoadSynchronously,
 			showStatusbarIcon:
-				this.settings.showStatusbarIcon ??
-				DEFAULT_SETTINGS.showStatusbarIcon,
+				this.settings.showStatusbarIcon ?? DEFAULT_SETTINGS.showStatusbarIcon,
 		};
 		await this.main.saveData(persistentSettings);
 	}
@@ -177,11 +175,11 @@ export default class Manager {
 		this.settings.generateCommands = val;
 	}
 
-	get showNoticeOnGroupLoad(): 'none' | 'short' | 'normal' {
+	get showNoticeOnGroupLoad(): "none" | "short" | "normal" {
 		return this.settings.showNoticeOnGroupLoad;
 	}
 
-	set showNoticeOnGroupLoad(val: 'none' | 'short' | 'normal') {
+	set showNoticeOnGroupLoad(val: "none" | "short" | "normal") {
 		this.settings.showNoticeOnGroupLoad = val;
 	}
 
@@ -195,18 +193,18 @@ export default class Manager {
 		if (this.statusbarItem) {
 			this.statusbarItem.remove();
 		}
-		if (this.showStatusbarIcon === 'None') {
+		if (this.showStatusbarIcon === "None") {
 			return;
 		}
 
 		this.statusbarItem = this.pluginInstance.addStatusBarItem();
-		this.statusbarItem.addClasses(['pg-statusbar-icon', 'mod-clickable']);
+		this.statusbarItem.addClasses(["pg-statusbar-icon", "mod-clickable"]);
 		this.statusbarItem.tabIndex = 0;
 
-		if (this.showStatusbarIcon === 'Text') {
-			this.statusbarItem.textContent = 'Plugins';
-		} else if (this.showStatusbarIcon === 'Icon') {
-			setIcon(this.statusbarItem, 'boxes');
+		if (this.showStatusbarIcon === "Text") {
+			this.statusbarItem.textContent = "Plugins";
+		} else if (this.showStatusbarIcon === "Icon") {
+			setIcon(this.statusbarItem, "boxes");
 		}
 
 		const menu = new GroupSettingsMenu(this.statusbarItem, {});

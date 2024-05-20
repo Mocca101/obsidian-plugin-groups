@@ -1,6 +1,6 @@
-import { Setting } from 'obsidian';
-import { PluginGroup } from '../DataStructures/PluginGroup';
-import Manager from '../Managers/Manager';
+import { Setting } from "obsidian";
+import type { PluginGroup } from "../DataStructures/PluginGroup";
+import Manager from "../Managers/Manager";
 
 export default class GroupEditGroupsTab {
 	containerEl: HTMLElement;
@@ -9,10 +9,7 @@ export default class GroupEditGroupsTab {
 
 	private availableGroups: PluginGroup[];
 
-	private groupListElements: Map<string, Setting> = new Map<
-		string,
-		Setting
-	>();
+	private groupListElements: Map<string, Setting> = new Map<string, Setting>();
 
 	constructor(group: PluginGroup, parentEl: HTMLElement) {
 		this.groupToEdit = group;
@@ -27,19 +24,19 @@ export default class GroupEditGroupsTab {
 	private generateGroupsSection(parentElement: HTMLElement): HTMLElement {
 		const groupSection: HTMLElement = parentElement.createDiv();
 
-		groupSection.createEl('h5', { text: 'Groups' });
+		groupSection.createEl("h5", { text: "Groups" });
 
-		const searchAndList: HTMLElement = groupSection.createEl('div');
+		const searchAndList: HTMLElement = groupSection.createEl("div");
 
-		new Setting(searchAndList).setName('Search').addText((txt) => {
-			txt.setPlaceholder('Search for Groups...');
+		new Setting(searchAndList).setName("Search").addText((txt) => {
+			txt.setPlaceholder("Search for Groups...");
 			txt.onChange((search) => {
 				this.searchGroups(search);
 			});
 		});
 
-		const groupList = searchAndList.createEl('div');
-		groupList.addClass('pg-settings-list');
+		const groupList = searchAndList.createEl("div");
+		groupList.addClass("pg-settings-list");
 
 		this.groupListElements = new Map<string, Setting>();
 
@@ -47,18 +44,20 @@ export default class GroupEditGroupsTab {
 			const setting = new Setting(groupList)
 				.setName(pluginGroup.name)
 				.addButton((btn) => {
-					btn.setIcon(
-						this.groupToEdit.groupIds.contains(pluginGroup.id)
-							? 'check-circle'
-							: 'circle'
-					).onClick(() => {
-						this.toggleGroupForGroup(pluginGroup);
-						btn.setIcon(
+					btn
+						.setIcon(
 							this.groupToEdit.groupIds.contains(pluginGroup.id)
-								? 'check-circle'
-								: 'circle'
-						);
-					});
+								? "check-circle"
+								: "circle"
+						)
+						.onClick(() => {
+							this.toggleGroupForGroup(pluginGroup);
+							btn.setIcon(
+								this.groupToEdit.groupIds.contains(pluginGroup.id)
+									? "check-circle"
+									: "circle"
+							);
+						});
 				});
 			this.groupListElements.set(pluginGroup.id, setting);
 		});
@@ -78,10 +77,9 @@ export default class GroupEditGroupsTab {
 			const aInGroup = this.isGroupInGroup(a);
 			const bInGroup = this.isGroupInGroup(b);
 			if (aInGroup && !bInGroup) return -1;
-			else if (!aInGroup && bInGroup) return 1;
-			else {
-				return a.name.localeCompare(b.name);
-			}
+			if (!aInGroup && bInGroup) return 1;
+
+			return a.name.localeCompare(b.name);
 		});
 	}
 
@@ -92,8 +90,7 @@ export default class GroupEditGroupsTab {
 	toggleGroupForGroup(group: PluginGroup) {
 		if (this.groupToEdit.groupIds.contains(group.id)) {
 			return this.groupToEdit.removeGroup(group);
-		} else {
-			return this.groupToEdit.addGroup(group);
 		}
+		return this.groupToEdit.addGroup(group);
 	}
 }

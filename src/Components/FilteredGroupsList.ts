@@ -1,5 +1,5 @@
-import { PluginGroup } from '../DataStructures/PluginGroup';
-import RemovableChip from './BaseComponents/RemovableChip';
+import type { PluginGroup } from "../DataStructures/PluginGroup";
+import RemovableChip from "./BaseComponents/RemovableChip";
 
 export default class FilteredGroupsList {
 	private parentEl: HTMLElement;
@@ -28,8 +28,8 @@ export default class FilteredGroupsList {
 	}
 
 	private render() {
-		this.listEL = this.parentEl.createDiv({ cls: 'pg-group-filter-list' });
-		this.listEL.createSpan({ text: 'Filters:' });
+		this.listEL = this.parentEl.createDiv({ cls: "pg-group-filter-list" });
+		this.listEL.createSpan({ text: "Filters:" });
 
 		this.groups.forEach((group) => {
 			new RemovableChip(this.listEL, {

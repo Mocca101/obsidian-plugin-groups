@@ -1,3 +1,15 @@
+import ConfirmationPopupModal from "@/Components/BaseComponents/ConfirmationPopupModal";
+import AdvancedSettings from "@/Components/Settings/AdvancedSettings";
+import GroupSettings from "@/Components/Settings/GroupSettings";
+import PluginSettings from "@/Components/Settings/PluginsSettings";
+import Manager from "@/Managers/Manager";
+import PluginManager from "@/Managers/PluginManager";
+import {
+	getCurrentlyActiveDevice,
+	makeCollapsible,
+	setCurrentlyActiveDevice,
+} from "@/Utils/Utilities";
+import type PgMain from "@/main";
 import {
 	type App,
 	type ButtonComponent,
@@ -5,25 +17,9 @@ import {
 	PluginSettingTab,
 	Setting,
 	TextComponent,
-} from 'obsidian';
-import type PgMain from '@/main';
-import {
-	getCurrentlyActiveDevice,
-	makeCollapsible,
-	setCurrentlyActiveDevice,
-} from '@/Utils/Utilities';
-import ConfirmationPopupModal from '@/Components/BaseComponents/ConfirmationPopupModal';
-import Manager from '@/Managers/Manager';
-import PluginManager from '@/Managers/PluginManager';
-import GroupSettings from '@/Components/Settings/GroupSettings';
-import AdvancedSettings from '@/Components/Settings/AdvancedSettings';
-import PluginSettings from '@/Components/Settings/PluginsSettings';
+} from "obsidian";
 
 export default class PluginGroupSettings extends PluginSettingTab {
-	constructor(app: App, plugin: PgMain) {
-		super(app, plugin);
-	}
-
 	async display(): Promise<void> {
 		await PluginManager.loadNewPlugins();
 
@@ -48,9 +44,9 @@ export default class PluginGroupSettings extends PluginSettingTab {
 	private generateGeneralSettings(containerEl: HTMLElement) {
 		const generalParent = containerEl.createDiv();
 
-		const header = generalParent.createEl('h4', {
-			text: 'General',
-			cls: 'mod-clickable',
+		const header = generalParent.createEl("h4", {
+			text: "General",
+			cls: "mod-clickable",
 		});
 
 		const content = generalParent.createDiv();
@@ -58,7 +54,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		makeCollapsible(header, content, true);
 
 		new Setting(content)
-			.setName('Generate Commands for Groups')
+			.setName("Generate Commands for Groups")
 			.addToggle((tgl) => {
 				tgl.setValue(Manager.getInstance().generateCommands ?? false);
 				tgl.onChange(async (value) => {
@@ -68,48 +64,45 @@ export default class PluginGroupSettings extends PluginSettingTab {
 			});
 
 		new Setting(content)
-			.setName('Notice upon un-/loading groups')
+			.setName("Notice upon un-/loading groups")
 			.addDropdown((drp) => {
-				drp.addOption('none', 'None')
-					.addOption('short', 'Short')
-					.addOption('normal', 'Normal');
-				drp.setValue(
-					Manager.getInstance().showNoticeOnGroupLoad ?? 'none'
-				);
+				drp
+					.addOption("none", "None")
+					.addOption("short", "Short")
+					.addOption("normal", "Normal");
+				drp.setValue(Manager.getInstance().showNoticeOnGroupLoad ?? "none");
 				drp.onChange(async (value) => {
 					switch (value) {
-						case 'normal':
-							Manager.getInstance().showNoticeOnGroupLoad =
-								'normal';
+						case "normal":
+							Manager.getInstance().showNoticeOnGroupLoad = "normal";
 							break;
-						case 'short':
-							Manager.getInstance().showNoticeOnGroupLoad =
-								'short';
+						case "short":
+							Manager.getInstance().showNoticeOnGroupLoad = "short";
 							break;
 						default:
-							Manager.getInstance().showNoticeOnGroupLoad =
-								'none';
+							Manager.getInstance().showNoticeOnGroupLoad = "none";
 							break;
 					}
 					await Manager.getInstance().saveSettings();
 				});
 			});
 
-		new Setting(content).setName('Statusbar Menu').addDropdown((drp) => {
-			drp.addOption('None', 'None')
-				.addOption('Icon', 'Icon')
-				.addOption('Text', 'Text');
-			drp.setValue(Manager.getInstance().showStatusbarIcon ?? 'None');
+		new Setting(content).setName("Statusbar Menu").addDropdown((drp) => {
+			drp
+				.addOption("None", "None")
+				.addOption("Icon", "Icon")
+				.addOption("Text", "Text");
+			drp.setValue(Manager.getInstance().showStatusbarIcon ?? "None");
 			drp.onChange(async (value) => {
 				switch (value) {
-					case 'Icon':
-						Manager.getInstance().showStatusbarIcon = 'Icon';
+					case "Icon":
+						Manager.getInstance().showStatusbarIcon = "Icon";
 						break;
-					case 'Text':
-						Manager.getInstance().showStatusbarIcon = 'Text';
+					case "Text":
+						Manager.getInstance().showStatusbarIcon = "Text";
 						break;
 					default:
-						Manager.getInstance().showStatusbarIcon = 'None';
+						Manager.getInstance().showStatusbarIcon = "None";
 						break;
 				}
 				await Manager.getInstance().saveSettings();
@@ -119,14 +112,14 @@ export default class PluginGroupSettings extends PluginSettingTab {
 	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {
-		let newDeviceName = '';
+		let newDeviceName = "";
 		const CreateNewDevice = async () => {
-			if (!newDeviceName || newDeviceName.replace(' ', '') === '') {
+			if (!newDeviceName || newDeviceName.replace(" ", "") === "") {
 				return;
 			}
 
 			if (Manager.getInstance().devices.contains(newDeviceName)) {
-				new Notice('Name already in use for other device');
+				new Notice("Name already in use for other device");
 				return;
 			}
 
@@ -139,11 +132,11 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 			this.display();
 
-			newDeviceName = '';
+			newDeviceName = "";
 			newDevNameText.setValue(newDeviceName);
 		};
 
-		const header = contentEl.createEl('h4', { text: 'Devices' });
+		const header = contentEl.createEl("h4", { text: "Devices" });
 
 		const content = contentEl.createDiv();
 
@@ -151,7 +144,7 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		let deviceAddBtn: ButtonComponent;
 
-		const deviceNameSetting = new Setting(content).setName('New Device');
+		const deviceNameSetting = new Setting(content).setName("New Device");
 
 		const newDevNameText = new TextComponent(deviceNameSetting.controlEl);
 		newDevNameText
@@ -159,13 +152,13 @@ export default class PluginGroupSettings extends PluginSettingTab {
 			.onChange((value) => {
 				newDeviceName = value;
 				if (deviceAddBtn) {
-					value.replace(' ', '').length > 0
-						? deviceAddBtn.buttonEl.removeClass('btn-disabled')
-						: deviceAddBtn.buttonEl.addClass('btn-disabled');
+					value.replace(" ", "").length > 0
+						? deviceAddBtn.buttonEl.removeClass("btn-disabled")
+						: deviceAddBtn.buttonEl.addClass("btn-disabled");
 				}
 			})
-			.setPlaceholder('Device Name').inputEl.onkeydown = async (e) => {
-			if (e.key === 'Enter') {
+			.setPlaceholder("Device Name").inputEl.onkeydown = async (e) => {
+			if (e.key === "Enter") {
 				await CreateNewDevice();
 			}
 		};
@@ -173,24 +166,24 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		deviceNameSetting.addButton((btn) => {
 			deviceAddBtn = btn;
 			deviceAddBtn
-				.setIcon('plus')
+				.setIcon("plus")
 				.onClick(async () => {
 					await CreateNewDevice();
 				})
-				.buttonEl.addClass('btn-disabled');
+				.buttonEl.addClass("btn-disabled");
 		});
 
 		Manager.getInstance().devices.forEach((device) => {
 			const deviceSetting = new Setting(content).setName(device);
 			if (getCurrentlyActiveDevice() === device) {
-				deviceSetting.setDesc('Current Device').addButton((btn) => {
-					btn.setIcon('trash');
+				deviceSetting.setDesc("Current Device").addButton((btn) => {
+					btn.setIcon("trash");
 					btn.onClick(() =>
 						new ConfirmationPopupModal(
 							this.app,
-							'This is the currently active device, are you sure?',
+							"This is the currently active device, are you sure?",
 							void 0,
-							'Delete',
+							"Delete",
 							() => {
 								this.ResetCurrentDevice();
 							}
@@ -200,24 +193,22 @@ export default class PluginGroupSettings extends PluginSettingTab {
 			} else {
 				deviceSetting
 					.addButton((btn) => {
-						btn.setButtonText('Set as Current');
+						btn.setButtonText("Set as Current");
 						btn.onClick(() => {
 							setCurrentlyActiveDevice(device);
 							this.display();
 						});
 					})
 					.addButton((btn) => {
-						btn.setIcon('trash');
+						btn.setIcon("trash");
 						btn.onClick(() =>
 							new ConfirmationPopupModal(
 								this.app,
-								'You are about to delete: ' + device,
+								`You are about to delete: ${device}`,
 								void 0,
-								'Delete',
+								"Delete",
 								async () => {
-									Manager.getInstance().devices.remove(
-										device
-									);
+									Manager.getInstance().devices.remove(device);
 									await Manager.getInstance().saveSettings();
 									this.display();
 								}

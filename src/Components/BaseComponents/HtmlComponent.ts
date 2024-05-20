@@ -38,7 +38,7 @@ export default abstract class HtmlComponent<OptionsType> {
 
 	protected clear(): void {
 		if (this.mainEl) {
-			this.mainEl.textContent = '';
+			this.mainEl.textContent = "";
 		}
 	}
 }

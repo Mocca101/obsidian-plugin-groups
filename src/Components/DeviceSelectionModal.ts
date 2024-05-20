@@ -1,5 +1,5 @@
-import { App, Modal, Setting } from 'obsidian';
-import Manager from '../Managers/Manager';
+import { type App, Modal, Setting } from "obsidian";
+import Manager from "../Managers/Manager";
 
 export default class DeviceSelectionModal extends Modal {
 	headerText: string;
@@ -10,7 +10,7 @@ export default class DeviceSelectionModal extends Modal {
 
 	eventTarget: EventTarget = new EventTarget();
 
-	onConfirm: CustomEvent = new CustomEvent('onConfirm', {
+	onConfirm: CustomEvent = new CustomEvent("onConfirm", {
 		detail: {
 			devices: [],
 		},
@@ -24,16 +24,14 @@ export default class DeviceSelectionModal extends Modal {
 		selectedDevices?: string[]
 	) {
 		super(app);
-		this.headerText = 'New device detected please enter a unique name.';
-		this.cancelText = 'Cancel';
-		this.confirmText = 'Confirm';
+		this.headerText = "New device detected please enter a unique name.";
+		this.cancelText = "Cancel";
+		this.confirmText = "Confirm";
 
 		this.selectedDevices = new Set(selectedDevices);
 
 		if (this.selectedDevices?.size > 0) {
-			this.onConfirm.detail.devices = Array.from(
-				this.selectedDevices.values()
-			);
+			this.onConfirm.detail.devices = Array.from(this.selectedDevices.values());
 		}
 
 		this.eventTarget.addEventListener(
@@ -47,23 +45,23 @@ export default class DeviceSelectionModal extends Modal {
 
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: this.headerText });
+		contentEl.createEl("h2", { text: this.headerText });
 
-		contentEl.createEl('h6', { text: 'Existing Devices' });
+		contentEl.createEl("h6", { text: "Existing Devices" });
 
 		Manager.getInstance().devices.forEach((device) => {
 			new Setting(contentEl).setName(device).addButton((tgl) => {
-				tgl.setIcon(
-					this.selectedDevices.has(device) ? 'check-circle' : 'circle'
-				).onClick(() => {
-					if (this.selectedDevices.has(device)) {
-						this.selectedDevices.delete(device);
-						tgl.setIcon('circle');
-					} else {
-						this.selectedDevices.add(device);
-						tgl.setIcon('check-circle');
-					}
-				});
+				tgl
+					.setIcon(this.selectedDevices.has(device) ? "check-circle" : "circle")
+					.onClick(() => {
+						if (this.selectedDevices.has(device)) {
+							this.selectedDevices.delete(device);
+							tgl.setIcon("circle");
+						} else {
+							this.selectedDevices.add(device);
+							tgl.setIcon("check-circle");
+						}
+					});
 			});
 		});
 

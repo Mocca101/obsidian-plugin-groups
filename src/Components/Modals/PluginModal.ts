@@ -1,8 +1,8 @@
-import { App, Modal, Setting } from 'obsidian';
-import { PgPlugin } from '../../DataStructures/PgPlugin';
-import Manager from '../../Managers/Manager';
-import TogglableList from '../BaseComponents/TogglableList';
-import { PluginGroup } from '../../DataStructures/PluginGroup';
+import { type App, Modal, Setting } from "obsidian";
+import type { PgPlugin } from "../../DataStructures/PgPlugin";
+import type { PluginGroup } from "../../DataStructures/PluginGroup";
+import Manager from "../../Managers/Manager";
+import TogglableList from "../BaseComponents/TogglableList";
 
 export default class PluginModal extends Modal {
 	private pluginToEdit: PgPlugin;
@@ -34,9 +34,9 @@ export default class PluginModal extends Modal {
 
 		const contentEl = modalEl.createDiv();
 
-		const title = contentEl.createEl('h4');
-		title.textContent = 'Editing Plugin: ';
-		title.createEl('b').textContent = this.pluginToEdit.name;
+		const title = contentEl.createEl("h4");
+		title.textContent = "Editing Plugin: ";
+		title.createEl("b").textContent = this.pluginToEdit.name;
 
 		if (this.memberGroupIds) {
 			const groupsList = new TogglableList<PluginGroup>(contentEl, {
@@ -61,7 +61,7 @@ export default class PluginModal extends Modal {
 	}
 
 	getToggleState(item: PluginGroup): boolean {
-		return this.memberGroupIds && this.memberGroupIds.contains(item.id);
+		return this.memberGroupIds?.contains(item.id);
 	}
 
 	onClose() {
@@ -75,20 +75,20 @@ export default class PluginModal extends Modal {
 	}
 
 	private generateFooter(parentElement: HTMLElement) {
-		const footer = parentElement.createEl('div');
+		const footer = parentElement.createEl("div");
 
-		footer.addClass('pg-edit-modal-footer');
+		footer.addClass("pg-edit-modal-footer");
 
 		new Setting(footer)
 			.addButton((btn) => {
-				btn.setButtonText('Cancel');
+				btn.setButtonText("Cancel");
 				btn.onClick(() => this.close());
 			})
 			.addButton((btn) => {
-				btn.setButtonText('Save');
+				btn.setButtonText("Save");
 				btn.onClick(() => this.saveChanges());
 			})
-			.settingEl.addClass('modal-footer');
+			.settingEl.addClass("modal-footer");
 	}
 
 	private async saveChanges() {
@@ -97,9 +97,7 @@ export default class PluginModal extends Modal {
 		);
 
 		removedGroupIds.forEach((id) =>
-			Manager.getInstance()
-				.groupsMap.get(id)
-				?.removePlugin(this.pluginToEdit)
+			Manager.getInstance().groupsMap.get(id)?.removePlugin(this.pluginToEdit)
 		);
 
 		const addedGroupIds = this.memberGroupIds.filter(
@@ -107,9 +105,7 @@ export default class PluginModal extends Modal {
 		);
 
 		addedGroupIds.forEach((id) => {
-			Manager.getInstance()
-				.groupsMap.get(id)
-				?.addPlugin(this.pluginToEdit);
+			Manager.getInstance().groupsMap.get(id)?.addPlugin(this.pluginToEdit);
 		});
 
 		await Manager.getInstance().saveSettings();

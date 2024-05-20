@@ -1,7 +1,7 @@
-import { App, Modal, Setting } from 'obsidian';
+import { type App, Modal, Setting } from "obsidian";
 
 export default class ConfirmationPopupModal extends Modal {
-	onConfirm: Event = new Event('onConfirm');
+	onConfirm: Event = new Event("onConfirm");
 
 	eventTarget: EventTarget;
 
@@ -23,8 +23,8 @@ export default class ConfirmationPopupModal extends Modal {
 		super(app);
 		this.headerText = headerText;
 		this.eventTarget = new EventTarget();
-		this.cancelText = cancelText ?? 'Cancel';
-		this.confirmText = confirmText ?? 'Confirm';
+		this.cancelText = cancelText ?? "Cancel";
+		this.confirmText = confirmText ?? "Confirm";
 
 		this.onConfirmListener = onConfirmListener;
 		if (this.onConfirmListener) {
@@ -40,7 +40,7 @@ export default class ConfirmationPopupModal extends Modal {
 
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: this.headerText });
+		contentEl.createEl("h2", { text: this.headerText });
 
 		new Setting(contentEl)
 			.addButton((btn) => {

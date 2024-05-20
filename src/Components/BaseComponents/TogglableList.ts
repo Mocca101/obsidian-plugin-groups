@@ -1,6 +1,6 @@
-import SettingsList from './SettingsList';
-import { ButtonComponent, Setting } from 'obsidian';
-import { Named } from '../../Utils/Types';
+import { type ButtonComponent, Setting } from "obsidian";
+import type { Named } from "../../Utils/Types";
+import SettingsList from "./SettingsList";
 
 export interface ToggleListOptions<ItemType extends Named> {
 	items: ItemType[];
@@ -52,7 +52,7 @@ export default class TogglableList<ItemType extends Named>
 	}
 
 	setToggleIcon(btn: ButtonComponent, value: boolean): void {
-		btn.setIcon(value ? 'check-circle' : 'circle');
+		btn.setIcon(value ? "check-circle" : "circle");
 	}
 }
 

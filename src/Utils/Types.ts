@@ -1,4 +1,4 @@
-import { PluginGroup } from '../DataStructures/PluginGroup';
+import type { PluginGroup } from "../DataStructures/PluginGroup";
 
 export interface Named {
 	name: string;
@@ -11,19 +11,19 @@ export interface PgComponent extends Named {
 export interface PluginGroupsSettings {
 	groupsMap: Map<string, PluginGroup>;
 	generateCommands: boolean;
-	showNoticeOnGroupLoad: 'none' | 'short' | 'normal';
+	showNoticeOnGroupLoad: "none" | "short" | "normal";
 	devices: string[];
 	devLogs: boolean;
 	doLoadSynchronously: boolean;
-	showStatusbarIcon: 'None' | 'Icon' | 'Text';
+	showStatusbarIcon: "None" | "Icon" | "Text";
 }
 
 export interface PersistentSettings {
 	groups: PluginGroup[];
 	generateCommands: boolean;
-	showNoticeOnGroupLoad: 'none' | 'short' | 'normal';
+	showNoticeOnGroupLoad: "none" | "short" | "normal";
 	devices: string[];
 	devLogs: boolean;
 	doLoadSynchronously: boolean;
-	showStatusbarIcon: 'None' | 'Icon' | 'Text';
+	showStatusbarIcon: "None" | "Icon" | "Text";
 }

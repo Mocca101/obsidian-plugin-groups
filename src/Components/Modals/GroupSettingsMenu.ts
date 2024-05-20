@@ -1,7 +1,7 @@
-import GroupSettings from '../Settings/GroupSettings';
-import HtmlComponent from '../BaseComponents/HtmlComponent';
+import HtmlComponent from "../BaseComponents/HtmlComponent";
+import GroupSettings from "../Settings/GroupSettings";
 
-interface GroupSettingMenuOptions {}
+type GroupSettingMenuOptions = {};
 
 export default class GroupSettingsMenu extends HtmlComponent<GroupSettingMenuOptions> {
 	constructor(parentEl: HTMLElement, options: GroupSettingMenuOptions) {
@@ -10,7 +10,7 @@ export default class GroupSettingsMenu extends HtmlComponent<GroupSettingMenuOpt
 	}
 
 	protected generateContainer(): void {
-		this.mainEl = this.parentEl.createDiv({ cls: 'pg-settings-window' });
+		this.mainEl = this.parentEl.createDiv({ cls: "pg-settings-window" });
 	}
 
 	protected generateContent(): void {
@@ -28,7 +28,7 @@ export default class GroupSettingsMenu extends HtmlComponent<GroupSettingMenuOpt
 			return;
 		}
 
-		this.mainEl.style.transform = 'translate(0px, 0px)';
+		this.mainEl.style.transform = "translate(0px, 0px)";
 
 		let xOffset = -this.mainEl.getBoundingClientRect().width / 2;
 		const yOffset = -this.mainEl.clientHeight / 2 - 30;
@@ -40,7 +40,6 @@ export default class GroupSettingsMenu extends HtmlComponent<GroupSettingMenuOpt
 			xOffset = diff;
 		}
 
-		this.mainEl.style.transform =
-			'translate(' + xOffset + 'px, ' + yOffset + 'px)';
+		this.mainEl.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
 	}
 }

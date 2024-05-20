@@ -1,6 +1,6 @@
-import { PgPlugin } from '../DataStructures/PgPlugin';
-import { ButtonComponent, Setting } from 'obsidian';
-import { PluginGroup } from '../DataStructures/PluginGroup';
+import { ButtonComponent, Setting } from "obsidian";
+import type { PgPlugin } from "../DataStructures/PgPlugin";
+import type { PluginGroup } from "../DataStructures/PluginGroup";
 
 export default class PluginListTogglable {
 	pluginListEl: HTMLElement;
@@ -25,7 +25,7 @@ export default class PluginListTogglable {
 			this.ownerGroup = actionOption?.group;
 
 			this.pluginListTarget.addEventListener(
-				'listToggleClicked',
+				"listToggleClicked",
 				(evt: CustomEvent) => {
 					actionOption.onClickAction(evt.detail);
 				}
@@ -45,19 +45,17 @@ export default class PluginListTogglable {
 	}
 
 	private generateList() {
-		this.pluginListEl = this.parentEL.createEl('div');
-		this.pluginListEl.addClass('pg-settings-list');
+		this.pluginListEl = this.parentEL.createEl("div");
+		this.pluginListEl.addClass("pg-settings-list");
 
 		this.plugins.forEach((plugin) => {
 			const setting = new Setting(this.pluginListEl).setName(plugin.name);
 			if (this.ownerGroup) {
-				const btn: ButtonComponent = new ButtonComponent(
-					setting.settingEl
-				);
+				const btn: ButtonComponent = new ButtonComponent(setting.settingEl);
 				this.setIconForPluginBtn(btn, plugin.id);
 				btn.onClick(() => {
 					this.pluginListTarget.dispatchEvent(
-						new CustomEvent('listToggleClicked', { detail: plugin })
+						new CustomEvent("listToggleClicked", { detail: plugin })
 					);
 					this.setIconForPluginBtn(btn, plugin.id);
 				});
@@ -72,8 +70,8 @@ export default class PluginListTogglable {
 
 		btn.setIcon(
 			this.ownerGroup.plugins.map((p) => p.id).contains(pluginId)
-				? 'check-circle'
-				: 'circle'
+				? "check-circle"
+				: "circle"
 		);
 	}
 }

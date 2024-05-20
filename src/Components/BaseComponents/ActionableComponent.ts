@@ -1,12 +1,12 @@
-import HtmlComponent from './HtmlComponent';
+import HtmlComponent from "./HtmlComponent";
 
 export default abstract class ActionableComponent<
-	Type
+	Type,
 > extends HtmlComponent<Type> {
 	private listener: EventListener;
 	private eventTarget: EventTarget;
 
-	eventType = 'pg-action';
+	eventType = "pg-action";
 	outwardEvent: CustomEvent<unknown>;
 
 	protected constructor(parentElement: HTMLElement) {

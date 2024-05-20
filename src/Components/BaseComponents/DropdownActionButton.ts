@@ -1,5 +1,5 @@
-import { setIcon } from 'obsidian';
-import HtmlComponent from './HtmlComponent';
+import { setIcon } from "obsidian";
+import HtmlComponent from "./HtmlComponent";
 
 interface DropdownActionButtonOptions {
 	mainLabel: MainLabelOptions;
@@ -21,8 +21,8 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 	}
 
 	protected generateContainer() {
-		this.mainEl = this.parentEl.createEl('button', {
-			cls: 'pg-drp-btn pg-has-dropdown-single',
+		this.mainEl = this.parentEl.createEl("button", {
+			cls: "pg-drp-btn pg-has-dropdown-single",
 		});
 	}
 
@@ -37,26 +37,22 @@ export default class DropdownActionButton extends HtmlComponent<DropdownActionBu
 		}
 
 		const activeOptionBtn = this.mainEl.createSpan({
-			cls: 'pg-drp-btn-main-label',
+			cls: "pg-drp-btn-main-label",
 		});
-		this.setElementTextOrIcon(
-			activeOptionBtn,
-			mainLabel.label,
-			mainLabel.icon
-		);
+		this.setElementTextOrIcon(activeOptionBtn, mainLabel.label, mainLabel.icon);
 
 		if (drpIcon) {
 			const iconSpan = this.mainEl.createSpan();
 			setIcon(iconSpan, drpIcon);
-			iconSpan.style.paddingTop = '12px';
+			iconSpan.style.paddingTop = "12px";
 		} else {
-			this.mainEl.createSpan({ text: '▼' });
+			this.mainEl.createSpan({ text: "▼" });
 		}
 
-		this.drpList = this.mainEl.createEl('ul', { cls: 'pg-dropdown' });
+		this.drpList = this.mainEl.createEl("ul", { cls: "pg-dropdown" });
 		dropDownOptions.forEach((option) => {
-			const item = this.drpList.createEl('li', {
-				cls: 'pg-dropdown-item',
+			const item = this.drpList.createEl("li", {
+				cls: "pg-dropdown-item",
 			});
 			this.setElementTextOrIcon(item, option.label, option.icon);
 

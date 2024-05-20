@@ -1,8 +1,8 @@
-import DescriptionsList, { ItemAndDescription } from './DescriptionsList';
-import { Setting } from 'obsidian';
-import PluginModal from './Modals/PluginModal';
-import Manager from '../Managers/Manager';
-import { PgPlugin } from '../DataStructures/PgPlugin';
+import type { Setting } from "obsidian";
+import type { PgPlugin } from "../DataStructures/PgPlugin";
+import Manager from "../Managers/Manager";
+import DescriptionsList, { type ItemAndDescription } from "./DescriptionsList";
+import PluginModal from "./Modals/PluginModal";
 
 export default class EditPluginList extends DescriptionsList<PgPlugin> {
 	onEditFinished?: () => void;
@@ -23,7 +23,7 @@ export default class EditPluginList extends DescriptionsList<PgPlugin> {
 		const item = super.generateListItem(listEl, plugin);
 
 		item.addButton((btn) => {
-			btn.setIcon('pencil');
+			btn.setIcon("pencil");
 			btn.onClick(() => {
 				new PluginModal(
 					Manager.getInstance().pluginInstance.app,

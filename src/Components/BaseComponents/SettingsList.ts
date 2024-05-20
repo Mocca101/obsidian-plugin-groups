@@ -1,9 +1,9 @@
-import { Setting } from 'obsidian';
-import HtmlComponent from './HtmlComponent';
+import type { Setting } from "obsidian";
+import HtmlComponent from "./HtmlComponent";
 
 export default abstract class SettingsList<
 	ItemType,
-	OptionsType extends { items: ItemType[] }
+	OptionsType extends { items: ItemType[] },
 > extends HtmlComponent<OptionsType> {
 	constructor(parentEL: HTMLElement, options: OptionsType) {
 		super(parentEL, options);
@@ -18,8 +18,8 @@ export default abstract class SettingsList<
 	abstract generateListItem(listEl: HTMLElement, item: ItemType): Setting;
 
 	protected generateContainer(): void {
-		this.mainEl = this.parentEl.createEl('div');
-		this.mainEl.addClass('pg-settings-list');
+		this.mainEl = this.parentEl.createEl("div");
+		this.mainEl.addClass("pg-settings-list");
 	}
 
 	protected generateContent() {
@@ -35,8 +35,8 @@ export default abstract class SettingsList<
 	}
 
 	protected clear() {
-		if (this.mainEl && this.mainEl.hasClass('pg-settings-list')) {
-			this.mainEl.textContent = '';
+		if (this.mainEl?.hasClass("pg-settings-list")) {
+			this.mainEl.textContent = "";
 		}
 	}
 }

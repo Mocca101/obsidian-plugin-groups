@@ -1,9 +1,9 @@
-import { Notice, Plugin } from 'obsidian';
-import PluginGroupSettings from './PluginGroupSettings';
-import { disableStartupTimeout } from './Utils/Constants';
-import Manager from './Managers/Manager';
-import CommandManager from './Managers/CommandManager';
-import PluginManager from './Managers/PluginManager';
+import { Notice, Plugin } from "obsidian";
+import CommandManager from "./Managers/CommandManager";
+import Manager from "./Managers/Manager";
+import PluginManager from "./Managers/PluginManager";
+import PluginGroupSettings from "./PluginGroupSettings";
+import { disableStartupTimeout } from "./Utils/Constants";
 
 export default class PgMain extends Plugin {
 	async onload() {
@@ -12,16 +12,16 @@ export default class PgMain extends Plugin {
 			time: number;
 		}[] = [];
 
-		times.push({ label: 'Time on Load', time: this.getCurrentTime() });
+		times.push({ label: "Time on Load", time: this.getCurrentTime() });
 
 		await Manager.getInstance().init(this);
-		this.logTime('Manager Setup', times);
+		this.logTime("Manager Setup", times);
 
 		await PluginManager.loadNewPlugins();
-		this.logTime('Loading new plugins', times);
+		this.logTime("Loading new plugins", times);
 
 		this.addSettingTab(new PluginGroupSettings(this.app, this));
-		this.logTime('Creating the Settings Tab', times);
+		this.logTime("Creating the Settings Tab", times);
 
 		Manager.getInstance().updateStatusbarItem();
 
@@ -36,7 +36,7 @@ export default class PgMain extends Plugin {
 				CommandManager.getInstance().AddGroupCommands(group.id)
 			);
 			if (Manager.getInstance().devLog) {
-				this.logTime('Generated Commands for Groups in', times);
+				this.logTime("Generated Commands for Groups in", times);
 			}
 		}
 
@@ -47,7 +47,7 @@ export default class PgMain extends Plugin {
 			});
 
 			if (Manager.getInstance().devLog) {
-				this.logTime('Dispatching Groups for delayed start in', times);
+				this.logTime("Dispatching Groups for delayed start in", times);
 			}
 		}
 
@@ -67,12 +67,9 @@ export default class PgMain extends Plugin {
 		const totalTime = Math.round(this.accTime(times.slice(1)));
 
 		new Notice(
-			times
-				.map((item) => item.label + ': ' + item.time + ' ms')
-				.join('\n') +
-				'\nTotal Time: ' +
-				totalTime +
-				' ms',
+			`${times
+				.map((item) => `${item.label}: ${item.time} ms`)
+				.join("\n")}\nTotal Time: ${totalTime} ms`,
 			10000
 		);
 	}
@@ -85,9 +82,7 @@ export default class PgMain extends Plugin {
 	}
 
 	private accTime(times: { label: string; time: number }[]): number {
-		return times
-			.map((item) => item.time)
-			.reduce((prev, curr) => prev + curr);
+		return times.map((item) => item.time).reduce((prev, curr) => prev + curr);
 	}
 
 	private getCurrentTime(): number {

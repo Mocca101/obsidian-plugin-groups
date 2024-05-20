@@ -1,13 +1,13 @@
-import { groupFromId } from '../Utils/Utilities';
-import { PluginGroup } from '../DataStructures/PluginGroup';
-import Manager from './Manager';
-import { Command } from 'obsidian';
+import type { Command } from "obsidian";
+import type { PluginGroup } from "../DataStructures/PluginGroup";
+import { groupFromId } from "../Utils/Utilities";
+import Manager from "./Manager";
 
 export default class CommandManager {
-	private enableGroupCommandPrefix = 'plugin-groups-enable-';
-	private disableGroupCommandPrefix = 'plugin-groups-disable-';
-	private cnEnablePrefix = 'Plugin Groups: Enable ';
-	private cnDisablePrefix = 'Plugin Groups: Disable ';
+	private enableGroupCommandPrefix = "plugin-groups-enable-";
+	private disableGroupCommandPrefix = "plugin-groups-disable-";
+	private cnEnablePrefix = "Plugin Groups: Enable ";
+	private cnDisablePrefix = "Plugin Groups: Disable ";
 
 	private commandMap: Map<string, Command> = new Map<string, Command>();
 
@@ -31,7 +31,7 @@ export default class CommandManager {
 			Manager.getInstance().pluginInstance.addCommand({
 				id: enableId,
 				name: this.cnEnablePrefix + group.name,
-				icon: 'power',
+				icon: "power",
 				checkCallback: (checking: boolean) => {
 					if (!this.shouldShowCommand(group)) return false;
 					if (checking) return true;
@@ -47,7 +47,7 @@ export default class CommandManager {
 			Manager.getInstance().pluginInstance.addCommand({
 				id: disableId,
 				name: this.cnDisablePrefix + group.name,
-				icon: 'power-off',
+				icon: "power-off",
 				checkCallback: (checking: boolean) => {
 					if (!this.shouldShowCommand(group)) return false;
 					if (checking) return true;
@@ -72,16 +72,12 @@ export default class CommandManager {
 			return;
 		}
 
-		let command = this.commandMap.get(
-			this.enableGroupCommandPrefix + group.id
-		);
+		let command = this.commandMap.get(this.enableGroupCommandPrefix + group.id);
 		if (command) {
 			command.name = this.cnEnablePrefix + group.name;
 		}
 
-		command = this.commandMap.get(
-			this.disableGroupCommandPrefix + group.id
-		);
+		command = this.commandMap.get(this.disableGroupCommandPrefix + group.id);
 		if (command) {
 			command.name = this.cnDisablePrefix + group.name;
 		}
