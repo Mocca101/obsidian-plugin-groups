@@ -11,5 +11,10 @@
 	},
 	"files": {
 		"ignore": [".svelte-kit", "node_modules", "test-vault", "build"]
+	},
+	"javascript": {
+		"formatter": {
+			"trailingComma": "es5"
+		}
 	}
 }
