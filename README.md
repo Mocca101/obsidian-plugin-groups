@@ -1,3 +1,5 @@
+⚠️ I'm currently unable to actively continue development. In the mean time check out **1C0D**'s amazing [Quick Plugin Switcher](https://github.com/1C0D/obsidian-quick-plugin-switcher) plugin that offers similar as well as some additional functionalities! ⚠️
+
 # Plugin Groups for Obsidian
 
 A plugin that allows you to easily group and manage your other plugins in Obsidian.
@@ -24,6 +26,7 @@ E.g.:
 Sometimes the pane will automatically reload, however this will only happen after the plugin has loaded that is the case for e.g.:
 
 -   [Kanban](https://github.com/mgmeyers/obsidian-kanban)
+-   [Outliner](https://github.com/vslinko/obsidian-outliner)
 
 _If you notice a plugin that has issues with delayed loading, please let me know or open a PR with the Plugin added to the list in this README.md_
 
