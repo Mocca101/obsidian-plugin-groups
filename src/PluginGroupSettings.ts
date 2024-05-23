@@ -19,6 +19,8 @@ import {
 	TextComponent,
 } from "obsidian";
 
+import MainSettings from "@/Components/Settings/main-settings.svelte"
+
 export default class PluginGroupSettings extends PluginSettingTab {
 	async display(): Promise<void> {
 		await PluginManager.loadNewPlugins();
@@ -27,7 +29,10 @@ export default class PluginGroupSettings extends PluginSettingTab {
 
 		containerEl.empty();
 
-		this.generateGeneralSettings(containerEl);
+		const target = containerEl.createDiv();
+
+		const svelteBaseComponent = new MainSettings({target})
+		
 
 		new GroupSettings(containerEl, {
 			collapsible: true,
@@ -41,75 +46,6 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		new AdvancedSettings(containerEl, { collapsible: true });
 	}
 
-	private generateGeneralSettings(containerEl: HTMLElement) {
-		const generalParent = containerEl.createDiv();
-
-		const header = generalParent.createEl("h4", {
-			text: "General",
-			cls: "mod-clickable",
-		});
-
-		const content = generalParent.createDiv();
-
-		makeCollapsible(header, content, true);
-
-		new Setting(content)
-			.setName("Generate Commands for Groups")
-			.addToggle((tgl) => {
-				tgl.setValue(Manager.getInstance().generateCommands ?? false);
-				tgl.onChange(async (value) => {
-					Manager.getInstance().shouldGenerateCommands = value;
-					await Manager.getInstance().saveSettings();
-				});
-			});
-
-		new Setting(content)
-			.setName("Notice upon un-/loading groups")
-			.addDropdown((drp) => {
-				drp
-					.addOption("none", "None")
-					.addOption("short", "Short")
-					.addOption("normal", "Normal");
-				drp.setValue(Manager.getInstance().showNoticeOnGroupLoad ?? "none");
-				drp.onChange(async (value) => {
-					switch (value) {
-						case "normal":
-							Manager.getInstance().showNoticeOnGroupLoad = "normal";
-							break;
-						case "short":
-							Manager.getInstance().showNoticeOnGroupLoad = "short";
-							break;
-						default:
-							Manager.getInstance().showNoticeOnGroupLoad = "none";
-							break;
-					}
-					await Manager.getInstance().saveSettings();
-				});
-			});
-
-		new Setting(content).setName("Statusbar Menu").addDropdown((drp) => {
-			drp
-				.addOption("None", "None")
-				.addOption("Icon", "Icon")
-				.addOption("Text", "Text");
-			drp.setValue(Manager.getInstance().showStatusbarIcon ?? "None");
-			drp.onChange(async (value) => {
-				switch (value) {
-					case "Icon":
-						Manager.getInstance().showStatusbarIcon = "Icon";
-						break;
-					case "Text":
-						Manager.getInstance().showStatusbarIcon = "Text";
-						break;
-					default:
-						Manager.getInstance().showStatusbarIcon = "None";
-						break;
-				}
-				await Manager.getInstance().saveSettings();
-				Manager.getInstance().updateStatusbarItem();
-			});
-		});
-	}
 
 	GenerateDeviceList(contentEl: HTMLElement) {
 		let newDeviceName = "";
