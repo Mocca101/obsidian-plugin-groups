@@ -1,3 +1,4 @@
+import "./styles.css";
 import { Notice, Plugin } from "obsidian";
 import CommandManager from "./Managers/CommandManager";
 import Manager from "./Managers/Manager";

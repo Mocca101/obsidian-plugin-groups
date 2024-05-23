@@ -1,5 +1,5 @@
 import { URL, fileURLToPath } from "node:url";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import builtins from "builtin-modules";
 import { defineConfig } from "vite";
 
@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
 		// test: {
 		// 	include: ["tests/unit/**/*"]
 		// },
-		plugins: [svelte()],
+		plugins: [svelte({preprocess: vitePreprocess()})],
 		build: {
 			lib: {
 				entry: "src/main",

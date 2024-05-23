@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .input-focus {
+        @apply focus:rounded focus:ring-[var(--background-modifier-border-focus)] focus:ring-4;
+    }
+}
