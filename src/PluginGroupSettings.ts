@@ -3,12 +3,7 @@ import GroupSettings from "@/Components/Settings/GroupSettings";
 import PluginSettings from "@/Components/Settings/PluginsSettings";
 import PluginManager from "@/Managers/PluginManager";
 import {
-	type App,
-	type ButtonComponent,
-	Notice,
 	PluginSettingTab,
-	Setting,
-	TextComponent,
 } from "obsidian";
 
 import MainSettings from "@/Components/Settings/main-settings.svelte"
