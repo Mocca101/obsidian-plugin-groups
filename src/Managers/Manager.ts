@@ -3,7 +3,7 @@ import { PluginGroup } from "@/DataStructures/PluginGroup";
 import { pluginId } from "@/Utils/Constants";
 import type { PersistentSettings, PluginGroupsSettings } from "@/Utils/Types";
 import type PgMain from "@/main";
-import { settingsStore } from "@/stores/main-store";
+import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { setIcon } from "obsidian";
 import { get } from "svelte/store";
 
@@ -20,11 +20,6 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 export default class Manager {
 	private static instance?: Manager;
 
-
-	private main: PgMain;
-
-	private constructor() {}
-
 	public static getInstance(): Manager {
 		if (!Manager.instance) {
 			Manager.instance = new Manager();
@@ -32,19 +27,17 @@ export default class Manager {
 		return Manager.instance;
 	}
 
-	async init(main: PgMain): Promise<Manager> {
-		this.main = main;
+	async init(): Promise<Manager> {
 		await this.loadSettings();
 		return this;
 	}
 
 	async loadSettings() {
-		const savedSettings: PersistentSettings = await this.main.loadData();
+		const savedSettings: PersistentSettings = await get(pluginInstance).loadData();
 
 		if (!savedSettings) {
 			return;
 		}
-
 
 		settingsStore.update((s) => {
 			for (const key in s) {
@@ -164,17 +157,12 @@ export default class Manager {
 		});
 	}
 
-	get pluginInstance(): PgMain {
-		return this.main;
-	}
-
 	public get pluginsManifests() {
 		return this.obsidianPluginsObject.manifests;
 	}
 
 	public get obsidianPluginsObject() {
-		// @ts-ignore
-		return this.main.app.plugins;
+		return get(pluginInstance).app.plugins;
 	}
 
 	get groupsMap(): Map<string, PluginGroup> {
@@ -217,7 +205,7 @@ export default class Manager {
 			return;
 		}
 
-		this.statusbarItem = this.pluginInstance.addStatusBarItem();
+		this.statusbarItem = get(pluginInstance).addStatusBarItem();
 		this.statusbarItem.addClasses(["pg-statusbar-icon", "mod-clickable"]);
 		this.statusbarItem.tabIndex = 0;
 

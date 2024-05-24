@@ -4,6 +4,8 @@ import Manager from "../../Managers/Manager";
 import { generateGroupID, makeCollapsible } from "../../Utils/Utilities";
 import HtmlComponent from "../BaseComponents/HtmlComponent";
 import GroupEditModal from "../Modals/GroupEditModal";
+import { pluginInstance } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export interface GroupSettingOptions {
 	collapsible?: boolean;
@@ -140,7 +142,7 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 			name: this.newGroupName,
 		});
 		new GroupEditModal(
-			Manager.getInstance().pluginInstance.app,
+			get(pluginInstance).app,
 			this,
 			newGroup
 		).open();
@@ -152,7 +154,7 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 
 	editGroup(group: PluginGroup) {
 		new GroupEditModal(
-			Manager.getInstance().pluginInstance.app,
+			get(pluginInstance).app,
 			this,
 			group
 		).open();

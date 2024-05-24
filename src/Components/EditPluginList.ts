@@ -3,6 +3,8 @@ import type { PgPlugin } from "../DataStructures/PgPlugin";
 import Manager from "../Managers/Manager";
 import DescriptionsList, { type ItemAndDescription } from "./DescriptionsList";
 import PluginModal from "./Modals/PluginModal";
+import { get } from "svelte/store";
+import { pluginInstance } from "@/stores/main-store";
 
 export default class EditPluginList extends DescriptionsList<PgPlugin> {
 	onEditFinished?: () => void;
@@ -26,7 +28,7 @@ export default class EditPluginList extends DescriptionsList<PgPlugin> {
 			btn.setIcon("pencil");
 			btn.onClick(() => {
 				new PluginModal(
-					Manager.getInstance().pluginInstance.app,
+					get(pluginInstance).app,
 					plugin.item,
 					() => {
 						if (this.onEditFinished) {

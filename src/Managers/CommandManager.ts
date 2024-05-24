@@ -2,6 +2,8 @@ import type { Command } from "obsidian";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import { groupFromId } from "../Utils/Utilities";
 import Manager from "./Manager";
+import { pluginInstance } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export default class CommandManager {
 	private enableGroupCommandPrefix = "plugin-groups-enable-";
@@ -28,7 +30,7 @@ export default class CommandManager {
 
 		this.commandMap.set(
 			enableId,
-			Manager.getInstance().pluginInstance.addCommand({
+			get(pluginInstance).addCommand({
 				id: enableId,
 				name: this.cnEnablePrefix + group.name,
 				icon: "power",
@@ -44,7 +46,7 @@ export default class CommandManager {
 
 		this.commandMap.set(
 			disableId,
-			Manager.getInstance().pluginInstance.addCommand({
+			get(pluginInstance).addCommand({
 				id: disableId,
 				name: this.cnDisablePrefix + group.name,
 				icon: "power-off",
