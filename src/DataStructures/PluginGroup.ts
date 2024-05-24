@@ -3,11 +3,11 @@ import Manager from "../Managers/Manager";
 import PluginManager from "../Managers/PluginManager";
 import type { PgComponent } from "../Utils/Types";
 import {
-	devLog,
-	getCurrentlyActiveDevice,
 	groupFromId,
 } from "../Utils/Utilities";
 import type { PgPlugin } from "./PgPlugin";
+import { currentDeviceStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export class PluginGroup implements PluginGroupData {
 	id: string;
@@ -46,7 +46,7 @@ export class PluginGroup implements PluginGroupData {
 			return true;
 		}
 
-		const activeDevice: string | null = getCurrentlyActiveDevice();
+		const activeDevice: string | null = get(currentDeviceStore);
 		if (!activeDevice) {
 			return true;
 		}

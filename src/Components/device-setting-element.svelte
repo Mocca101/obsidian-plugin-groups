@@ -1,71 +1,89 @@
 <script lang="ts">
 	import Manager from "@/Managers/Manager";
-	import { getCurrentlyActiveDevice, setCurrentlyActiveDevice } from "@/Utils/Utilities";
-	import { Setting } from "obsidian";
+	import { ButtonComponent, Setting } from "obsidian";
 	import { onMount } from "svelte";
 	import ConfirmationPopupModal from "./BaseComponents/ConfirmationPopupModal";
-	
+	import { currentDeviceStore, pluginInstance, settingsStore } from "@/stores/main-store";
+
 	let content: HTMLDivElement;
 
 	export let device: string;
 
-	onMount(() => {
-		if(!content) return;
+	let deviceSetting: Setting;
+	let delteButton: ButtonComponent;
+	let setCurrentButton: ButtonComponent;
 
-		const deviceSetting = new Setting(content).setName(device);
-			if (getCurrentlyActiveDevice() === device) {
-				deviceSetting.setDesc("Current Device").addButton((btn) => {
-					btn.setIcon("trash");
-					btn.onClick(() =>
-						new ConfirmationPopupModal(
-							Manager.getInstance().pluginInstance.app,
-							"This is the currently active device, are you sure?",
-							void 0,
-							"Delete",
-							() => {
-								ResetCurrentDevice();
-							}
-						).open()
-					);
-				});
-			} else {
-				deviceSetting
-					.addButton((btn) => {
-						btn.setButtonText("Set as Current");
-						btn.onClick(() => {
-							setCurrentlyActiveDevice(device);
-							// this.display();
-						});
-					})
-					.addButton((btn) => {
-						btn.setIcon("trash");
-						btn.onClick(() =>
-							new ConfirmationPopupModal(
-								Manager.getInstance().pluginInstance.app,
-								`You are about to delete: ${device}`,
-								void 0,
-								"Delete",
-								async () => {
-									Manager.getInstance().devices.remove(device);
-									await Manager.getInstance().saveSettings();
-									// this.display();
-								}
-							).open()
-						);
+	function updateDevice() {
+		if(!deviceSetting) return;
+
+		if(!setCurrentButton) {
+			deviceSetting.addButton((btn) => {
+				setCurrentButton = btn;
+				setCurrentButton.setButtonText("Set as Current");
+				setCurrentButton.onClick(() => {
+						$currentDeviceStore = device;
 					});
-			}
-	});
+			});
+		}
 
-	function ResetCurrentDevice() {
-		const device: string | null = getCurrentlyActiveDevice();
+		if(!delteButton) {
+			deviceSetting
+				.addButton((btn) => {
+				delteButton = btn;
+				delteButton.setIcon("trash");
+			});
+		}
 
-		if (!device) {
+
+		if($currentDeviceStore === device) {
+			deviceSetting.setDesc("Current Device");
+			setCurrentButton.buttonEl.hide();
+
+			delteButton.onClick(() => new ConfirmationPopupModal(
+					$pluginInstance.app,
+					"This is the currently active device, are you sure?",
+					void 0,
+					"Delete",
+					() => {
+						ResetCurrentDevice();
+					}
+				).open()
+			);
 			return;
 		}
-		Manager.getInstance().devices.remove(device);
-		setCurrentlyActiveDevice(null);
-		// this.display();
+
+		deviceSetting.setDesc("");
+		setCurrentButton.buttonEl.show();
+
+		delteButton.onClick(() => new ConfirmationPopupModal(
+				$pluginInstance.app,
+				`You are about to delete: ${device}`,
+				void 0,
+				"Delete",
+				async () => {
+					$settingsStore.devices = $settingsStore.devices.filter((d) => d !== device);
+				}
+			).open()
+		);
 	}
+
+	function ResetCurrentDevice() {
+		const currentDevice: string | null = $currentDeviceStore;
+
+		if (!currentDevice) return;
+		$settingsStore.devices = $settingsStore.devices.filter((d) => d !== currentDevice);
+		$currentDeviceStore = null;
+	}
+
+	onMount(() => {
+		if(!content) return;
+		deviceSetting = new Setting(content).setName(device);
+		updateDevice();
+	});
+
+	currentDeviceStore.subscribe(() => {
+		updateDevice();
+	});
 
 </script>
 <div bind:this={content} />

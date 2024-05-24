@@ -5,9 +5,13 @@ import Manager from "./Managers/Manager";
 import PluginManager from "./Managers/PluginManager";
 import PluginGroupSettings from "./PluginGroupSettings";
 import { disableStartupTimeout } from "./Utils/Constants";
+import { settingsStore, setupStores } from "./stores/main-store";
+import { get } from "svelte/store";
 
 export default class PgMain extends Plugin {
 	async onload() {
+		setupStores(this);
+
 		const times: {
 			label: string;
 			time: number;
@@ -32,22 +36,24 @@ export default class PgMain extends Plugin {
 			return; // Exit early if there are no groups yet, no need to load the rest.
 		}
 
-		if (Manager.getInstance().generateCommands) {
-			Manager.getInstance().groupsMap.forEach((group) =>
-				CommandManager.getInstance().AddGroupCommands(group.id)
-			);
-			if (Manager.getInstance().devLog) {
+		if (get(settingsStore).generateCommands) {
+			for (const group of Object.values(get(settingsStore).groupsMap)) {
+				CommandManager.getInstance().AddGroupCommands(group.id);
+			}
+
+			if (get(settingsStore).devLogs) {
 				this.logTime("Generated Commands for Groups in", times);
 			}
 		}
 
 		// TODO: Improve hacky solution if possible
 		if (window.performance.now() < disableStartupTimeout) {
-			Manager.getInstance().groupsMap.forEach((group) => {
-				if (group.loadAtStartup) group.startup();
-			});
+			for (const group of Object.values(get(settingsStore).groupsMap)) {
+				if (!group.loadAtStartup) continue;
+				group.startup();
+			}
 
-			if (Manager.getInstance().devLog) {
+			if (get(settingsStore).devLogs) {
 				this.logTime("Dispatching Groups for delayed start in", times);
 			}
 		}
@@ -56,13 +62,13 @@ export default class PgMain extends Plugin {
 	}
 
 	private logTime(label: string, times: { label: string; time: number }[]) {
-		if (Manager.getInstance().devLog) {
+		if (get(settingsStore).devLogs) {
 			times.push({ label, time: this.elapsedTime(times) });
 		}
 	}
 
 	private displayTimeNotice(times: { label: string; time: number }[]) {
-		if (!Manager.getInstance().devLog || times.length === 0) {
+		if (!get(settingsStore).devLogs || times.length === 0) {
 			return;
 		}
 		const totalTime = Math.round(this.accTime(times.slice(1)));

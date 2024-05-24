@@ -1,7 +1,9 @@
 import { setIcon } from "obsidian";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
-import { deviceNameKey } from "./Constants";
+import { DEVICE_NAME_KEY } from "./Constants";
+import { pluginInstance } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export function generateGroupID(
 	name: string,
@@ -40,25 +42,13 @@ export function nameToId(name: string): string {
 }
 
 export function saveVaultLocalStorage(key: string, object: any): void {
-	// @ts-ignore
-	Manager.getInstance().pluginInstance.app.saveLocalStorage(key, object);
+	if(!get(pluginInstance)?.app) return;
+	get(pluginInstance).app.saveLocalStorage(key, object);
 }
 
 export function loadVaultLocalStorage(key: string): string | null | undefined {
-	// @ts-ignore
-	return Manager.getInstance().pluginInstance.app.loadLocalStorage(key);
-}
-
-export function getCurrentlyActiveDevice(): string | null {
-	const device = loadVaultLocalStorage(deviceNameKey);
-	if (typeof device === "string") {
-		return device as string;
-	}
-	return null;
-}
-
-export function setCurrentlyActiveDevice(device: string | null) {
-	saveVaultLocalStorage(deviceNameKey, device);
+	if(!get(pluginInstance)?.app) return;
+	return get(pluginInstance).app.loadLocalStorage(key);
 }
 
 export function groupFromId(id: string): PluginGroup | undefined {

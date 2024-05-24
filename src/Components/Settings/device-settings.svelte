@@ -1,22 +1,23 @@
 <script lang="ts">
-	import Manager from "@/Managers/Manager";
-	import { getCurrentlyActiveDevice, setCurrentlyActiveDevice } from "@/Utils/Utilities";
-	import { ButtonComponent, Notice, Setting, TextComponent } from "obsidian";	
+	import { type ButtonComponent, Notice, Setting, TextComponent } from "obsidian";
 	import { onMount } from "svelte";
 	import DeviceSettingElement from "../device-setting-element.svelte";
-	
+	import { currentDeviceStore, settingsStore } from "@/stores/main-store";
+
 	let content: HTMLDivElement;
 
 	let newDeviceName = "";
 	let deviceAddBtn: ButtonComponent;
 	let newDevNameText: TextComponent;
 
-	let devices: string[] = Manager.getInstance().devices;
+	settingsStore.subscribe((value) => {
+		console.log(value);
+	});
 
-	
+
 	onMount(() => {
 		if (!content) return;
-		
+
 		const deviceNameSetting = new Setting(content).setName("New Device");
 
 		newDevNameText = new TextComponent(deviceNameSetting.controlEl);
@@ -35,7 +36,7 @@
 				await CreateNewDevice();
 			}
 		};
-	
+
 		deviceNameSetting.addButton((btn) => {
 				deviceAddBtn = btn;
 				deviceAddBtn
@@ -52,19 +53,16 @@
 			return;
 		}
 
-		if (Manager.getInstance().devices.contains(newDeviceName)) {
+		if ($settingsStore.devices.contains(newDeviceName)) {
 			new Notice("Name already in use for other device");
 			return;
 		}
 
-		Manager.getInstance().devices.push(newDeviceName);
-		await Manager.getInstance().saveSettings();
+		$settingsStore.devices = [...$settingsStore.devices, newDeviceName];
 
-		if (!getCurrentlyActiveDevice()) {
-			setCurrentlyActiveDevice(newDeviceName);
+		if (!$currentDeviceStore) {
+			$currentDeviceStore = newDeviceName;
 		}
-
-		// this.display();
 
 		newDeviceName = "";
 		newDevNameText.setValue(newDeviceName);
@@ -75,7 +73,7 @@
 <div>
 <div bind:this={content} />
 
-	{#each devices as device}
+	{#each $settingsStore.devices as device}
 		<DeviceSettingElement device={device} />
 	{/each}
 </div>

@@ -3,7 +3,9 @@ import { PluginGroup } from "@/DataStructures/PluginGroup";
 import { pluginId } from "@/Utils/Constants";
 import type { PersistentSettings, PluginGroupsSettings } from "@/Utils/Types";
 import type PgMain from "@/main";
+import { settingsStore } from "@/stores/main-store";
 import { setIcon } from "obsidian";
+import { get } from "svelte/store";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
@@ -18,7 +20,6 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 export default class Manager {
 	private static instance?: Manager;
 
-	private settings: PluginGroupsSettings;
 
 	private main: PgMain;
 
@@ -40,29 +41,32 @@ export default class Manager {
 	async loadSettings() {
 		const savedSettings: PersistentSettings = await this.main.loadData();
 
-		this.settings = Object.assign({}, DEFAULT_SETTINGS);
-
 		if (!savedSettings) {
 			return;
 		}
 
-		Object.keys(this.settings).forEach((key) => {
-			if (key in savedSettings) {
-				// @ts-ignore
-				Manager.getInstance().settings[key] = savedSettings[key];
-			}
-		});
 
-		if (savedSettings.groups && Array.isArray(savedSettings.groups)) {
-			this.settings.groupsMap = new Map<string, PluginGroup>();
-			savedSettings.groups.forEach((g) => {
-				this.groupsMap.set(g.id, new PluginGroup(g));
-			});
-		}
+		settingsStore.update((s) => {
+			for (const key in s) {
+				if (key in savedSettings) {
+					// @ts-ignore
+					s[key] = savedSettings[key];
+				}
+			}
+
+			if(!savedSettings.groups || !Array.isArray(savedSettings.groups)) return s;
+
+			s.groupsMap = new Map<string, PluginGroup>();
+			for (const g of savedSettings.groups) {
+				s.groupsMap.set(g.id, new PluginGroup(g));
+			}
+
+			return s;
+		});
 	}
 
 	/***
-	 * Returns a map of each plugin that is in 1 or more groups, and it's connected groups.
+	 * Returns a map of each plugin that is in 1 or more groups, and its connected groups.
 	 * Format: PluginID -> Set of connected groupsId's
 	 */
 	public get mapOfPluginsConnectedGroupsIncludingParentGroups(): Map<
@@ -71,28 +75,29 @@ export default class Manager {
 	> {
 		const pluginsMemMap = new Map<string, Set<string>>();
 
-		this.groupsMap.forEach((group) => {
-			group.getAllPluginIdsControlledByGroup().forEach((plugin) => {
-				if (!pluginsMemMap.has(pluginId)) {
-					pluginsMemMap.set(plugin, new Set<string>());
+		for (const group of this.groupsMap.values()) {
+			for (const plugin of group.plugins) {
+				if (!pluginsMemMap.has(plugin.id)) {
+					pluginsMemMap.set(plugin.id, new Set<string>());
 				}
-				pluginsMemMap.get(plugin)?.add(group.id);
-			});
-		});
+				pluginsMemMap.get(plugin.id)?.add(group.id);
+			}
+		}
+
 		return pluginsMemMap;
 	}
 
 	public get mapOfPluginsDirectlyConnectedGroups(): Map<string, Set<string>> {
 		const pluginsMemMap = new Map<string, Set<string>>();
 
-		this.groupsMap.forEach((group) => {
-			group.plugins.forEach((plugin) => {
+		for (const group of this.groupsMap.values()) {
+			for (const plugin of group.plugins) {
 				if (!pluginsMemMap.has(plugin.id)) {
 					pluginsMemMap.set(plugin.id, new Set<string>());
 				}
 				pluginsMemMap.get(plugin.id)?.add(group.id);
-			});
-		});
+			}
+		}
 		return pluginsMemMap;
 	}
 
@@ -107,47 +112,56 @@ export default class Manager {
 	}
 
 	async saveSettings() {
-		const persistentSettings: PersistentSettings = {
-			groups: Array.from(this.groupsMap.values() ?? []),
-			generateCommands:
-				this.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
-			showNoticeOnGroupLoad:
-				this.settings.showNoticeOnGroupLoad ??
-				DEFAULT_SETTINGS.showNoticeOnGroupLoad,
-			devLogs: this.settings.devLogs ?? DEFAULT_SETTINGS.devLogs,
-			devices: this.settings.devices ?? DEFAULT_SETTINGS.devices,
-			doLoadSynchronously:
-				this.settings.doLoadSynchronously ??
-				DEFAULT_SETTINGS.doLoadSynchronously,
-			showStatusbarIcon:
-				this.settings.showStatusbarIcon ?? DEFAULT_SETTINGS.showStatusbarIcon,
-		};
-		await this.main.saveData(persistentSettings);
+		// const persistentSettings: PersistentSettings = {
+		// 	groups: Array.from(this.groupsMap.values() ?? []),
+		// 	generateCommands:
+		// 		this.settings.generateCommands ?? DEFAULT_SETTINGS.generateCommands,
+		// 	showNoticeOnGroupLoad:
+		// 		this.settings.showNoticeOnGroupLoad ??
+		// 		DEFAULT_SETTINGS.showNoticeOnGroupLoad,
+		// 	devLogs: this.settings.devLogs ?? DEFAULT_SETTINGS.devLogs,
+		// 	devices: this.settings.devices ?? DEFAULT_SETTINGS.devices,
+		// 	doLoadSynchronously:
+		// 		this.settings.doLoadSynchronously ??
+		// 		DEFAULT_SETTINGS.doLoadSynchronously,
+		// 	showStatusbarIcon:
+		// 		this.settings.showStatusbarIcon ?? DEFAULT_SETTINGS.showStatusbarIcon,
+		// };
+		// await this.main.saveData(persistentSettings);
 	}
 
 	// Getters & Setters
 
 	get doLoadSynchronously(): boolean {
-		return this.settings.doLoadSynchronously;
+		return get(settingsStore).doLoadSynchronously;
 	}
 
 	set doLoadSynchronously(value: boolean) {
-		this.settings.doLoadSynchronously = value;
+		settingsStore.update((s) => {
+			s.doLoadSynchronously = value;
+			return s;
+		});
 	}
 
 	get showStatusbarIcon() {
-		return this.settings.showStatusbarIcon;
+		return get(settingsStore).showStatusbarIcon;
 	}
 
 	set showStatusbarIcon(value) {
-		this.settings.showStatusbarIcon = value;
+		settingsStore.update((s) => {
+			s.showStatusbarIcon = value;
+			return s;
+		});
 	}
 
 	get devLog(): boolean {
-		return this.settings.devLogs;
+		return get(settingsStore).devLogs;
 	}
 	set devLog(value: boolean) {
-		this.settings.devLogs = value;
+		settingsStore.update((s) => {
+			s.devLogs = value;
+			return s;
+		});
 	}
 
 	get pluginInstance(): PgMain {
@@ -164,27 +178,33 @@ export default class Manager {
 	}
 
 	get groupsMap(): Map<string, PluginGroup> {
-		return this.settings.groupsMap;
+		return get(settingsStore).groupsMap;
 	}
 
 	get generateCommands(): boolean {
-		return this.settings.generateCommands;
+		return get(settingsStore).generateCommands;
 	}
 
 	set shouldGenerateCommands(val: boolean) {
-		this.settings.generateCommands = val;
+		settingsStore.update((s) => {
+			s.generateCommands = val;
+			return s;
+		});
 	}
 
 	get showNoticeOnGroupLoad(): "none" | "short" | "normal" {
-		return this.settings.showNoticeOnGroupLoad;
+		return get(settingsStore).showNoticeOnGroupLoad;
 	}
 
 	set showNoticeOnGroupLoad(val: "none" | "short" | "normal") {
-		this.settings.showNoticeOnGroupLoad = val;
+		settingsStore.update((s) => {
+			s.showNoticeOnGroupLoad = val;
+			return s;
+		});
 	}
 
 	get devices(): string[] {
-		return this.settings.devices;
+		return get(settingsStore).devices;
 	}
 
 	private statusbarItem: HTMLElement;
