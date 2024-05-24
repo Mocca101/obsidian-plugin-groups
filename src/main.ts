@@ -19,7 +19,7 @@ export default class PgMain extends Plugin {
 
 		times.push({ label: "Time on Load", time: this.getCurrentTime() });
 
-		await Manager.getInstance().init(this);
+		await Manager.getInstance().init();
 		this.logTime("Manager Setup", times);
 
 		await PluginManager.loadNewPlugins();
@@ -30,7 +30,7 @@ export default class PgMain extends Plugin {
 
 		Manager.getInstance().updateStatusbarItem();
 
-		if (!Manager.getInstance().groupsMap) {
+		if (!get(settingsStore).groupsMap) {
 			this.displayTimeNotice(times);
 
 			return; // Exit early if there are no groups yet, no need to load the rest.

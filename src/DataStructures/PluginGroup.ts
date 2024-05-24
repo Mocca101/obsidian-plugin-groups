@@ -6,7 +6,7 @@ import {
 	groupFromId,
 } from "../Utils/Utilities";
 import type { PgPlugin } from "./PgPlugin";
-import { currentDeviceStore } from "@/stores/main-store";
+import { currentDeviceStore, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
 export class PluginGroup implements PluginGroupData {
@@ -84,7 +84,7 @@ export class PluginGroup implements PluginGroupData {
 		const pluginPromises: Promise<boolean>[] = [];
 
 		for (const plugin of this.plugins) {
-			if (Manager.getInstance().doLoadSynchronously) {
+			if (get(settingsStore).doLoadSynchronously) {
 				pluginPromises.push(PluginManager.queuePluginForEnable(plugin));
 			} else {
 				await PluginManager.queuePluginForEnable(plugin);
@@ -96,12 +96,12 @@ export class PluginGroup implements PluginGroupData {
 		for (const groupId of this.groupIds) {
 			await groupFromId(groupId)?.enable();
 		}
-		if (Manager.getInstance().showNoticeOnGroupLoad) {
+		if (get(settingsStore).showNoticeOnGroupLoad) {
 			const messageString: string = `Loaded ${this.name}`;
 
-			if (Manager.getInstance().showNoticeOnGroupLoad === "short") {
+			if (get(settingsStore).showNoticeOnGroupLoad === "short") {
 				new Notice(messageString);
-			} else if (Manager.getInstance().showNoticeOnGroupLoad === "normal") {
+			} else if (get(settingsStore).showNoticeOnGroupLoad === "normal") {
 				new Notice(`${messageString}\n${this.getGroupListString()}`);
 			}
 		}
@@ -120,12 +120,12 @@ export class PluginGroup implements PluginGroupData {
 			groupFromId(groupId)?.disable();
 		});
 
-		if (Manager.getInstance().showNoticeOnGroupLoad !== "none") {
+		if (get(settingsStore).showNoticeOnGroupLoad !== "none") {
 			const messageString: string = `Disabled ${this.name}`;
 
-			if (Manager.getInstance().showNoticeOnGroupLoad === "short") {
+			if (get(settingsStore).showNoticeOnGroupLoad === "short") {
 				new Notice(messageString);
-			} else if (Manager.getInstance().showNoticeOnGroupLoad === "normal") {
+			} else if (get(settingsStore).showNoticeOnGroupLoad === "normal") {
 				new Notice(`${messageString}\n${this.getGroupListString()}`);
 			}
 		}

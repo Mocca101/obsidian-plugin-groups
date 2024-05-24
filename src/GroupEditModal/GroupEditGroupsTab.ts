@@ -1,6 +1,8 @@
 import { Setting } from "obsidian";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
+import { settingsStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export default class GroupEditGroupsTab {
 	containerEl: HTMLElement;
@@ -15,7 +17,7 @@ export default class GroupEditGroupsTab {
 		this.groupToEdit = group;
 
 		this.availableGroups = Array.from(
-			Manager.getInstance().groupsMap.values()
+			get(settingsStore).groupsMap.values()
 		).filter((g) => g.id !== group.id);
 
 		this.containerEl = this.generateGroupsSection(parentEl);

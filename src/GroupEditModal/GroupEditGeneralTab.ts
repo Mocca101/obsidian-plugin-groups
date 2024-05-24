@@ -3,6 +3,8 @@ import DeviceSelectionModal from "../Components/DeviceSelectionModal";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
 import { disableStartupTimeout } from "../Utils/Constants";
+import { settingsStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export default class GroupEditGeneralTab {
 	containerEl: HTMLElement;
@@ -64,7 +66,7 @@ export default class GroupEditGeneralTab {
 			return description;
 		}
 		const arr: string[] = this.groupToEdit.assignedDevices.filter((device) =>
-			Manager.getInstance().devices.contains(device)
+			get(settingsStore).devices.contains(device)
 		);
 		if (arr?.length > 0) {
 			description = `Active on: ${arr.reduce((acc, curr, i, arr) => {

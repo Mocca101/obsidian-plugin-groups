@@ -2,7 +2,7 @@ import { setIcon } from "obsidian";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
 import { DEVICE_NAME_KEY } from "./Constants";
-import { pluginInstance } from "@/stores/main-store";
+import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
 export function generateGroupID(
@@ -11,7 +11,7 @@ export function generateGroupID(
 ): string | undefined {
 	let id = nameToId((delay ? "stg-" : "pg-") + name);
 
-	const groupMap = Manager.getInstance().groupsMap;
+	const groupMap = get(settingsStore).groupsMap;
 
 	if (!groupMap) {
 		return undefined;
@@ -32,7 +32,7 @@ export function generateGroupID(
 }
 
 export function devLog(message?: any, ...data: any[]) {
-	if (Manager.getInstance().devLog) {
+	if (get(settingsStore).devLogs) {
 		console.log(message, data);
 	}
 }
@@ -52,7 +52,7 @@ export function loadVaultLocalStorage(key: string): string | null | undefined {
 }
 
 export function groupFromId(id: string): PluginGroup | undefined {
-	return Manager.getInstance().groupsMap.get(id);
+	return get(settingsStore).groupsMap.get(id);
 }
 
 export function makeCollapsible(

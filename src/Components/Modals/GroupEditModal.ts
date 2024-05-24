@@ -9,6 +9,8 @@ import { generateGroupID } from "../../Utils/Utilities";
 import ConfirmationPopupModal from "../BaseComponents/ConfirmationPopupModal";
 import TabGroupComponent from "../BaseComponents/TabGroupComponent";
 import type GroupSettings from "../Settings/GroupSettings";
+import { settingsStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export default class GroupEditModal extends Modal {
 	groupToEdit: PluginGroup;
@@ -110,7 +112,7 @@ export default class GroupEditModal extends Modal {
 		contentEl.empty();
 
 		if (
-			Manager.getInstance().groupsMap.has(this.groupToEdit.id) &&
+			get(settingsStore).groupsMap.has(this.groupToEdit.id) &&
 			this.discardChanges
 		) {
 			Object.assign(this.groupToEdit, JSON.parse(this.groupToEditCache));
@@ -119,7 +121,7 @@ export default class GroupEditModal extends Modal {
 
 	async saveChanges() {
 		this.discardChanges = false;
-		if (Manager.getInstance().groupsMap.has(this.groupToEdit.id)) {
+		if (get(settingsStore).groupsMap.has(this.groupToEdit.id)) {
 			await this.editGroup(this.groupToEdit);
 		} else {
 			await this.addGroup(this.groupToEdit);
@@ -128,7 +130,7 @@ export default class GroupEditModal extends Modal {
 
 	async duplicate() {
 		const duplicateGroup = new PluginGroup(this.groupToEdit);
-		const groupMap = Manager.getInstance().groupsMap;
+		const groupMap = get(settingsStore).groupsMap;
 
 		if (!groupMap) {
 			return;
@@ -145,7 +147,10 @@ export default class GroupEditModal extends Modal {
 	}
 
 	async addGroup(group: PluginGroup) {
-		Manager.getInstance().groupsMap.set(group.id, group);
+		settingsStore.update((s) => {
+			s.groupsMap.set(group.id, group);
+			return s;
+		})
 
 		CommandManager.getInstance().AddGroupCommands(group.id);
 
@@ -153,20 +158,24 @@ export default class GroupEditModal extends Modal {
 	}
 
 	async editGroup(group: PluginGroup) {
-		Manager.getInstance().groupsMap.set(group.id, group);
+		settingsStore.update((s) => {
+			s.groupsMap.set(group.id, group);
+			return s;
+		})
 		CommandManager.getInstance().updateCommand(group.id);
 		await this.persistChangesAndClose();
 	}
 
 	async persistChangesAndClose() {
-		await Manager.getInstance().saveSettings();
 		this.groupSettings.render();
 		this.close();
 	}
 
-	async deleteGroup() {
-		Manager.getInstance().groupsMap.delete(this.groupToEdit.id);
-		await Manager.getInstance().saveSettings();
+	async deleteGroup() {		
+		settingsStore.update((s) => {
+			s.groupsMap.delete(this.groupToEdit.id);
+			return s;
+		})
 		this.groupSettings.render();
 		this.close();
 	}

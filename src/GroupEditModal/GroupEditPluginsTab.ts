@@ -11,6 +11,8 @@ import type { PgPlugin } from "../DataStructures/PgPlugin";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
 import PluginManager from "../Managers/PluginManager";
+import { settingsStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 interface PluginTabOptions {
 	group: PluginGroup;
@@ -131,17 +133,17 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 				label: "All groups",
 				func: () => {
 					if (
-						this.filteredGroups.size === Manager.getInstance().groupsMap.size
+						this.filteredGroups.size === get(settingsStore).groupsMap.size
 					) {
 						this.filteredGroups.clear();
 					} else {
-						this.filteredGroups = new Map(Manager.getInstance().groupsMap);
+						this.filteredGroups = new Map(get(settingsStore).groupsMap);
 					}
 					updateGroupFilters();
 				},
 			},
 		];
-		Manager.getInstance().groupsMap.forEach((group) => {
+		get(settingsStore).groupsMap.forEach((group) => {
 			groupFilterOptions.push({
 				label: group.name,
 				func: () => {

@@ -1,10 +1,10 @@
 import type { PluginGroup } from "@/DataStructures/PluginGroup";
 import type { PersistentSettings, PluginGroupsSettings } from "@/Utils/Types";
-import { get, readable, writable, type Readable, type Writable } from "svelte/store";
-import Manager from "@/Managers/Manager";
+import { derived, get, readable, writable, type Readable, type Writable } from "svelte/store";
 import type PgMain from "@/main";
 import { loadVaultLocalStorage, saveVaultLocalStorage } from "@/Utils/Utilities";
 import { DEVICE_NAME_KEY } from "@/Utils/Constants";
+import type { Plugins } from "obsidian";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
@@ -17,6 +17,8 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 };
 
 export let pluginInstance: Readable<PgMain>;
+export let installedPlugins: Readable<Plugins>;
+export let pluginsManifests: Readable<Record<string, any>>;
 
 export let currentDeviceStore: Writable<string | null>;
 function initCurrentDeviceStore() {
@@ -29,7 +31,9 @@ function initCurrentDeviceStore() {
 
 export function setupStores(p: PgMain) {
 	pluginInstance = readable(p);
-
+	installedPlugins = derived(pluginInstance, ($pluginInstance) => $pluginInstance.app.plugins);
+	pluginsManifests = derived(pluginInstance, ($pluginInstance) => $pluginInstance.app.plugins.manifests);
+	
 	currentDeviceStore = writable(initCurrentDeviceStore());
 
 	currentDeviceStore.subscribe((device) => {

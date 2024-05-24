@@ -1,7 +1,9 @@
 <script lang="ts">
 	import Manager from "@/Managers/Manager";
+	import { settingsStore } from "@/stores/main-store";
 	import { Setting } from "obsidian";
 	import { onMount } from "svelte";
+	import { get } from "svelte/store";
 	
 	let content: HTMLDivElement;
 
@@ -11,9 +13,9 @@
 		new Setting(content)
 			.setName("Generate Commands for Groups")
 			.addToggle((tgl) => {
-				tgl.setValue(Manager.getInstance().generateCommands ?? false);
+				tgl.setValue(get(settingsStore).generateCommands ?? false);
 				tgl.onChange(async (value) => {
-					Manager.getInstance().shouldGenerateCommands = value;
+					$settingsStore.generateCommands = value;
 					await Manager.getInstance().saveSettings();
 				});
 			});
@@ -26,17 +28,17 @@
 					.addOption("none", "None")
 					.addOption("short", "Short")
 					.addOption("normal", "Normal");
-				drp.setValue(Manager.getInstance().showNoticeOnGroupLoad ?? "none");
+				drp.setValue($settingsStore.showNoticeOnGroupLoad ?? "none");
 				drp.onChange(async (value) => {
 					switch (value) {
 						case "normal":
-							Manager.getInstance().showNoticeOnGroupLoad = "normal";
+							$settingsStore.showNoticeOnGroupLoad = "normal";
 							break;
 						case "short":
-							Manager.getInstance().showNoticeOnGroupLoad = "short";
+							$settingsStore.showNoticeOnGroupLoad = "short";
 							break;
 						default:
-							Manager.getInstance().showNoticeOnGroupLoad = "none";
+							$settingsStore.showNoticeOnGroupLoad = "none";
 							break;
 					}
 					await Manager.getInstance().saveSettings();
@@ -48,17 +50,17 @@
 				.addOption("None", "None")
 				.addOption("Icon", "Icon")
 				.addOption("Text", "Text");
-			drp.setValue(Manager.getInstance().showStatusbarIcon ?? "None");
+			drp.setValue(get(settingsStore).showStatusbarIcon ?? "None");
 			drp.onChange(async (value) => {
 				switch (value) {
 					case "Icon":
-						Manager.getInstance().showStatusbarIcon = "Icon";
+						get(settingsStore).showStatusbarIcon = "Icon";
 						break;
 					case "Text":
-						Manager.getInstance().showStatusbarIcon = "Text";
+						get(settingsStore).showStatusbarIcon = "Text";
 						break;
 					default:
-						Manager.getInstance().showStatusbarIcon = "None";
+						get(settingsStore).showStatusbarIcon = "None";
 						break;
 				}
 				await Manager.getInstance().saveSettings();

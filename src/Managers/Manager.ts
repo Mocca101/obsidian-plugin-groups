@@ -1,21 +1,9 @@
 import GroupSettingsMenu from "@/Components/Modals/GroupSettingsMenu";
 import { PluginGroup } from "@/DataStructures/PluginGroup";
-import { pluginId } from "@/Utils/Constants";
-import type { PersistentSettings, PluginGroupsSettings } from "@/Utils/Types";
-import type PgMain from "@/main";
+import type { PersistentSettings  } from "@/Utils/Types";
 import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { setIcon } from "obsidian";
 import { get } from "svelte/store";
-
-const DEFAULT_SETTINGS: PluginGroupsSettings = {
-	groupsMap: new Map<string, PluginGroup>(),
-	generateCommands: true,
-	showNoticeOnGroupLoad: "none",
-	devLogs: false,
-	devices: [],
-	doLoadSynchronously: true,
-	showStatusbarIcon: "None",
-};
 
 export default class Manager {
 	private static instance?: Manager;
@@ -68,7 +56,7 @@ export default class Manager {
 	> {
 		const pluginsMemMap = new Map<string, Set<string>>();
 
-		for (const group of this.groupsMap.values()) {
+		for (const group of get(settingsStore).groupsMap.values()) {
 			for (const plugin of group.plugins) {
 				if (!pluginsMemMap.has(plugin.id)) {
 					pluginsMemMap.set(plugin.id, new Set<string>());
@@ -83,7 +71,7 @@ export default class Manager {
 	public get mapOfPluginsDirectlyConnectedGroups(): Map<string, Set<string>> {
 		const pluginsMemMap = new Map<string, Set<string>>();
 
-		for (const group of this.groupsMap.values()) {
+		for (const group of get(settingsStore).groupsMap.values()) {
 			for (const plugin of group.plugins) {
 				if (!pluginsMemMap.has(plugin.id)) {
 					pluginsMemMap.set(plugin.id, new Set<string>());
@@ -96,7 +84,7 @@ export default class Manager {
 
 	public getGroupsOfPlugin(pluginId: string): PluginGroup[] {
 		const groups: PluginGroup[] = [];
-		for (const group of this.groupsMap.values()) {
+		for (const group of get(settingsStore).groupsMap.values()) {
 			if (group.plugins.find((plugin) => plugin.id === pluginId)) {
 				groups.push(group);
 			}
@@ -125,83 +113,13 @@ export default class Manager {
 
 	// Getters & Setters
 
-	get doLoadSynchronously(): boolean {
-		return get(settingsStore).doLoadSynchronously;
-	}
-
-	set doLoadSynchronously(value: boolean) {
-		settingsStore.update((s) => {
-			s.doLoadSynchronously = value;
-			return s;
-		});
-	}
-
-	get showStatusbarIcon() {
-		return get(settingsStore).showStatusbarIcon;
-	}
-
-	set showStatusbarIcon(value) {
-		settingsStore.update((s) => {
-			s.showStatusbarIcon = value;
-			return s;
-		});
-	}
-
-	get devLog(): boolean {
-		return get(settingsStore).devLogs;
-	}
-	set devLog(value: boolean) {
-		settingsStore.update((s) => {
-			s.devLogs = value;
-			return s;
-		});
-	}
-
-	public get pluginsManifests() {
-		return this.obsidianPluginsObject.manifests;
-	}
-
-	public get obsidianPluginsObject() {
-		return get(pluginInstance).app.plugins;
-	}
-
-	get groupsMap(): Map<string, PluginGroup> {
-		return get(settingsStore).groupsMap;
-	}
-
-	get generateCommands(): boolean {
-		return get(settingsStore).generateCommands;
-	}
-
-	set shouldGenerateCommands(val: boolean) {
-		settingsStore.update((s) => {
-			s.generateCommands = val;
-			return s;
-		});
-	}
-
-	get showNoticeOnGroupLoad(): "none" | "short" | "normal" {
-		return get(settingsStore).showNoticeOnGroupLoad;
-	}
-
-	set showNoticeOnGroupLoad(val: "none" | "short" | "normal") {
-		settingsStore.update((s) => {
-			s.showNoticeOnGroupLoad = val;
-			return s;
-		});
-	}
-
-	get devices(): string[] {
-		return get(settingsStore).devices;
-	}
-
 	private statusbarItem: HTMLElement;
 
 	public updateStatusbarItem() {
 		if (this.statusbarItem) {
 			this.statusbarItem.remove();
 		}
-		if (this.showStatusbarIcon === "None") {
+		if (get(settingsStore).showStatusbarIcon === "None") {
 			return;
 		}
 
@@ -209,9 +127,9 @@ export default class Manager {
 		this.statusbarItem.addClasses(["pg-statusbar-icon", "mod-clickable"]);
 		this.statusbarItem.tabIndex = 0;
 
-		if (this.showStatusbarIcon === "Text") {
+		if (get(settingsStore).showStatusbarIcon === "Text") {
 			this.statusbarItem.textContent = "Plugins";
-		} else if (this.showStatusbarIcon === "Icon") {
+		} else if (get(settingsStore).showStatusbarIcon === "Icon") {
 			setIcon(this.statusbarItem, "boxes");
 		}
 

@@ -1,5 +1,7 @@
 import { type App, Modal, Setting } from "obsidian";
 import Manager from "../Managers/Manager";
+import { settingsStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export default class DeviceSelectionModal extends Modal {
 	headerText: string;
@@ -49,7 +51,7 @@ export default class DeviceSelectionModal extends Modal {
 
 		contentEl.createEl("h6", { text: "Existing Devices" });
 
-		Manager.getInstance().devices.forEach((device) => {
+		get(settingsStore).devices.forEach((device) => {
 			new Setting(contentEl).setName(device).addButton((tgl) => {
 				tgl
 					.setIcon(this.selectedDevices.has(device) ? "check-circle" : "circle")

@@ -3,6 +3,8 @@ import type { PgPlugin } from "../../DataStructures/PgPlugin";
 import type { PluginGroup } from "../../DataStructures/PluginGroup";
 import Manager from "../../Managers/Manager";
 import TogglableList from "../BaseComponents/TogglableList";
+import { settingsStore } from "@/stores/main-store";
+import { get } from "svelte/store";
 
 export default class PluginModal extends Modal {
 	private pluginToEdit: PgPlugin;
@@ -40,7 +42,7 @@ export default class PluginModal extends Modal {
 
 		if (this.memberGroupIds) {
 			const groupsList = new TogglableList<PluginGroup>(contentEl, {
-				items: Array.from(Manager.getInstance().groupsMap.values()),
+				items: Array.from(get(settingsStore).groupsMap.values()),
 				getToggleState: (item) => {
 					return this.getToggleState(item);
 				},
@@ -97,7 +99,7 @@ export default class PluginModal extends Modal {
 		);
 
 		removedGroupIds.forEach((id) =>
-			Manager.getInstance().groupsMap.get(id)?.removePlugin(this.pluginToEdit)
+			get(settingsStore).groupsMap.get(id)?.removePlugin(this.pluginToEdit)
 		);
 
 		const addedGroupIds = this.memberGroupIds.filter(
@@ -105,7 +107,7 @@ export default class PluginModal extends Modal {
 		);
 
 		addedGroupIds.forEach((id) => {
-			Manager.getInstance().groupsMap.get(id)?.addPlugin(this.pluginToEdit);
+			get(settingsStore).groupsMap.get(id)?.addPlugin(this.pluginToEdit);
 		});
 
 		await Manager.getInstance().saveSettings();

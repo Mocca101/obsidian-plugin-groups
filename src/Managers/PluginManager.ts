@@ -1,3 +1,4 @@
+import { get } from "svelte/store";
 import { PgPlugin } from "../DataStructures/PgPlugin";
 import { knownPluginIdsKey, pluginId } from "../Utils/Constants";
 import {
@@ -5,6 +6,7 @@ import {
 	saveVaultLocalStorage,
 } from "../Utils/Utilities";
 import Manager from "./Manager";
+import { installedPlugins, pluginsManifests, settingsStore } from "@/stores/main-store";
 
 export default class PluginManager {
 	private static enablePluginQueue: Set<string> = new Set<string>();
@@ -60,7 +62,7 @@ export default class PluginManager {
 
 			installedPlugins?.forEach((id) => {
 				if (!knownPlugins?.has(id)) {
-					Manager.getInstance().groupsMap.forEach((g) => {
+					get(settingsStore).groupsMap.forEach((g) => {
 						if (g.autoAdd) {
 							const plugin = PluginManager.getInstalledPluginFromId(id);
 							if (plugin) {
@@ -91,7 +93,7 @@ export default class PluginManager {
 	}
 
 	public static getInstalledPluginIds(): Set<string> {
-		const manifests = Manager.getInstance().pluginsManifests;
+		const manifests = get(pluginsManifests);
 
 		const installedPlugins = new Set<string>();
 
@@ -103,21 +105,21 @@ export default class PluginManager {
 	}
 
 	public static getInstalledPluginFromId(id: string): PgPlugin | null {
-		if (!Manager.getInstance().obsidianPluginsObject) {
+		if (!get(installedPlugins)) {
 			return null;
 		}
-		if (!Manager.getInstance().pluginsManifests?.[id]) {
+		if (!get(pluginsManifests)?.[id]) {
 			return null;
 		}
 
 		return new PgPlugin(
-			Manager.getInstance().pluginsManifests[id].id,
-			Manager.getInstance().pluginsManifests[id].name
+			get(pluginsManifests)[id].id,
+			get(pluginsManifests)[id].name
 		);
 	}
 
 	public static getAllAvailablePlugins(): PgPlugin[] {
-		const manifests = Manager.getInstance().pluginsManifests;
+		const manifests = get(pluginsManifests);
 
 		const plugins: PgPlugin[] = [];
 
@@ -136,9 +138,9 @@ export default class PluginManager {
 
 	public static checkPluginEnabled(plugin: PgPlugin): boolean {
 		return (
-			// obsidianPluginsObject.getPlugin(id) would be the preferred method, however it does not work since,
+			// .getPlugin(id) would be the preferred method, however it does not work since,
 			// for some reason it won't recognize the admonition plugin as active if it was loaded through obsidian
-			Manager.getInstance().obsidianPluginsObject.enabledPlugins.has(
+			get(installedPlugins).enabledPlugins.has(
 				plugin.id
 			) || PluginManager.checkPluginEnabledFromPluginGroups(plugin)
 		);
@@ -149,10 +151,10 @@ export default class PluginManager {
 	}
 
 	private static enablePlugin(plugin: PgPlugin): Promise<boolean> {
-		return Manager.getInstance().obsidianPluginsObject.enablePlugin(plugin.id);
+		return get(installedPlugins).enablePlugin(plugin.id);
 	}
 
 	private static disablePlugin(plugin: PgPlugin) {
-		return Manager.getInstance().obsidianPluginsObject.disablePlugin(plugin.id);
+		return get(installedPlugins).disablePlugin(plugin.id);
 	}
 }

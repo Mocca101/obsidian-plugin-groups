@@ -1,8 +1,7 @@
 import type { Command } from "obsidian";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import { groupFromId } from "../Utils/Utilities";
-import Manager from "./Manager";
-import { pluginInstance } from "@/stores/main-store";
+import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
 export default class CommandManager {
@@ -60,8 +59,8 @@ export default class CommandManager {
 	}
 
 	shouldShowCommand(group: PluginGroup): boolean {
-		if (!Manager.getInstance().groupsMap.has(group.id)) return false;
-		if (!Manager.getInstance().generateCommands) return false;
+		if (!get(settingsStore).groupsMap.has(group.id)) return false;
+		if (!get(settingsStore).generateCommands) return false;
 		if (!group.groupActive()) {
 			return false;
 		}

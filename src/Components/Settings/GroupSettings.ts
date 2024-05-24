@@ -4,7 +4,7 @@ import Manager from "../../Managers/Manager";
 import { generateGroupID, makeCollapsible } from "../../Utils/Utilities";
 import HtmlComponent from "../BaseComponents/HtmlComponent";
 import GroupEditModal from "../Modals/GroupEditModal";
-import { pluginInstance } from "@/stores/main-store";
+import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
 export interface GroupSettingOptions {
@@ -78,7 +78,7 @@ export default class GroupSettings extends HtmlComponent<GroupSettingOptions> {
 	}
 
 	GenerateGroupList(groupParent: HTMLElement) {
-		Manager.getInstance().groupsMap.forEach((group) => {
+		get(settingsStore).groupsMap.forEach((group) => {
 			const groupSetting = new Setting(groupParent)
 				.setName(group.name)
 				.addButton((btn) => {
