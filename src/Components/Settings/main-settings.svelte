@@ -1,7 +1,8 @@
 <script lang="ts">
-	import DeviceSettings from "./device-settings.svelte";
-	import GeneralSettings from "./general-settings.svelte";
-	import SettingsGroup from "./settings-group.svelte";
+	import AdvancedSettings from "@/Components/Settings/advanced-settings.svelte";
+	import DeviceSettings from "@/Components/Settings/device-settings.svelte";
+	import GeneralSettings from "@/Components/Settings/general-settings.svelte";
+	import SettingsGroup from "@/Components/Settings/settings-group.svelte";
 
 </script>
 <h1>Plugin Groups</h1>
@@ -10,4 +11,7 @@
 </SettingsGroup>
 <SettingsGroup title="Device Settings">
 	<DeviceSettings />
+</SettingsGroup>
+<SettingsGroup title="Advanced Settings">
+	<AdvancedSettings />
 </SettingsGroup>
