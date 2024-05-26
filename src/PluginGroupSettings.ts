@@ -1,4 +1,3 @@
-import AdvancedSettings from "@/Components/Settings/AdvancedSettings";
 import GroupSettings from "@/Components/Settings/GroupSettings";
 import PluginSettings from "@/Components/Settings/PluginsSettings";
 import PluginManager from "@/Managers/PluginManager";
@@ -27,8 +26,6 @@ export default class PluginGroupSettings extends PluginSettingTab {
 		});
 
 		new PluginSettings(containerEl, { collapsible: true });
-
-		new AdvancedSettings(containerEl, { collapsible: true });
 	}
 
 }
