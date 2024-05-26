@@ -1,5 +1,4 @@
 import { Notice } from "obsidian";
-import Manager from "../Managers/Manager";
 import PluginManager from "../Managers/PluginManager";
 import type { PgComponent } from "../Utils/Types";
 import {

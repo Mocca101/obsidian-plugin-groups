@@ -1,7 +1,5 @@
 import { setIcon } from "obsidian";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
-import Manager from "../Managers/Manager";
-import { DEVICE_NAME_KEY } from "./Constants";
 import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 

@@ -1,6 +1,5 @@
 import { Setting, type TextComponent } from "obsidian";
 import { PluginGroup } from "../../DataStructures/PluginGroup";
-import Manager from "../../Managers/Manager";
 import { generateGroupID, makeCollapsible } from "../../Utils/Utilities";
 import HtmlComponent from "../BaseComponents/HtmlComponent";
 import GroupEditModal from "../Modals/GroupEditModal";

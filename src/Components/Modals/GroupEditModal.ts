@@ -4,7 +4,6 @@ import GroupEditGeneralTab from "../../GroupEditModal/GroupEditGeneralTab";
 import GroupEditGroupsTab from "../../GroupEditModal/GroupEditGroupsTab";
 import GroupEditPluginsTab from "../../GroupEditModal/GroupEditPluginsTab";
 import CommandManager from "../../Managers/CommandManager";
-import Manager from "../../Managers/Manager";
 import { generateGroupID } from "../../Utils/Utilities";
 import ConfirmationPopupModal from "../BaseComponents/ConfirmationPopupModal";
 import TabGroupComponent from "../BaseComponents/TabGroupComponent";
@@ -171,7 +170,7 @@ export default class GroupEditModal extends Modal {
 		this.close();
 	}
 
-	async deleteGroup() {		
+	async deleteGroup() {
 		settingsStore.update((s) => {
 			s.groupsMap.delete(this.groupToEdit.id);
 			return s;

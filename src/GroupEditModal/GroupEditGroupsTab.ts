@@ -1,6 +1,5 @@
 import { Setting } from "obsidian";
-import type { PluginGroup } from "../DataStructures/PluginGroup";
-import Manager from "../Managers/Manager";
+import type { PluginGroup } from "@/DataStructures/PluginGroup";
 import { settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 

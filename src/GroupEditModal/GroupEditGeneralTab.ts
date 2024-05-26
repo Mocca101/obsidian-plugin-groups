@@ -1,7 +1,6 @@
 import { Setting } from "obsidian";
 import DeviceSelectionModal from "../Components/DeviceSelectionModal";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
-import Manager from "../Managers/Manager";
 import { disableStartupTimeout } from "../Utils/Constants";
 import { settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";

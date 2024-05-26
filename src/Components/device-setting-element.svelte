@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Manager from "@/Managers/Manager";
-	import { ButtonComponent, Setting } from "obsidian";
+	import { type ButtonComponent, Setting } from "obsidian";
 	import { onMount } from "svelte";
 	import ConfirmationPopupModal from "./BaseComponents/ConfirmationPopupModal";
 	import { currentDeviceStore, pluginInstance, settingsStore } from "@/stores/main-store";

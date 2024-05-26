@@ -4,7 +4,7 @@
 	import { Setting } from "obsidian";
 	import { onMount } from "svelte";
 	import { get } from "svelte/store";
-	
+
 	let content: HTMLDivElement;
 
 	onMount(() => {
@@ -16,10 +16,9 @@
 				tgl.setValue(get(settingsStore).generateCommands ?? false);
 				tgl.onChange(async (value) => {
 					$settingsStore.generateCommands = value;
-					await Manager.getInstance().saveSettings();
 				});
 			});
-		
+
 		new Setting(content)
 			.setName("Notice upon un-/loading groups")
 			.setDesc("Show a notice in the statusbar when groups are loaded or unloaded")
@@ -41,7 +40,6 @@
 							$settingsStore.showNoticeOnGroupLoad = "none";
 							break;
 					}
-					await Manager.getInstance().saveSettings();
 				});
 			});
 
@@ -63,7 +61,6 @@
 						get(settingsStore).showStatusbarIcon = "None";
 						break;
 				}
-				await Manager.getInstance().saveSettings();
 				Manager.getInstance().updateStatusbarItem();
 			});
 		});

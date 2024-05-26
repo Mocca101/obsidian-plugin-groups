@@ -15,37 +15,6 @@ export default class Manager {
 		return Manager.instance;
 	}
 
-	async init(): Promise<Manager> {
-		await this.loadSettings();
-		return this;
-	}
-
-	async loadSettings() {
-		const savedSettings: PersistentSettings = await get(pluginInstance).loadData();
-
-		if (!savedSettings) {
-			return;
-		}
-
-		settingsStore.update((s) => {
-			for (const key in s) {
-				if (key in savedSettings) {
-					// @ts-ignore
-					s[key] = savedSettings[key];
-				}
-			}
-
-			if(!savedSettings.groups || !Array.isArray(savedSettings.groups)) return s;
-
-			s.groupsMap = new Map<string, PluginGroup>();
-			for (const g of savedSettings.groups) {
-				s.groupsMap.set(g.id, new PluginGroup(g));
-			}
-
-			return s;
-		});
-	}
-
 	/***
 	 * Returns a map of each plugin that is in 1 or more groups, and its connected groups.
 	 * Format: PluginID -> Set of connected groupsId's
