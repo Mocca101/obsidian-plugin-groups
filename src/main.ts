@@ -8,6 +8,7 @@ import { disableStartupTimeout } from "@/Utils/Constants";
 import { settingsStore, setupStores } from "@/stores/main-store";
 import { get } from "svelte/store";
 import { loadSettings } from "@/Utils/load-settings";
+import { devLog } from "@/Utils/Utilities";
 
 export default class PgMain extends Plugin {
 	async onload() {
@@ -35,6 +36,7 @@ export default class PgMain extends Plugin {
 		if (!get(settingsStore).groupsMap) {
 			this.displayTimeNotice(times);
 
+			devLog("No groups found, exiting early");
 			return; // Exit early if there are no groups yet, no need to load the rest.
 		}
 
@@ -43,21 +45,17 @@ export default class PgMain extends Plugin {
 				CommandManager.getInstance().AddGroupCommands(group.id);
 			}
 
-			if (get(settingsStore).devLogs) {
-				this.logTime("Generated Commands for Groups in", times);
-			}
+			this.logTime("Generated Commands for Groups in", times);
 		}
 
 		// TODO: Improve hacky solution if possible
 		if (window.performance.now() < disableStartupTimeout) {
-			for (const group of Object.values(get(settingsStore).groupsMap)) {
+			for (const group of get(settingsStore).groupsMap.values()) {
 				if (!group.loadAtStartup) continue;
 				group.startup();
 			}
 
-			if (get(settingsStore).devLogs) {
-				this.logTime("Dispatching Groups for delayed start in", times);
-			}
+			this.logTime("Dispatching Groups for delayed start in", times);
 		}
 
 		this.displayTimeNotice(times);
