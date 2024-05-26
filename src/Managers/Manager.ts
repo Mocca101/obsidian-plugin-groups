@@ -1,6 +1,5 @@
 import GroupSettingsMenu from "@/Components/Modals/GroupSettingsMenu";
-import { PluginGroup } from "@/DataStructures/PluginGroup";
-import type { PersistentSettings  } from "@/Utils/Types";
+import type { PluginGroup } from "@/DataStructures/PluginGroup";
 import { pluginInstance, settingsStore } from "@/stores/main-store";
 import { setIcon } from "obsidian";
 import { get } from "svelte/store";
