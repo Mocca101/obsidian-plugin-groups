@@ -10,6 +10,15 @@
 	let deviceAddBtn: ButtonComponent;
 	let newDevNameText: TextComponent;
 
+	const onDeviceNameChange = (val: string) => {
+		if (!deviceAddBtn) return;
+
+		if (val.trim().length > 0) deviceAddBtn.setDisabled(false);
+		else deviceAddBtn.setDisabled(true);
+	};
+
+	$: onDeviceNameChange(newDeviceName);
+
 	onMount(() => {
 		if (!content) return;
 
@@ -20,11 +29,6 @@
 			.setValue(newDeviceName)
 			.onChange((value) => {
 				newDeviceName = value;
-				if (deviceAddBtn) {
-					value.replace(" ", "").length > 0
-						? deviceAddBtn.buttonEl.removeClass("btn-disabled")
-						: deviceAddBtn.buttonEl.addClass("btn-disabled");
-				}
 			})
 			.setPlaceholder("Device Name").inputEl.onkeydown = async (e) => {
 			if (e.key === "Enter") {
@@ -38,8 +42,8 @@
 					.setIcon("plus")
 					.onClick(async () => {
 						await CreateNewDevice();
-					})
-					.buttonEl.addClass("btn-disabled");
+					});
+					deviceAddBtn.setDisabled(true);
 			});
 	});
 
