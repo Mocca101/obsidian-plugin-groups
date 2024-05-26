@@ -10,11 +10,6 @@
 	let deviceAddBtn: ButtonComponent;
 	let newDevNameText: TextComponent;
 
-	settingsStore.subscribe((value) => {
-		console.log(value);
-	});
-
-
 	onMount(() => {
 		if (!content) return;
 
