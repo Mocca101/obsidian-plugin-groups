@@ -30,11 +30,12 @@
 			.onChange((value) => {
 				newDeviceName = value;
 			})
-			.setPlaceholder("Device Name").inputEl.onkeydown = async (e) => {
-			if (e.key === "Enter") {
-				await CreateNewDevice();
-			}
-		};
+			.setPlaceholder("Device Name")
+			.inputEl.onkeydown = async (e) => {
+				if (e.key === "Enter") {
+					await CreateNewDevice();
+				}
+			};
 
 		deviceNameSetting.addButton((btn) => {
 				deviceAddBtn = btn;
