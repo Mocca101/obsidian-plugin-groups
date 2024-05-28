@@ -3,7 +3,6 @@
 	import { settingsStore } from "@/stores/main-store";
 	import { Setting } from "obsidian";
 	import { onMount } from "svelte";
-	import { get } from "svelte/store";
 
 	let content: HTMLDivElement;
 
@@ -13,7 +12,7 @@
 		new Setting(content)
 			.setName("Generate Commands for Groups")
 			.addToggle((tgl) => {
-				tgl.setValue(get(settingsStore).generateCommands ?? false);
+				tgl.setValue($settingsStore.generateCommands ?? false);
 				tgl.onChange(async (value) => {
 					$settingsStore.generateCommands = value;
 				});
@@ -48,17 +47,17 @@
 				.addOption("None", "None")
 				.addOption("Icon", "Icon")
 				.addOption("Text", "Text");
-			drp.setValue(get(settingsStore).showStatusbarIcon ?? "None");
+			drp.setValue($settingsStore.showStatusbarIcon ?? "None");
 			drp.onChange(async (value) => {
 				switch (value) {
 					case "Icon":
-						get(settingsStore).showStatusbarIcon = "Icon";
+						$settingsStore.showStatusbarIcon = "Icon";
 						break;
 					case "Text":
-						get(settingsStore).showStatusbarIcon = "Text";
+						$settingsStore.showStatusbarIcon = "Text";
 						break;
 					default:
-						get(settingsStore).showStatusbarIcon = "None";
+						$settingsStore.showStatusbarIcon = "None";
 						break;
 				}
 				Manager.getInstance().updateStatusbarItem();
