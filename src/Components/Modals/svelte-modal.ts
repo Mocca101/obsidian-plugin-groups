@@ -1,21 +1,21 @@
-import { type App, Modal } from "obsidian";
-import type { SvelteComponent } from "svelte";
+import { pluginInstance } from "@/stores/main-store";
+import { Modal } from "obsidian";
+import type { SvelteComponent, ComponentProps } from 'svelte';
+import { get } from "svelte/store";
 
-type SvelteProps = ConstructorParameters<typeof SvelteComponent>[0];
 
-/**
- * Generic modal utility class that can be used to easily display a modal
- * using any Svelte component.
- */
-export class SvelteModal<T extends SvelteProps> extends Modal {
-    _component!: SvelteComponent<T>;
+
+export class SvelteModal<T extends SvelteComponent, P = ComponentProps<T>> extends Modal {
+	_component!: SvelteComponent<T>;
 
     constructor(
-        app: App,
-        private component: typeof SvelteComponent<T>,
-        private getProps: (modal: Modal) => T,
+			private component: { new (arg:{
+				target: HTMLElement,
+				props: P
+			}): T },
+        private props: () => P
     ) {
-        super(app);
+        super(get(pluginInstance).app);
     }
 
     onClose() {
@@ -26,7 +26,9 @@ export class SvelteModal<T extends SvelteProps> extends Modal {
         const { contentEl } = this;
         this._component = new this.component({
             target: contentEl,
-            props: this.getProps(this),
+						props: this.props()
         });
     }
+
+
 }
