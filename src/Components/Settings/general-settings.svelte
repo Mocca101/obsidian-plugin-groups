@@ -60,7 +60,6 @@
 						$settingsStore.showStatusbarIcon = "None";
 						break;
 				}
-				Manager.getInstance().updateStatusbarItem();
 			});
 		});
 	});
