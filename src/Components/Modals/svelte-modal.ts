@@ -28,6 +28,7 @@ export class SvelteModal<T extends SvelteComponent, P = ComponentProps<T>> exten
             target: contentEl,
 						props: this.props()
         });
+				this._component.$on('close-modal', () => this.close());
     }
 
 
