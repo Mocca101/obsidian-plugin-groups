@@ -1,7 +1,5 @@
-import GroupSettingsMenu from "@/Components/Modals/GroupSettingsMenu";
 import type { PluginGroup } from "@/DataStructures/PluginGroup";
-import { pluginInstance, settingsStore } from "@/stores/main-store";
-import { setIcon } from "obsidian";
+import { settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
 export default class Manager {
@@ -77,34 +75,5 @@ export default class Manager {
 		// 		this.settings.showStatusbarIcon ?? DEFAULT_SETTINGS.showStatusbarIcon,
 		// };
 		// await this.main.saveData(persistentSettings);
-	}
-
-	// Getters & Setters
-
-	private statusbarItem: HTMLElement;
-
-	public updateStatusbarItem() {
-		if (this.statusbarItem) {
-			this.statusbarItem.remove();
-		}
-		if (get(settingsStore).showStatusbarIcon === "None") {
-			return;
-		}
-
-		this.statusbarItem = get(pluginInstance).addStatusBarItem();
-		this.statusbarItem.addClasses(["pg-statusbar-icon", "mod-clickable"]);
-		this.statusbarItem.tabIndex = 0;
-
-		if (get(settingsStore).showStatusbarIcon === "Text") {
-			this.statusbarItem.textContent = "Plugins";
-		} else if (get(settingsStore).showStatusbarIcon === "Icon") {
-			setIcon(this.statusbarItem, "boxes");
-		}
-
-		const menu = new GroupSettingsMenu(this.statusbarItem, {});
-
-		this.statusbarItem.onfocus = () => {
-			menu.updatePosition();
-		};
 	}
 }

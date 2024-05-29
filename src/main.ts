@@ -1,7 +1,7 @@
 import "./styles.css";
 import { Notice, Plugin } from "obsidian";
 import CommandManager from "@/Managers/CommandManager";
-import Manager from "@/Managers/Manager";
+import StatusbarItem from "./Components/statusbar-item.svelte";
 import PluginManager from "@/Managers/PluginManager";
 import PluginGroupSettings from "@/PluginGroupSettings";
 import { disableStartupTimeout } from "@/Utils/Constants";
@@ -31,7 +31,9 @@ export default class PgMain extends Plugin {
 		this.addSettingTab(new PluginGroupSettings(this.app, this));
 		this.logTime("Creating the Settings Tab", times);
 
-		Manager.getInstance().updateStatusbarItem();
+		new StatusbarItem({
+			target: this.addStatusBarItem()
+		})
 
 		if (!get(settingsStore).groupsMap) {
 			this.displayTimeNotice(times);
