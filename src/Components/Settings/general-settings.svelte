@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Manager from "@/Managers/Manager";
 	import { settingsStore } from "@/stores/main-store";
 	import { Setting } from "obsidian";
 	import { onMount } from "svelte";
