@@ -3,6 +3,9 @@
 	import { onMount } from "svelte";
 	import ConfirmationPopupModal from "./BaseComponents/ConfirmationPopupModal";
 	import { currentDeviceStore, pluginInstance, settingsStore } from "@/stores/main-store";
+	import ObsidianSettingItem from "./BaseComponents/obsidian-setting-item.svelte";
+	import { LucideTrash2 } from "lucide-svelte";
+	import ObsButton from "./BaseComponents/obs-button.svelte";
 
 	let content: HTMLDivElement;
 
@@ -12,61 +15,27 @@
 	let delteButton: ButtonComponent;
 	let setCurrentButton: ButtonComponent;
 
-	function updateDevice() {
-		if(!deviceSetting) return;
+	$: isCurrentDevice = $currentDeviceStore === device;
 
-		if(!setCurrentButton) {
-			deviceSetting.addButton((btn) => {
-				setCurrentButton = btn;
-				setCurrentButton.setButtonText("Set as Current");
-				setCurrentButton.onClick(() => {
-						$currentDeviceStore = device;
-					});
-			});
-		}
+	$: deletionText = isCurrentDevice ? "This is the currently active device, are you sure?" : `You are about to delete: ${device}`;
 
-		if(!delteButton) {
-			deviceSetting
-				.addButton((btn) => {
-				delteButton = btn;
-				delteButton.setIcon("trash");
-			});
-		}
+	$: deletionFuntion = isCurrentDevice ? DeleteCurrentDevice : deleteDevice;
 
-
-		if($currentDeviceStore === device) {
-			deviceSetting.setDesc("Current Device");
-			setCurrentButton.buttonEl.hide();
-
-			delteButton.onClick(() => new ConfirmationPopupModal(
-					$pluginInstance.app,
-					"This is the currently active device, are you sure?",
-					void 0,
-					"Delete",
-					() => {
-						ResetCurrentDevice();
-					}
-				).open()
-			);
-			return;
-		}
-
-		deviceSetting.setDesc("");
-		setCurrentButton.buttonEl.show();
-
-		delteButton.onClick(() => new ConfirmationPopupModal(
-				$pluginInstance.app,
-				`You are about to delete: ${device}`,
-				void 0,
-				"Delete",
-				async () => {
-					$settingsStore.devices = $settingsStore.devices.filter((d) => d !== device);
-				}
-			).open()
-		);
+	const deleteDevice = () => {
+		$settingsStore.devices = $settingsStore.devices.filter((d) => d !== device);
 	}
 
-	function ResetCurrentDevice() {
+	const createDeletionModal = () => new ConfirmationPopupModal(
+			$pluginInstance.app,
+			deletionText,
+			void 0,
+			"Delete",
+			() => {
+				deletionFuntion();
+			}
+		).open();
+
+	function DeleteCurrentDevice() {
 		const currentDevice: string | null = $currentDeviceStore;
 
 		if (!currentDevice) return;
@@ -74,15 +43,10 @@
 		$currentDeviceStore = null;
 	}
 
-	onMount(() => {
-		if(!content) return;
-		deviceSetting = new Setting(content).setName(device);
-		updateDevice();
-	});
-
-	currentDeviceStore.subscribe(() => {
-		updateDevice();
-	});
-
 </script>
-<div bind:this={content} />
+<ObsidianSettingItem name={device} description={isCurrentDevice ? 'Current Device' : ''}>
+	{#if !isCurrentDevice}
+		<ObsButton title="Set as Current" onClick={() => {$currentDeviceStore = device;}} />
+	{/if}
+	<ObsButton onClick={createDeletionModal} icon={LucideTrash2} />
+</ObsidianSettingItem>
