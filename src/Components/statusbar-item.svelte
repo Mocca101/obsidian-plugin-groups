@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Popover} from "bits-ui";
-	import { fly } from "svelte/transition"
 	import GroupSettings from "./Settings/group-settings.svelte";
 	import { settingsStore } from "@/stores/main-store";
 	import { Boxes } from "lucide-svelte";
