@@ -3,9 +3,9 @@
 	import { generateGroupID } from "@/Utils/Utilities";
 	import { type ButtonComponent, Setting, type TextComponent } from "obsidian";
 	import { onMount } from "svelte";
-	import GroupEditModal from "../Modals/GroupEditModal";
-	import { pluginInstance } from "@/stores/main-store";
-	import { get } from "svelte/store";
+	import GroupEditModal from "../Modals/group-edit-modal.svelte";
+	import type { ComponentProps } from "svelte"
+	import { SvelteModal } from "../Modals/svelte-modal";
 
 	let content: HTMLElement;
 
@@ -64,12 +64,11 @@
 			id: id,
 			name: newGroupName,
 		});
-		// TODO:
-		// new GroupEditModal(
-		// 	get(pluginInstance).app,
-		// 	this,
-		// 	newGroup
-		// ).open();
+
+		new SvelteModal(GroupEditModal, () => ({
+			groupToEdit: newGroup
+		})).open();
+
 		newGroupName = "";
 		if (groupNameField) {
 			groupNameField.setValue("");

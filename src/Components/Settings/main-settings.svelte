@@ -7,10 +7,10 @@
 
 </script>
 <h1>Plugin Groups</h1>
-<SettingsGroup title="General Settings">
+<SettingsGroup title="General Settings" collapsibleOpen={false} >
 	<GeneralSettings />
 </SettingsGroup>
-<SettingsGroup title="Device Settings">
+<SettingsGroup title="Device Settings" collapsibleOpen={false} >
 	<DeviceSettings />
 </SettingsGroup>
 <SettingsGroup title="Groups">

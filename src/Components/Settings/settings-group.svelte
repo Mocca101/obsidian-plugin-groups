@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Collapsible } from "bits-ui";
 	import { ChevronDown, ChevronUp } from "lucide-svelte";
-  let collapsibleOpen = true;
+  export let collapsibleOpen = true;
 
 	export let title = "Settings";
 
