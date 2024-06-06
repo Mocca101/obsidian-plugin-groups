@@ -1,56 +1,20 @@
 <script lang="ts">
 	import { PluginGroup } from "@/DataStructures/PluginGroup";
 	import { generateGroupID } from "@/Utils/Utilities";
-	import { type ButtonComponent, Setting, type TextComponent } from "obsidian";
-	import { onMount } from "svelte";
 	import GroupEditModal from "../Modals/group-edit-modal.svelte";
-	import type { ComponentProps } from "svelte"
 	import { SvelteModal } from "../Modals/svelte-modal";
-
-	let content: HTMLElement;
-
-	let setting: Setting;
-	let addButton: ButtonComponent;
-	let groupNameField: TextComponent;
+	import ObsidianSettingItem from "../BaseComponents/obsidian-setting-item.svelte";
+	import ObsText from "../BaseComponents/obs-text.svelte";
+	import ObsButton from "../BaseComponents/obs-button.svelte";
+	import { LucidePlus } from "lucide-svelte";
 
 	let newGroupName = "";
 
-	const onNewGroupNameChange = (val: string) => {
-		if (!addButton) return;
-
-		if(val.trim().length > 0)
-			addButton.setDisabled(false);
-		else
-			addButton.setDisabled(true);
-	};
-
-	$: onNewGroupNameChange(newGroupName);
-
-	onMount(() => {
-		if(!content) return;
-		setting = new Setting(content)
-			.setName("Add Group")
-			.addText((text) => {
-				groupNameField = text;
-				groupNameField
-					.setPlaceholder("Enter group name...")
-					.setValue(newGroupName)
-					.onChange((val) => {
-						newGroupName = val;
-					})
-					.inputEl.onkeydown = async (e) => {
-						if (e.key === "Enter")
-							await addNewGroup();
-					};
-			})
-			.addButton((btn) => {
-				addButton = btn;
-				btn.setIcon("plus").onClick(() => addNewGroup());
-				addButton.setDisabled(true);
-			});
-	});
+	$: disableButton = newGroupName.trim().length === 0;
 
 	async function addNewGroup() {
+		if(newGroupName.trim().length === 0) return;
+
 		const id = generateGroupID(newGroupName);
 
 		if (!id) {
@@ -70,9 +34,6 @@
 		})).open();
 
 		newGroupName = "";
-		if (groupNameField) {
-			groupNameField.setValue("");
-		}
 	}
 
 	function editGroup(group: PluginGroup) {
@@ -85,4 +46,7 @@
 	}
 
 </script>
-<div bind:this={content} />
+<ObsidianSettingItem name="Add Group">
+	<ObsText bind:value={newGroupName} placeholder="Enter group name..." onSubmit={addNewGroup} />
+	<ObsButton  icon={LucidePlus} onClick={addNewGroup} disabled={disableButton} />
+</ObsidianSettingItem>
