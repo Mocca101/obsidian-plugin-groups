@@ -131,7 +131,7 @@
 
 <div class="flex gap-2">
 	<div class="flex-grow"/>
-	<button on:click={() => console.error('TODO')}>Delete</button>
+	<button on:click={deleteGroup}>Delete</button>
 	<button on:click={close}>Cancel</button>
 	<button on:click={saveChanges}>Save</button>
 	<button on:click={duplicate} aria-label="Duplicate this group"><Copy size="12" /><span class="sr-only">Duplicate Group</span></button>
