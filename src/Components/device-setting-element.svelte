@@ -1,19 +1,11 @@
 <script lang="ts">
-	import { type ButtonComponent, Setting } from "obsidian";
-	import { onMount } from "svelte";
 	import ConfirmationPopupModal from "./BaseComponents/ConfirmationPopupModal";
 	import { currentDeviceStore, pluginInstance, settingsStore } from "@/stores/main-store";
 	import ObsidianSettingItem from "./BaseComponents/obsidian-setting-item.svelte";
 	import { LucideTrash2 } from "lucide-svelte";
 	import ObsButton from "./BaseComponents/obs-button.svelte";
 
-	let content: HTMLDivElement;
-
 	export let device: string;
-
-	let deviceSetting: Setting;
-	let delteButton: ButtonComponent;
-	let setCurrentButton: ButtonComponent;
 
 	$: isCurrentDevice = $currentDeviceStore === device;
 
