@@ -1,12 +1,11 @@
 <script lang="ts">
-	import type {} from "svelte";
-
 	export let title: string | null = null;
 	export let icon: any | null = null;
 	export let onClick: () => void;
+	export let disabled: boolean = false;
 
 </script>
-<button on:click={onClick} >
+<button on:click={onClick} disabled={disabled} >
 	{#if title}
 		{title}
 	{:else if icon}
