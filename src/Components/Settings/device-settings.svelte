@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type ButtonComponent, Notice, Setting, TextComponent } from "obsidian";
 	import { onMount } from "svelte";
-	import DeviceSettingElement from "@/Components/device-setting-element.svelte";
+	import DeviceItem from "@/Components/device-item.svelte";
 	import { currentDeviceStore, settingsStore } from "@/stores/main-store";
 
 	let content: HTMLDivElement;
@@ -73,6 +73,6 @@
 <div>
 <div bind:this={content} />
 	{#each $settingsStore.devices as device}
-		<DeviceSettingElement device={device} />
+		<DeviceItem device={device} />
 	{/each}
 </div>
