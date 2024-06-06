@@ -7,6 +7,8 @@
 	import ObsText from "../BaseComponents/obs-text.svelte";
 	import ObsButton from "../BaseComponents/obs-button.svelte";
 	import { LucidePlus } from "lucide-svelte";
+	import { settingsStore } from "@/stores/main-store";
+	import GroupItem from "../group-item.svelte";
 
 	let newGroupName = "";
 
@@ -36,17 +38,12 @@
 		newGroupName = "";
 	}
 
-	function editGroup(group: PluginGroup) {
-		// TODO:
-		// new GroupEditModal(
-		// 	get(pluginInstance).app,
-		// 	this,
-		// 	group
-		// ).open();
-	}
-
 </script>
 <ObsidianSettingItem name="Add Group">
 	<ObsText bind:value={newGroupName} placeholder="Enter group name..." onSubmit={addNewGroup} />
 	<ObsButton  icon={LucidePlus} onClick={addNewGroup} disabled={disableButton} />
 </ObsidianSettingItem>
+{#each $settingsStore.groupsMap as [key, group] }
+	<GroupItem group={group} />
+{/each}
+
