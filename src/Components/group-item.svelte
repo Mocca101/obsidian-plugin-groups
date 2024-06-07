@@ -15,6 +15,6 @@
 	}
 
 </script>
-<ObsidianSettingItem name={group.name}>
+<ObsidianSettingItem title={group.name}>
 	<ObsButton icon={LucidePen} onClick={editGroup} tooltip="Edit" />
 </ObsidianSettingItem>

@@ -36,7 +36,7 @@
 	}
 
 </script>
-<ObsidianSettingItem name={device} description={isCurrentDevice ? 'Current Device' : ''}>
+<ObsidianSettingItem title={device} description={isCurrentDevice ? 'Current Device' : ''}>
 	{#if !isCurrentDevice}
 		<ObsButton title="Set as Current" onClick={() => {$currentDeviceStore = device;}} />
 	{/if}

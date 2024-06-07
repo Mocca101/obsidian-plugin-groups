@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { PluginGroup } from "@/DataStructures/PluginGroup";
 	import { Copy } from "lucide-svelte";
-	import { Setting } from "obsidian";
 	import { settingsStore } from "@/stores/main-store";
 	import { onMount, createEventDispatcher } from "svelte";
 	import CommandManager from "@/Managers/CommandManager";
 	import { generateGroupID } from "@/Utils/Utilities";
 	import { get } from "svelte/store";
 	import { Tabs } from "bits-ui"
-	import ObsidianSettingItem from "../BaseComponents/obsidian-setting-item.svelte";
-	import ObsToggle from "../BaseComponents/obs-toggle.svelte";
+	import GroupGeneral from "./group-modal/group-general.svelte";
 
 	export let groupToEdit: PluginGroup;
 
@@ -18,7 +16,7 @@
 	const tabs = [
 		{
 			title: "General",
-			content: "General Settings"
+			content: GroupGeneral
 		},
 		{
 			title: "Plugins",
@@ -117,15 +115,8 @@
 		{/each}
 
 	</Tabs.List>
-		<Tabs.Content value="General">
-			<div>
-				<ObsidianSettingItem
-					name="Commands"
-					description="Add Commands to enable/disable this group"
-				>
-					<ObsToggle bind:value={groupToEdit.generateCommands} />
-				</ObsidianSettingItem>
-			</div>
+		<Tabs.Content value="General" class="m-4">
+			<svelte:component this={GroupGeneral} {groupToEdit} />
 		</Tabs.Content>
 </Tabs.Root>
 

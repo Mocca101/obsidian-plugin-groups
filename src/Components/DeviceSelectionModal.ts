@@ -1,5 +1,4 @@
 import { type App, Modal, Setting } from "obsidian";
-import Manager from "../Managers/Manager";
 import { settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 

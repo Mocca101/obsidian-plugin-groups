@@ -39,7 +39,7 @@
 	}
 
 </script>
-<ObsidianSettingItem name="Add Group">
+<ObsidianSettingItem title="Add Group">
 	<ObsText bind:value={newGroupName} placeholder="Enter group name..." onSubmit={addNewGroup} />
 	<ObsButton  icon={LucidePlus} onClick={addNewGroup} disabled={disableButton} />
 </ObsidianSettingItem>
