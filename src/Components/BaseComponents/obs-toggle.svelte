@@ -9,6 +9,7 @@
 		if(!content) return;
 
 		new ToggleComponent(content)
+			.setValue(value)
 			.onChange((newVal) => {
 				value = newVal;
 			})
