@@ -30,26 +30,30 @@
 	]
 
 	let groupToEditCache: string;
-	let discardChanges = true;
 
 	onMount(() => {
 		groupToEditCache = JSON.stringify(groupToEdit);
 	});
 
 	const close = () => {
-		if (discardChanges && $settingsStore.groupsMap.has(groupToEdit.id)) {
-			groupToEdit = JSON.parse(groupToEditCache);
-		}
 		dispatch('close-modal');
 	};
 
 	const saveChanges = async () => {
-		discardChanges = false;
 		if ($settingsStore.groupsMap.has(groupToEdit.id)) {
 			await editGroup(groupToEdit);
 		} else {
 			await addGroup(groupToEdit);
 		}
+		close();
+	}
+
+	const discardChanges = async () => {
+		if (!$settingsStore.groupsMap.has(groupToEdit.id)) {
+			return;
+		}
+		groupToEdit = JSON.parse(groupToEditCache);		
+		await editGroup(groupToEdit);
 		close();
 	}
 
@@ -72,7 +76,7 @@
 
 	const duplicate= async () => {
 		const duplicateGroup = new PluginGroup(groupToEdit);
-		const groupMap = get(settingsStore).groupsMap;
+		const groupMap = $settingsStore.groupsMap;
 
 		if (!groupMap) return;
 
@@ -116,14 +120,14 @@
 
 	</Tabs.List>
 		<Tabs.Content value="General" class="m-4">
-			<svelte:component this={GroupGeneral} {groupToEdit} />
+			<svelte:component this={GroupGeneral} bind:groupToEdit={groupToEdit} />
 		</Tabs.Content>
 </Tabs.Root>
 
 <div class="flex gap-2">
 	<div class="flex-grow"/>
 	<button on:click={deleteGroup}>Delete</button>
-	<button on:click={close}>Cancel</button>
+	<button on:click={discardChanges}>Cancel</button>
 	<button on:click={saveChanges}>Save</button>
 	<button on:click={duplicate} aria-label="Duplicate this group"><Copy size="12" /><span class="sr-only">Duplicate Group</span></button>
 </div>

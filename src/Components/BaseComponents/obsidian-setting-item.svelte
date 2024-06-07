@@ -10,6 +10,9 @@
 			{title}
 		</div>
 		<div class="setting-item-description">
+			{#if description === ""}
+				<slot name="description" />
+			{/if}
 			{description}
 		</div>
 	</div>
