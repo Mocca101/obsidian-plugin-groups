@@ -8,6 +8,8 @@ import type { PgPlugin } from "./PgPlugin";
 import { currentDeviceStore, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
+export type GroupStartupBehaviour = "none" | "enable" | "disable";
+
 export class PluginGroup implements PluginGroupData {
 	id: string;
 	name: string;
@@ -16,6 +18,10 @@ export class PluginGroup implements PluginGroupData {
 	groupIds: string[];
 
 	generateCommands: boolean;
+
+	// TODO: Add to saved data
+	// TODO: BREAKING CHANGE: this would replace "loadAtStartup" and "disableOnStartup". Create a migration script for this.
+	onStartupBehaviour: GroupStartupBehaviour = "none";
 
 	loadAtStartup = false;
 	disableOnStartup = false;

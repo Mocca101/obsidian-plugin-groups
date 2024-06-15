@@ -1,31 +1,48 @@
 <script lang="ts">
-	import ObsButton from "@/Components/BaseComponents/obs-button.svelte";
   import ObsToggle from "@/Components/BaseComponents/obs-toggle.svelte";
 	import ObsidianSettingItem from "@/Components/BaseComponents/obsidian-setting-item.svelte";
-	import type { PluginGroup } from "@/DataStructures/PluginGroup";
-	import { LucideCheck, LucideCheckCircle, LucideCircle, LucideEdit3 } from "lucide-svelte";
-	import { Popover, Select } from "bits-ui";
+	import type { GroupStartupBehaviour, PluginGroup } from "@/DataStructures/PluginGroup";
+	import { LucideCheck } from "lucide-svelte";
+	import { Select } from "bits-ui";
 	import { settingsStore } from "@/stores/main-store";
 	import { scale } from "svelte/transition";
+	import { type Selected } from "bits-ui";
+	import ObsSlider from "@/Components/BaseComponents/obs-slider.svelte";
 
 	export let groupToEdit: PluginGroup;
 
-	$: devicesList = $settingsStore.devices.map((device) => {
-		return {
-			name: device,
-			selected: groupToEdit.assignedDevices?.includes(device),
-		};
-	});
+	$: selectedDevices = groupToEdit.assignedDevices?.map(device => ({
+		value: device,
+		label: device
+	}));
 
-	const toggleDevice = (device: string) => {
-		if(groupToEdit.assignedDevices?.includes(device)){
-			groupToEdit.assignedDevices = groupToEdit.assignedDevices?.filter((d) => d !== device);
-		}else{
-			groupToEdit.assignedDevices = groupToEdit.assignedDevices ? [...groupToEdit.assignedDevices, device] : [device];
+	let deviceSelectPortal: HTMLDivElement;
+
+	const updateDevices = (devices: Array<Selected<string>> | undefined) => {
+		if(!devices) {
+			groupToEdit.assignedDevices = [];
+			return;
 		}
+		groupToEdit.assignedDevices = devices.map(device => device.value);
 	}
 
-	let selectBase: HTMLDivElement;
+	const behaviourOptions: Array<Selected<GroupStartupBehaviour>> = [
+		{ value: "none", label: "None" },
+		{ value: "enable", label: "Enable" },
+		{ value: "disable", label: "Disable" }
+	];
+	let startupBehaviourPortal: HTMLDivElement;
+
+	$: selectedStartupBehaviour = behaviourOptions
+		.find(behaviour => behaviour.value === groupToEdit.onStartupBehaviour) 
+		|| { value: "none", label: "None"	} as Selected<GroupStartupBehaviour>;
+	const updateStartupBehaviour = (behaviour: Selected<GroupStartupBehaviour> | undefined) => {
+		if(!behaviour) {
+			groupToEdit.onStartupBehaviour = "none";
+			return;
+		}
+		groupToEdit.onStartupBehaviour = behaviour.value;
+	}
 
 </script>
 
@@ -44,84 +61,83 @@
 		<ObsToggle bind:value={groupToEdit.autoAdd} />
 	</ObsidianSettingItem>
 
-	<Select.Root multiple portal={selectBase}>
-		<ObsidianSettingItem
+	<ObsidianSettingItem
 		title="Devices"
 	>
 		<span slot="description">
+			Active on:
 			{#if groupToEdit.assignedDevices && groupToEdit.assignedDevices.length > 0}
-				Active on:
 					{#each groupToEdit.assignedDevices as device}
-						<span class="tag">{device}</span>
+						<span class="px-1 mr-1 border border-solid rounded">{device}</span>
 					{/each}
 			{:else}
-				Active on all devices
+				<span class="px-1 mr-1 border border-solid rounded">
+					All devices
+				</span>
 			{/if}
 		</span>
-		<Select.Trigger
-			aria-label="Select a Device"
-		>
-    	<Select.Value class="text-sm" placeholder="Select a Device" />
-		</Select.Trigger>
-	</ObsidianSettingItem>
-	<div bind:this={selectBase} />
-		<Select.Content
-			class="menu"
-			transition={scale}
-			sideOffset={8}
-		>
-			{#each devicesList as device}
-				<Select.Item
-					class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted"
-					value={device.selected}
-					label={device.name}
-				>
-					{device.name}
-					<Select.ItemIndicator class="ml-auto" asChild={false}>
-						<LucideCheck />
-					</Select.ItemIndicator>
-				</Select.Item>
-			{/each}
-		</Select.Content>
-
-	</Select.Root>
-
-	<Popover.Root>
-		<ObsidianSettingItem
-			title="Devices"
-		>
-			<span slot="description">
-				{#if groupToEdit.assignedDevices && groupToEdit.assignedDevices.length > 0}
-					Active on:
-						{#each groupToEdit.assignedDevices as device}
-							<span class="tag">{device}</span>
-						{/each}
-				{:else}
-					Active on all devices
-				{/if}
-			</span>
-			<Popover.Trigger
-				asChild
-				let:builder
+		<Select.Root multiple portal={deviceSelectPortal} selected={selectedDevices} onSelectedChange={updateDevices} >
+			<Select.Trigger>
+				Select a Device
+			</Select.Trigger>
+			<div bind:this={deviceSelectPortal} />
+			<Select.Content
+				class="menu"
+				transition={scale}
+				sideOffset={8}
 			>
-				<div use:builder.action {...builder}>
-					<ObsButton icon={LucideEdit3} tooltip="Open Device Picker" onClick={() => {}} />
-				</div>
-				</Popover.Trigger>
-		</ObsidianSettingItem>
-		<Popover.Content
-			sideOffset={12}
-			side="left"
-			class="menu"
-		>
-			<div class="m-2">
-				{#each devicesList as device}
-					<ObsidianSettingItem title={device.name}>
-						<ObsButton icon={device.selected ? LucideCheckCircle : LucideCircle} onClick={() => toggleDevice(device.name)} />
-					</ObsidianSettingItem>
+				{#each $settingsStore.devices as device}
+					<Select.Item
+						class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted"
+						value={device}
+						label={device}
+					>
+						{device}
+						<Select.ItemIndicator class="ml-auto" asChild={false}>
+							<LucideCheck size=12 />
+						</Select.ItemIndicator>
+					</Select.Item>
 				{/each}
-			</div>
-			<Popover.Arrow />
-		</Popover.Content>
-	</Popover.Root>
+			</Select.Content>
+		</Select.Root>
+	</ObsidianSettingItem>
+
+
+	<ObsidianSettingItem
+		title="Behaviour on Startup"
+	>
+		<Select.Root items={behaviourOptions} portal={startupBehaviourPortal} selected={selectedStartupBehaviour} onSelectedChange={updateStartupBehaviour} >
+			<Select.Trigger class="w-28">
+				<Select.Value placeholder="Select startup behaviour" />
+			</Select.Trigger>
+			<div bind:this={startupBehaviourPortal} />
+			<Select.Content
+				class="menu"
+				transition={scale}
+				sideOffset={8}
+			>
+				{#each behaviourOptions as behaviour}
+					<Select.Item
+						class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted"
+						value={behaviour.value}
+						label={behaviour.label}
+					>
+						{behaviour.label}
+						<Select.ItemIndicator class="ml-auto" asChild={false}>
+							<LucideCheck size=12 />
+						</Select.ItemIndicator>
+					</Select.Item>
+				{/each}
+			</Select.Content>
+		</Select.Root>
+	</ObsidianSettingItem>
+
+	{#if groupToEdit.onStartupBehaviour !== "none"}
+		<ObsidianSettingItem
+		title="Startup Delay"
+			description={`Delay this group by ${groupToEdit.delay}s`}
+		>	
+			<ObsSlider bind:value={groupToEdit.delay} tooltip={`${groupToEdit.delay}s`} />
+		</ObsidianSettingItem>	
+	{/if}
 </div>
