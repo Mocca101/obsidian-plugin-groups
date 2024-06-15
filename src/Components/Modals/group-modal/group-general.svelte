@@ -3,9 +3,10 @@
   import ObsToggle from "@/Components/BaseComponents/obs-toggle.svelte";
 	import ObsidianSettingItem from "@/Components/BaseComponents/obsidian-setting-item.svelte";
 	import type { PluginGroup } from "@/DataStructures/PluginGroup";
-	import { LucideCheckCircle, LucideCircle, LucideEdit3 } from "lucide-svelte";
-	import { Popover } from "bits-ui";
+	import { LucideCheck, LucideCheckCircle, LucideCircle, LucideEdit3 } from "lucide-svelte";
+	import { Popover, Select } from "bits-ui";
 	import { settingsStore } from "@/stores/main-store";
+	import { scale } from "svelte/transition";
 
 	export let groupToEdit: PluginGroup;
 
@@ -15,7 +16,7 @@
 			selected: groupToEdit.assignedDevices?.includes(device),
 		};
 	});
-	
+
 	const toggleDevice = (device: string) => {
 		if(groupToEdit.assignedDevices?.includes(device)){
 			groupToEdit.assignedDevices = groupToEdit.assignedDevices?.filter((d) => d !== device);
@@ -23,6 +24,8 @@
 			groupToEdit.assignedDevices = groupToEdit.assignedDevices ? [...groupToEdit.assignedDevices, device] : [device];
 		}
 	}
+
+	let selectBase: HTMLDivElement;
 
 </script>
 
@@ -40,15 +43,56 @@
 	>
 		<ObsToggle bind:value={groupToEdit.autoAdd} />
 	</ObsidianSettingItem>
-	
+
+	<Select.Root multiple portal={selectBase}>
+		<ObsidianSettingItem
+		title="Devices"
+	>
+		<span slot="description">
+			{#if groupToEdit.assignedDevices && groupToEdit.assignedDevices.length > 0}
+				Active on:
+					{#each groupToEdit.assignedDevices as device}
+						<span class="tag">{device}</span>
+					{/each}
+			{:else}
+				Active on all devices
+			{/if}
+		</span>
+		<Select.Trigger
+			aria-label="Select a Device"
+		>
+    	<Select.Value class="text-sm" placeholder="Select a Device" />
+		</Select.Trigger>
+	</ObsidianSettingItem>
+	<div bind:this={selectBase} />
+		<Select.Content
+			class="menu"
+			transition={scale}
+			sideOffset={8}
+		>
+			{#each devicesList as device}
+				<Select.Item
+					class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted"
+					value={device.selected}
+					label={device.name}
+				>
+					{device.name}
+					<Select.ItemIndicator class="ml-auto" asChild={false}>
+						<LucideCheck />
+					</Select.ItemIndicator>
+				</Select.Item>
+			{/each}
+		</Select.Content>
+
+	</Select.Root>
 
 	<Popover.Root>
-		<ObsidianSettingItem 
+		<ObsidianSettingItem
 			title="Devices"
 		>
 			<span slot="description">
 				{#if groupToEdit.assignedDevices && groupToEdit.assignedDevices.length > 0}
-					Active on: 
+					Active on:
 						{#each groupToEdit.assignedDevices as device}
 							<span class="tag">{device}</span>
 						{/each}
@@ -76,7 +120,7 @@
 						<ObsButton icon={device.selected ? LucideCheckCircle : LucideCircle} onClick={() => toggleDevice(device.name)} />
 					</ObsidianSettingItem>
 				{/each}
-			</div> 
+			</div>
 			<Popover.Arrow />
 		</Popover.Content>
 	</Popover.Root>
