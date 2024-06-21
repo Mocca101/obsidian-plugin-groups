@@ -1,15 +1,15 @@
 import GroupSettings from "@/Components/Settings/GroupSettings";
 import PluginSettings from "@/Components/Settings/PluginsSettings";
-import PluginManager from "@/Managers/PluginManager";
 import {
 	PluginSettingTab,
 } from "obsidian";
 
 import MainSettings from "@/Components/Settings/main-settings.svelte"
+import { loadNewPlugins } from "./Utils/plugin-utils";
 
 export default class PluginGroupSettings extends PluginSettingTab {
 	async display(): Promise<void> {
-		await PluginManager.loadNewPlugins();
+		await loadNewPlugins();
 
 		const { containerEl } = this;
 

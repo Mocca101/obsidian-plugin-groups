@@ -1,11 +1,6 @@
 import type { PgComponent } from "../Utils/Types";
 
-export class PgPlugin implements PgComponent {
+export interface PgPlugin extends PgComponent {
 	id: string;
 	name: string;
-
-	constructor(id: string, name: string) {
-		this.id = id;
-		this.name = name;
-	}
 }

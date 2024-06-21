@@ -2,13 +2,13 @@ import "./styles.css";
 import { Notice, Plugin } from "obsidian";
 import CommandManager from "@/Managers/CommandManager";
 import StatusbarItem from "./Components/statusbar-item.svelte";
-import PluginManager from "@/Managers/PluginManager";
 import PluginGroupSettings from "@/PluginGroupSettings";
 import { disableStartupTimeout } from "@/Utils/Constants";
 import { settingsStore, setupStores } from "@/stores/main-store";
 import { get } from "svelte/store";
 import { loadSettings } from "@/Utils/load-settings";
 import { devLog } from "@/Utils/Utilities";
+import { loadNewPlugins } from "./Utils/plugin-utils";
 
 export default class PgMain extends Plugin {
 	async onload() {
@@ -25,7 +25,7 @@ export default class PgMain extends Plugin {
 
 		this.logTime("Manager Setup", times);
 
-		await PluginManager.loadNewPlugins();
+		await loadNewPlugins();
 		this.logTime("Loading new plugins", times);
 
 		this.addSettingTab(new PluginGroupSettings(this.app, this));

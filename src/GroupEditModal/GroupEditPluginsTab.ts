@@ -10,8 +10,7 @@ import ReorderablePluginList from "../Components/ReorderablePluginList";
 import type { PgPlugin } from "../DataStructures/PgPlugin";
 import type { PluginGroup } from "../DataStructures/PluginGroup";
 import Manager from "../Managers/Manager";
-import PluginManager from "../Managers/PluginManager";
-import { settingsStore } from "@/stores/main-store";
+import { availablePlugins, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
 
 interface PluginTabOptions {
@@ -19,8 +18,7 @@ interface PluginTabOptions {
 }
 
 export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions> {
-	private readonly availablePlugins: PgPlugin[] =
-		PluginManager.getAllAvailablePlugins();
+	private readonly availablePluginsList: PgPlugin[] = get(availablePlugins)
 
 	private filteredPlugins: PgPlugin[];
 
@@ -42,7 +40,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 
 	constructor(parentElement: HTMLElement, options: PluginTabOptions) {
 		super(parentElement, options);
-		this.filteredPlugins = this.availablePlugins;
+		this.filteredPlugins = this.availablePluginsList;
 
 		this.generateComponent();
 	}
@@ -217,7 +215,7 @@ export default class GroupEditPluginsTab extends HtmlComponent<PluginTabOptions>
 
 	// Cumulative Filter function called from various points that acts depending on filter variables set at object level
 	private filterAndSortPlugins() {
-		this.filteredPlugins = this.availablePlugins;
+		this.filteredPlugins = this.availablePluginsList;
 		if (this.searchTerm && this.searchTerm !== "") {
 			this.filteredPlugins = this.filteredPlugins.filter((p) =>
 				p.name.toLowerCase().contains(this.searchTerm.toLowerCase())

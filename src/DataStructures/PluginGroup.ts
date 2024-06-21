@@ -1,12 +1,12 @@
 import { Notice } from "obsidian";
-import PluginManager from "../Managers/PluginManager";
 import type { PgComponent } from "../Utils/Types";
 import {
 	groupFromId,
 } from "../Utils/Utilities";
 import type { PgPlugin } from "./PgPlugin";
-import { currentDeviceStore, settingsStore } from "@/stores/main-store";
+import { availablePlugins, currentDeviceStore, settingsStore } from "@/stores/main-store";
 import { get } from "svelte/store";
+import { queuePluginForDisable, queuePluginForEnable } from "@/Utils/plugin-utils";
 
 export type GroupStartupBehaviour = "none" | "enable" | "disable";
 
@@ -90,9 +90,9 @@ export class PluginGroup implements PluginGroupData {
 
 		for (const plugin of this.plugins) {
 			if (get(settingsStore).doLoadSynchronously) {
-				pluginPromises.push(PluginManager.queuePluginForEnable(plugin));
+				pluginPromises.push(queuePluginForEnable(plugin));
 			} else {
-				await PluginManager.queuePluginForEnable(plugin);
+				await queuePluginForEnable(plugin);
 			}
 		}
 
@@ -117,13 +117,13 @@ export class PluginGroup implements PluginGroupData {
 			return;
 		}
 
-		this.plugins.forEach((plugin) => {
-			PluginManager.queueDisablePlugin(plugin);
-		});
+		for (const plugin of this.plugins) {
+			queuePluginForDisable(plugin);
+		}
 
-		this.groupIds.forEach((groupId) => {
+		for(const groupId of this.groupIds) {
 			groupFromId(groupId)?.disable();
-		});
+		}
 
 		if (get(settingsStore).showNoticeOnGroupLoad !== "none") {
 			const messageString: string = `Disabled ${this.name}`;
@@ -138,7 +138,7 @@ export class PluginGroup implements PluginGroupData {
 
 	getGroupListString(): string {
 		const existingPluginsInGroup =
-			PluginManager.getAllAvailablePlugins().filter((p) =>
+			get(availablePlugins).filter((p) =>
 				this.plugins.map((p) => p.id).contains(p.id)
 			);
 		let messageString = "";

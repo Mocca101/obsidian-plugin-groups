@@ -6,7 +6,7 @@
 	import { Select } from "bits-ui";
 	import { settingsStore } from "@/stores/main-store";
 	import { scale } from "svelte/transition";
-	import { type Selected } from "bits-ui";
+	import type { Selected } from "bits-ui";
 	import ObsSlider from "@/Components/BaseComponents/obs-slider.svelte";
 
 	export let groupToEdit: PluginGroup;
@@ -34,7 +34,7 @@
 	let startupBehaviourPortal: HTMLDivElement;
 
 	$: selectedStartupBehaviour = behaviourOptions
-		.find(behaviour => behaviour.value === groupToEdit.onStartupBehaviour) 
+		.find(behaviour => behaviour.value === groupToEdit.onStartupBehaviour)
 		|| { value: "none", label: "None"	} as Selected<GroupStartupBehaviour>;
 	const updateStartupBehaviour = (behaviour: Selected<GroupStartupBehaviour> | undefined) => {
 		if(!behaviour) {
@@ -136,8 +136,8 @@
 		<ObsidianSettingItem
 		title="Startup Delay"
 			description={`Delay this group by ${groupToEdit.delay}s`}
-		>	
+		>
 			<ObsSlider bind:value={groupToEdit.delay} tooltip={`${groupToEdit.delay}s`} />
-		</ObsidianSettingItem>	
+		</ObsidianSettingItem>
 	{/if}
-</div>
+	</div>

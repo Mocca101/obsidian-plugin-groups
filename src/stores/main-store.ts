@@ -3,8 +3,9 @@ import type { PersistentSettings, PluginGroupsSettings } from "@/Utils/Types";
 import { derived, get, readable, writable, type Readable, type Writable } from "svelte/store";
 import type PgMain from "@/main";
 import { loadVaultLocalStorage, saveVaultLocalStorage } from "@/Utils/Utilities";
-import { DEVICE_NAME_KEY } from "@/Utils/Constants";
-import type { Plugins } from "obsidian";
+import { DEVICE_NAME_KEY, pluginId } from "@/Utils/Constants";
+import type { PluginManifest, Plugins } from "obsidian";
+import type { PgPlugin } from "@/DataStructures/PgPlugin";
 
 const DEFAULT_SETTINGS: PluginGroupsSettings = {
 	groupsMap: new Map<string, PluginGroup>(),
@@ -17,8 +18,10 @@ const DEFAULT_SETTINGS: PluginGroupsSettings = {
 };
 
 export let pluginInstance: Readable<PgMain>;
-export let installedPlugins: Readable<Plugins>;
-export let pluginsManifests: Readable<Record<string, any>>;
+export let pluginManifests: Readable<Record<string, PluginManifest>>;
+export let obsidianPluginsInstance: Readable<Plugins>;
+export let availablePlugins: Readable<Array<PgPlugin>>;
+export let installedPluginIds: Readable<Set<string>>;
 
 export let currentDeviceStore: Writable<string | null>;
 function initCurrentDeviceStore() {
@@ -31,9 +34,29 @@ function initCurrentDeviceStore() {
 
 export function setupStores(p: PgMain) {
 	pluginInstance = readable(p);
-	installedPlugins = derived(pluginInstance, ($pluginInstance) => $pluginInstance.app.plugins);
-	pluginsManifests = derived(pluginInstance, ($pluginInstance) => $pluginInstance.app.plugins.manifests);
-	
+	obsidianPluginsInstance = derived(pluginInstance, ($pluginInstance) => $pluginInstance.app.plugins);
+
+	pluginManifests = derived(pluginInstance, ($pluginInstance) => $pluginInstance.app.plugins.manifests);
+
+	availablePlugins = derived(pluginManifests, ($pluginManifests) => {
+		return Object.values($pluginManifests).reduce(
+			(plugins, manifest) => {
+				if(manifest.id === pluginId) return plugins;
+
+				plugins.push({
+					id: manifest.id,
+					name: manifest.name,
+				});
+
+				return plugins;
+			}, [] as PgPlugin[]
+		)
+	})
+
+	installedPluginIds = derived(pluginManifests, ($pluginsManifests) => {
+		return new Set(Object.keys($pluginsManifests));
+	});
+
 	currentDeviceStore = writable(initCurrentDeviceStore());
 
 	currentDeviceStore.subscribe((device) => {

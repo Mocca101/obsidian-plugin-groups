@@ -8,9 +8,8 @@ import FilteredGroupsList from "@/Components/FilteredGroupsList";
 import type { PgPlugin } from "@/DataStructures/PgPlugin";
 import type { PluginGroup } from "@/DataStructures/PluginGroup";
 import Manager from "@/Managers/Manager";
-import PluginManager from "@/Managers/PluginManager";
 import { makeCollapsible } from "@/Utils/Utilities";
-import { settingsStore } from "@/stores/main-store";
+import { availablePlugins, settingsStore } from "@/stores/main-store";
 import { ExtraButtonComponent, Setting } from "obsidian";
 import { get } from "svelte/store";
 
@@ -105,7 +104,7 @@ export default class PluginSettings extends HtmlComponent<PluginSettingOptions> 
 	}
 
 	private getPluginsWithGroupsAsDescription(): ItemAndDescription<PgPlugin>[] {
-		return PluginManager.getAllAvailablePlugins().map((plugin) => {
+		return get(availablePlugins).map((plugin) => {
 			const groups = Manager.getInstance().getGroupsOfPlugin(plugin.id);
 
 			return {
