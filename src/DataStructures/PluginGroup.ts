@@ -216,17 +216,15 @@ export class PluginGroup implements PluginGroupData {
 	}
 
 	getAllPluginIdsControlledByGroup(): Set<string> {
-		let pluginsArr = this.plugins.map((plugin) => plugin.id);
+		const pluginsArr = this.plugins.map((plugin) => plugin.id);
 
-		this.groupIds.forEach((gid) => {
+		for(const gid of this.groupIds) {
 			const group = groupFromId(gid);
-			if (group) {
-				pluginsArr = [
-					...pluginsArr,
-					...group.getAllPluginIdsControlledByGroup(),
-				];
-			}
-		});
+			if(!group) continue;
+
+			pluginsArr.push(...group.getAllPluginIdsControlledByGroup());
+		}
+
 		return new Set<string>(pluginsArr);
 	}
 }
