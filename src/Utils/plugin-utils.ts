@@ -30,7 +30,7 @@ export const setKnownPluginIds = (ids: Set<string> | null) => {
 export const enablePlugin = (plugin: PgPlugin): Promise<boolean> => {
 	// The typings for the obsidian API are incorrect.
 	// The enablePlugin method does actually return a boolean
-	// @ts-expect-error
+	// @ts-expect-error - The return type is acutally a boolean
 	return get(obsidianPluginsInstance)?.enablePlugin(plugin.id);
 }
 
