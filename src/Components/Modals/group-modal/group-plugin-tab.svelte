@@ -7,11 +7,7 @@ import { availablePlugins, pluginsGroupMap, settingsStore } from "@/stores/main-
 import { DropdownMenu } from "bits-ui";
 import { LucideCheckCircle, LucideCircle, LucideFilter } from "lucide-svelte";
 
-
 export let groupToEdit: PluginGroup;
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-type ExtendedPgPlugin = PgPlugin & { isSelected: boolean, icon: any, groups?: string };
 
 $: includedPlugins = groupToEdit.plugins;
 $: nonIncludedPlugins = $availablePlugins.filter(p => !groupToEdit.plugins.find(gp => gp.id === p.id));
