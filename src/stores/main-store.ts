@@ -22,6 +22,7 @@ export let pluginManifests: Readable<Record<string, PluginManifest>>;
 export let obsidianPluginsInstance: Readable<Plugins>;
 export let availablePlugins: Readable<Array<PgPlugin>>;
 export let installedPluginIds: Readable<Set<string>>;
+export let pluginsGroupMap: Readable<Map<string, Set<string>>>;
 
 export let currentDeviceStore: Writable<string | null>;
 function initCurrentDeviceStore() {
@@ -56,6 +57,21 @@ export function setupStores(p: PgMain) {
 	installedPluginIds = derived(pluginManifests, ($pluginsManifests) => {
 		return new Set(Object.keys($pluginsManifests));
 	});
+
+	pluginsGroupMap = derived(settingsStore, ($settingsStore) => {
+		const pluginsMemMap = new Map<string, Set<string>>();
+
+		for (const group of $settingsStore.groupsMap.values()) {
+			for (const plugin of group.plugins) {
+				if (!pluginsMemMap.has(plugin.id)) {
+					pluginsMemMap.set(plugin.id, new Set<string>());
+				}
+				pluginsMemMap.get(plugin.id)?.add(group.id);
+			}
+		}
+		return pluginsMemMap;
+	})
+
 
 	currentDeviceStore = writable(initCurrentDeviceStore());
 

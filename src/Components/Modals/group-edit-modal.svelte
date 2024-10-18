@@ -5,9 +5,9 @@
 	import { onMount, createEventDispatcher } from "svelte";
 	import CommandManager from "@/Managers/CommandManager";
 	import { generateGroupID } from "@/Utils/Utilities";
-	import { get } from "svelte/store";
 	import { Tabs } from "bits-ui"
 	import GroupGeneral from "./group-modal/group-general.svelte";
+	import GroupPluginTab from "./group-modal/group-plugin-tab.svelte";
 
 	export let groupToEdit: PluginGroup;
 
@@ -20,11 +20,11 @@
 		},
 		{
 			title: "Plugins",
-			content: "Plugin Settings",
+			content: GroupPluginTab,
 		},
 		{
 			title: "Groups",
-			content: "Group Settings"
+			content: GroupPluginTab
 		}
 
 	]
@@ -52,7 +52,7 @@
 		if (!$settingsStore.groupsMap.has(groupToEdit.id)) {
 			return;
 		}
-		groupToEdit = JSON.parse(groupToEditCache);		
+		groupToEdit = JSON.parse(groupToEditCache);
 		await editGroup(groupToEdit);
 		close();
 	}
@@ -110,7 +110,7 @@
 		leading-[0.01em] shadow-mini-inset
 		dark:border dark:border-neutral-600/30 dark:bg-background"
 	>
-		{#each tabs as {title, content}}
+		{#each tabs as {title}}
 			<Tabs.Trigger value={title}
 				class="h-8 rounded-[7px] bg-transparent py-2 data-[state=active]:bg-white data-[state=active]:shadow-mini dark:data-[state=active]:bg-muted"
 			>
@@ -119,9 +119,11 @@
 		{/each}
 
 	</Tabs.List>
-		<Tabs.Content value="General" class="m-4">
-			<svelte:component this={GroupGeneral} bind:groupToEdit={groupToEdit} />
+	{#each tabs as {title, content}}
+		<Tabs.Content value={title} class="m-4">
+			<svelte:component this={content} bind:groupToEdit={groupToEdit} />
 		</Tabs.Content>
+	{/each}
 </Tabs.Root>
 
 <div class="flex gap-2">
