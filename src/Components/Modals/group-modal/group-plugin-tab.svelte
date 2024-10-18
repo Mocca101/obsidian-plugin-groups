@@ -29,14 +29,6 @@ const removePluginFromGroup = (plugin: PgPlugin) => {
 	groupToEdit.plugins = groupToEdit.plugins.filter(p => p.id !== plugin.id);
 }
 
-const togglePlugin = (plugin: ExtendedPgPlugin) => {
-	if(plugin.isSelected) {
-		removePluginFromGroup(plugin);
-	} else {
-		addPluginToGroup(plugin);
-	}
-}
-
 let dropdownTarget: HTMLDivElement;
 
 </script>
