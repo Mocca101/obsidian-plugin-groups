@@ -8,13 +8,12 @@ import { DropdownMenu } from "bits-ui";
 import { LucideCheckCircle, LucideCircle, LucideFilter } from "lucide-svelte";
 import MultiSelectList from "@/Components/BaseComponents/multi-select-list.svelte";
 	import SettingsGroup from "@/Components/Settings/settings-group.svelte";
+	import ObsText from "@/Components/BaseComponents/obs-text.svelte";
 
 type SelectableGroup = Pick<PluginGroup, "id" | "name">;
 type PluginWithGroups = PgPlugin & { groups: Array<PluginGroup> };
 
 export let groupToEdit: PluginGroup;
-
-let dropdownTarget: HTMLDivElement;
 
 const allGroups: Array<SelectableGroup> = Array.from($settingsStore.groupsMap.values()).map(g => ({ id: g.id, name: g.name }));
 
@@ -50,13 +49,25 @@ const removePluginFromGroup = (plugin: PgPlugin) => {
 // 				Filtering
 // ==============================
 
-const filterPlugins = (plugins: Array<PluginWithGroups>, includedGroups: Array<SelectableGroup>, excludedGroups: Array<SelectableGroup>) => {
-	if(includedGroups.length === 0 && excludedGroups.length === 0) return plugins;
+// biome-ignore lint/style/useConst: Reassigned through binding
+let pluginNameFilter = "";
+
+$: console.log({pluginNameFilter});
+
+const filterPlugins = (
+		plugins: Array<PluginWithGroups>,
+		includedGroups: Array<SelectableGroup>,
+		excludedGroups: Array<SelectableGroup>,
+		nameFilter: string,
+	) => {
+	if(includedGroups.length === 0 && excludedGroups.length === 0 && nameFilter.length === 0) return plugins;
 
 	const includedFilterIds = includedGroups.map(g => g.id);
 	const excludedFilterIds = excludedGroups.map(g => g.id);
 
 	return plugins
+		// Filter by Name
+		.filter(plugin => plugin.name.toLowerCase().includes(nameFilter.toLowerCase()))
 		// Included
 		.filter(plugin => includedFilterIds.every(id => plugin.groups.some(g => g.id === id)))
 		// Ecxluded
@@ -73,7 +84,7 @@ let excludeGroups: Array<SelectableGroup> = []; // TODO: Implement Excluded Grou
 // ==============================
 
 $: includedPlugins = groupToEdit.plugins.map(toPluginWithGroups);
-$: filteredIncludedPlugins = filterPlugins(includedPlugins, includeGroups, excludeGroups);
+$: filteredIncludedPlugins = filterPlugins(includedPlugins, includeGroups, excludeGroups, pluginNameFilter);
 
 // ==============================
 // 				Available Plugins
@@ -83,7 +94,7 @@ $: availablePlugins = $allPlugins
 		.filter(p => !groupToEdit.plugins.find(gp => gp.id === p.id))
 		.map(toPluginWithGroups);
 
-$: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, excludeGroups);
+$: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, excludeGroups, pluginNameFilter);
 
 
 
@@ -97,6 +108,10 @@ $: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, exc
 
 
 <SettingsGroup title="Filters" collapsibleOpen={false}>
+	<ObsidianSettingItem title="Search Plugin">
+		<ObsText bind:value={pluginNameFilter} placeholder="Enter Name..." />
+	</ObsidianSettingItem>
+
 	<div class="flex gap-2" >
 		<MultiSelectList
 			class="w-36"
@@ -104,7 +119,7 @@ $: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, exc
 			bind:selectedElements={includeGroups}
 			availableElements={allGroups}
 			labelKey="name"
-			noSelectionText="No Group selected"
+			noSelectionText="No group selected"
 			/>
 
 		<MultiSelectList
@@ -113,7 +128,7 @@ $: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, exc
 			bind:selectedElements={excludeGroups}
 			availableElements={allGroups}
 			labelKey="name"
-			noSelectionText="No Group selected"
+			noSelectionText="No group selected"
 			/>
 	</div>
 </SettingsGroup>
