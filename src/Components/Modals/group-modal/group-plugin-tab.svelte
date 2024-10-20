@@ -52,8 +52,6 @@ const removePluginFromGroup = (plugin: PgPlugin) => {
 // biome-ignore lint/style/useConst: Reassigned through binding
 let pluginNameFilter = "";
 
-$: console.log({pluginNameFilter});
-
 const filterPlugins = (
 		plugins: Array<PluginWithGroups>,
 		includedGroups: Array<SelectableGroup>,
@@ -77,7 +75,7 @@ const filterPlugins = (
 // biome-ignore lint/style/useConst: It is reassigned through binding
 let includeGroups: Array<SelectableGroup> = [];
 // biome-ignore lint/style/useConst: It is reassigned through binding
-let excludeGroups: Array<SelectableGroup> = []; // TODO: Implement Excluded Groups
+let excludeGroups: Array<SelectableGroup> = [];
 
 // ==============================
 // 				Included Plugins
