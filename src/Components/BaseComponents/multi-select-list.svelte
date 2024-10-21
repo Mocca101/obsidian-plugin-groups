@@ -2,7 +2,7 @@
 	import { Select } from "bits-ui";
 	import { scale } from "svelte/transition";
 	import type { Selected } from "bits-ui";
-	import { LucideCheck, LucidePlusCircle } from "lucide-svelte";
+	import { LucideCheck, LucidePlusCircle, LucideX } from "lucide-svelte";
 
 	let selectPortal: HTMLDivElement;
 
@@ -43,6 +43,10 @@
 
 	const onSelectedChange: (selected: Array<Selected<T>>|undefined) => void = updateSelection;
 
+	const removeElement = (element: T) => {
+		selectedElements = selectedElements.filter(e => e !== element);
+	}
+
 </script>
 
 <div class="{$$restProps.class || ''}">
@@ -81,10 +85,19 @@
 	<div class="flex flex-wrap gap-1">
 		{#if selElements.length > 0}
 			{#each selElements as element}
-				<div class="px-1 border border-solid rounded">{element.label}</div>
+				<button class="group p-2 border border-solid rounded-full" on:click={() => removeElement(element.value)}>
+					{element.label}
+					<LucideX
+						size=14
+						class="
+							p-0 m-0 ml-1
+							group-focus:border group-focus:border-solid group-focus:rounded-full
+							group-hover:border group-hover:border-solid group-hover:rounded-full"
+						/>
+				</button>
 			{/each}
 		{:else}
-			<div class="px-1 border border-solid rounded">
+			<div>
 				{noSelectionText}
 			</div>
 		{/if}
