@@ -8,6 +8,7 @@
 	import { scale } from "svelte/transition";
 	import type { Selected } from "bits-ui";
 	import ObsSlider from "@/Components/BaseComponents/obs-slider.svelte";
+	import MultiSelectList from "@/Components/BaseComponents/multi-select-list.svelte";
 
 	export let groupToEdit: PluginGroup;
 
@@ -61,47 +62,20 @@
 		<ObsToggle bind:value={groupToEdit.autoAdd} />
 	</ObsidianSettingItem>
 
-	<ObsidianSettingItem
-		title="Devices"
-	>
-		<span slot="description">
-			Active on:
-			{#if groupToEdit.assignedDevices && groupToEdit.assignedDevices.length > 0}
-					{#each groupToEdit.assignedDevices as device}
-						<span class="px-1 mr-1 border border-solid rounded">{device}</span>
-					{/each}
-			{:else}
-				<span class="px-1 mr-1 border border-solid rounded">
-					All devices
-				</span>
-			{/if}
-		</span>
-		<Select.Root multiple portal={deviceSelectPortal} selected={selectedDevices} onSelectedChange={updateDevices} >
-			<Select.Trigger>
-				Select a Device
-			</Select.Trigger>
-			<div bind:this={deviceSelectPortal} />
-			<Select.Content
-				class="menu"
-				transition={scale}
-				sideOffset={8}
-			>
-				{#each $settingsStore.devices as device}
-					<Select.Item
-						class="flex h-10 w-full select-none items-center rounded-button py-3 pl-5 pr-1.5 text-sm outline-none transition-all duration-75 data-[highlighted]:bg-muted"
-						value={device}
-						label={device}
-					>
-						{device}
-						<Select.ItemIndicator class="ml-auto" asChild={false}>
-							<LucideCheck size=12 />
-						</Select.ItemIndicator>
-					</Select.Item>
-				{/each}
-			</Select.Content>
-		</Select.Root>
-	</ObsidianSettingItem>
-
+	<div class="setting-item">
+		<MultiSelectList
+			title="Devices"
+			bind:selectedElements={groupToEdit.assignedDevices}
+			availableElements={$settingsStore.devices}
+			noSelectionText="All devices"
+			selectTitle="Select Device(s)"
+			class="w-full pr-[var(--size-4-2)]"
+		>
+			<span slot="preChiplist">
+				Active on:
+			</span>
+		</MultiSelectList>
+	</div>
 
 	<ObsidianSettingItem
 		title="Behaviour on Startup"

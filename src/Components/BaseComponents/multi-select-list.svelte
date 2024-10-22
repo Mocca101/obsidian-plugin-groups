@@ -6,27 +6,50 @@
 
 	let selectPortal: HTMLDivElement;
 
-	export let selectedElements: Array<T>;
+	export let selectedElements: Array<T>|undefined;
 	export let availableElements: Array<T>;
 
 	export let title: string;
-	// biome-ignore lint/style/useConst: Since it can be bound to from outside it needs to be let.
+	// biome-ignore lint/style/useConst: Can be bound to from outside
 	export let noSelectionText:string = "None";
+	// biome-ignore lint/style/useConst: Can be bound to from outside
+	export let selectTitle:string | null = null;
+
 
 	/**
 	 * The property of the element that should be displayed as label.
 	 * @requires T[labelKey] to be a string
 	 */
-	export let labelKey: keyof T;
+	// biome-ignore lint/style/useConst: Can be bound to from outside
+	export let labelKey: keyof T | undefined = undefined;
 
 	$: avElements = availableElements.map(e => {
+		if (typeof e === 'string' || e instanceof String) {
+			return {
+				label: e as string,
+				value: e
+			}
+		}
+
+		if(!labelKey) throw new Error("labelKey is required when selectedElements is not an array of strings");
+
+
 		return {
 			label: e[labelKey] as string,
 			value: e
 		}
 	});
 
-	$: selElements = selectedElements.map(e => {
+	$: selElements = (!selectedElements ? [] : selectedElements).map(e => {
+		if (typeof e === 'string' || e instanceof String) {
+			return {
+				label: e as string,
+				value: e
+			}
+		}
+
+		if(!labelKey) throw new Error("labelKey is required when selectedElements is not an array of strings");
+
 		return {
 			label: e[labelKey] as string,
 			value: e
@@ -44,6 +67,7 @@
 	const onSelectedChange: (selected: Array<Selected<T>>|undefined) => void = updateSelection;
 
 	const removeElement = (element: T) => {
+		if(!selectedElements) return;
 		selectedElements = selectedElements.filter(e => e !== element);
 	}
 
@@ -56,10 +80,18 @@
 		selected={selElements}
 		onSelectedChange={onSelectedChange}
 	>
-		{title}
-		<Select.Trigger class="mb-2">
-			<LucidePlusCircle size=12/>
-		</Select.Trigger>
+		<div class="flex justify-between">
+			<span>
+				{title}
+			</span>
+			<Select.Trigger class="mb-1">
+				{#if selectTitle}
+					{selectTitle}
+				{:else}
+					<LucidePlusCircle size=14/>
+				{/if}
+			</Select.Trigger>
+		</div>
 		<div bind:this={selectPortal} />
 		<Select.Content
 			class="menu p-4 contain-content"
@@ -82,11 +114,17 @@
 		</Select.Content>
 	</Select.Root>
 
-	<div class="flex flex-wrap gap-1">
+	<div class="flex flex-wrap gap-1 items-center">
+		<slot name="preChiplist" />
 		{#if selElements.length > 0}
 			{#each selElements as element}
-				<button class="group p-2 border border-solid rounded-full" on:click={() => removeElement(element.value)}>
-					{element.label}
+				<button class="h-fit group px-2 py-1 border border-solid rounded-full" on:click={() => removeElement(element.value)}>
+					<span>
+						{element.label}
+					</span>
+					<span class="sr-only">
+						Remove {element.label}
+					</span>
 					<LucideX
 						size=14
 						class="
@@ -97,9 +135,9 @@
 				</button>
 			{/each}
 		{:else}
-			<div>
-				{noSelectionText}
-			</div>
+		<div class="h-fit px-2 py-1 border border-solid rounded-full" style="font-size: var(--font-ui-small);">
+			{noSelectionText}
+		</div>
 		{/if}
 	</div>
 </div>
