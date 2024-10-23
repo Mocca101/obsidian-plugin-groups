@@ -4,11 +4,12 @@ import ObsidianSettingItem from "@/Components/BaseComponents/obsidian-setting-it
 import type { PgPlugin } from "@/DataStructures/PgPlugin";
 import type { PluginGroup } from "@/DataStructures/PluginGroup";
 import { availablePlugins as allPlugins, pluginsGroupMap, settingsStore } from "@/stores/main-store";
-import { DropdownMenu } from "bits-ui";
-import { LucideCheckCircle, LucideCircle, LucideFilter } from "lucide-svelte";
+
+import { LucideCheckCircle, LucideCircle } from "lucide-svelte";
 import MultiSelectList from "@/Components/BaseComponents/multi-select-list.svelte";
-	import SettingsGroup from "@/Components/Settings/settings-group.svelte";
-	import ObsText from "@/Components/BaseComponents/obs-text.svelte";
+import SettingsGroup from "@/Components/Settings/settings-group.svelte";
+import ObsText from "@/Components/BaseComponents/obs-text.svelte";
+import ChipList from "@/Components/chip-list.svelte";
 
 type SelectableGroup = Pick<PluginGroup, "id" | "name">;
 type PluginWithGroups = PgPlugin & { groups: Array<PluginGroup> };
@@ -54,35 +55,31 @@ let pluginNameFilter = "";
 
 const filterPlugins = (
 		plugins: Array<PluginWithGroups>,
-		includedGroups: Array<SelectableGroup>,
-		excludedGroups: Array<SelectableGroup>,
+		filterGroups: Array<SelectableGroup>,
 		nameFilter: string,
 	) => {
-	if(includedGroups.length === 0 && excludedGroups.length === 0 && nameFilter.length === 0) return plugins;
+	if(filterGroups.length === 0 && nameFilter.length === 0) return plugins;
 
-	const includedFilterIds = includedGroups.map(g => g.id);
-	const excludedFilterIds = excludedGroups.map(g => g.id);
+	const includedFilterIds = filterGroups.map(g => g.id);
 
 	return plugins
 		// Filter by Name
 		.filter(plugin => plugin.name.toLowerCase().includes(nameFilter.toLowerCase()))
-		// Included
-		.filter(plugin => includedFilterIds.every(id => plugin.groups.some(g => g.id === id)))
-		// Ecxluded
-		.filter(plugin => !excludedFilterIds.some(id => plugin.groups.some(g => g.id === id)));
+		// Filter out Group
+		.filter(plugin => {
+			return !includedFilterIds.some(id => plugin.groups.some(g => g.id === id));
+		});
 }
 
 // biome-ignore lint/style/useConst: It is reassigned through binding
-let includeGroups: Array<SelectableGroup> = [];
-// biome-ignore lint/style/useConst: It is reassigned through binding
-let excludeGroups: Array<SelectableGroup> = [];
+let filterGroups: Array<SelectableGroup> = [];
 
 // ==============================
 // 				Included Plugins
 // ==============================
 
 $: includedPlugins = groupToEdit.plugins.map(toPluginWithGroups);
-$: filteredIncludedPlugins = filterPlugins(includedPlugins, includeGroups, excludeGroups, pluginNameFilter);
+$: filteredIncludedPlugins = filterPlugins(includedPlugins, filterGroups, pluginNameFilter);
 
 // ==============================
 // 				Available Plugins
@@ -92,17 +89,9 @@ $: availablePlugins = $allPlugins
 		.filter(p => !groupToEdit.plugins.find(gp => gp.id === p.id))
 		.map(toPluginWithGroups);
 
-$: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, excludeGroups, pluginNameFilter);
-
-
+$: filteredAvailablePlugins = filterPlugins(availablePlugins, filterGroups, pluginNameFilter);
 
 </script>
-
-<!-- Search (filter list by entered text)-->
-<!-- Select to Filter out by groups (which groups already have the plugin) -->
-	 <!-- Chip list with the selected groupfilters -->
-<!-- Select for Sort -->
-
 
 
 <SettingsGroup title="Filters" collapsibleOpen={false}>
@@ -110,25 +99,22 @@ $: filteredAvailablePlugins = filterPlugins(availablePlugins, includeGroups, exc
 		<ObsText bind:value={pluginNameFilter} placeholder="Enter Name..." />
 	</ObsidianSettingItem>
 
-	<div class="flex gap-2" >
-		<MultiSelectList
-			class="w-36"
-			title="Include:"
-			bind:selectedElements={includeGroups}
-			availableElements={allGroups}
-			labelKey="name"
-			noSelectionText="No group selected"
+	<div class="setting-item">
+		<div class="flex gap-2">
+			<MultiSelectList
+				title="Groups"
+				bind:selectedElements={filterGroups}
+				availableElements={allGroups}
+				selectTitle="Filter by Group"
+				labelKey="name"
 			/>
-
-		<MultiSelectList
-			class="w-36"
-			title="Exclude:"
-			bind:selectedElements={excludeGroups}
-			availableElements={allGroups}
-			labelKey="name"
-			noSelectionText="No group selected"
-			/>
-	</div>
+			<ChipList
+				bind:selectedElements={filterGroups}
+				labelKey="name"
+				noSelectionText="None"
+				/>
+		</div>
+		</div>
 </SettingsGroup>
 
 

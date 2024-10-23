@@ -9,34 +9,22 @@
 	import type { Selected } from "bits-ui";
 	import ObsSlider from "@/Components/BaseComponents/obs-slider.svelte";
 	import MultiSelectList from "@/Components/BaseComponents/multi-select-list.svelte";
+	import ChipList from "@/Components/chip-list.svelte";
 
 	export let groupToEdit: PluginGroup;
-
-	$: selectedDevices = groupToEdit.assignedDevices?.map(device => ({
-		value: device,
-		label: device
-	}));
-
-	let deviceSelectPortal: HTMLDivElement;
-
-	const updateDevices = (devices: Array<Selected<string>> | undefined) => {
-		if(!devices) {
-			groupToEdit.assignedDevices = [];
-			return;
-		}
-		groupToEdit.assignedDevices = devices.map(device => device.value);
-	}
 
 	const behaviourOptions: Array<Selected<GroupStartupBehaviour>> = [
 		{ value: "none", label: "None" },
 		{ value: "enable", label: "Enable" },
 		{ value: "disable", label: "Disable" }
 	];
+
 	let startupBehaviourPortal: HTMLDivElement;
 
 	$: selectedStartupBehaviour = behaviourOptions
 		.find(behaviour => behaviour.value === groupToEdit.onStartupBehaviour)
 		|| { value: "none", label: "None"	} as Selected<GroupStartupBehaviour>;
+
 	const updateStartupBehaviour = (behaviour: Selected<GroupStartupBehaviour> | undefined) => {
 		if(!behaviour) {
 			groupToEdit.onStartupBehaviour = "none";
@@ -62,20 +50,20 @@
 		<ObsToggle bind:value={groupToEdit.autoAdd} />
 	</ObsidianSettingItem>
 
-	<div class="setting-item">
+
+	<ObsidianSettingItem title="Devices">
 		<MultiSelectList
 			title="Devices"
 			bind:selectedElements={groupToEdit.assignedDevices}
 			availableElements={$settingsStore.devices}
-			noSelectionText="All devices"
 			selectTitle="Select Device(s)"
-			class="w-full pr-[var(--size-4-2)]"
-		>
-			<span slot="preChiplist">
-				Active on:
-			</span>
-		</MultiSelectList>
-	</div>
+			class="pr-[var(--size-4-2)]"
+		/>
+		<div slot="description" class="flex items-center gap-1">
+			<span>Active on: </span><ChipList bind:selectedElements={groupToEdit.assignedDevices} noSelectionText="All devices" />
+		</div>
+
+	</ObsidianSettingItem>
 
 	<ObsidianSettingItem
 		title="Behaviour on Startup"
